@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="imgs/favicon.png" type="image/png">
+    <title>Repuestos</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+    <!-- Encabezado -->
+    <header>
+        <button class="logo-btn" onclick="irInicio()">
+            <img src="imgs/bicicleta.png" alt="Logo bicicleta">
+        </button>
+        <h1>Repuestos</h1>
+        <div class="usuario">
+            <span class="nombre-usuario">Usuario</span>
+            <button class="user-btn" onclick="toggleMenu()">
+                <img src="imgs/logo_user.png" alt="Usuario">
+            </button>
+            <div id="menuUsuario" class="menu-usuario">
+                <a href="#">Cerrar sesión</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- Formulario -->
+        <section class="formulario">
+            <button class="btn-registrar">Registrar repuesto <br> Nuevo</button>
+
+            <label>Nombre de Repuesto</label>
+            <input type="text" placeholder="Escriba aquí">
+
+            <label>Descripción de repuesto</label>
+            <input type="text" placeholder="Escriba aquí">
+
+            <label>Stock mínimo</label>
+            <input type="number" placeholder="Digite un número">
+
+            <label>Marca</label>
+            <select>
+                <option value="" disabled selected>Seleccionar marca</option>
+            </select>
+
+            <label>Medida</label>
+            <select>
+                <option value="" disabled selected>Seleccionar medida</option>
+            </select>
+        </section>
+
+
+        <!-- Tabla -->
+        <section class="tabla">
+            <div class="buscador">
+                <input type="text" placeholder="Buscar...">
+                <button><img src="imgs/lupa.png" alt="Buscar"></button>
+            </div>
+
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Repuesto</th>
+                            <th>Descripción</th>
+                            <th>Stock mínimo</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>001</td>
+                            <td>Cadena</td>
+                            <td>Cadena reforzada acero</td>
+                            <td>10</td>
+                            <td><button class="btn-editar"><img src="imgs/editar.png" alt="Editar"></button></td>
+                        </tr>
+                        <tr>
+                            <td>002</td>
+                            <td>Freno</td>
+                            <td>Freno de disco hidráulico</td>
+                            <td>5</td>
+                            <td><button class="btn-editar"><img src="imgs/editar.png" alt="Editar"></button></td>
+                        </tr>
+                        <tr>
+                            <td>003</td>
+                            <td>Llanta</td>
+                            <td>Llanta 29 MTB</td>
+                            <td>8</td>
+                            <td><button class="btn-editar"><img src="imgs/editar.png" alt="Editar"></button></td>
+                        </tr>
+                        <tr>
+                            <td>004</td>
+                            <td>Pedales</td>
+                            <td>Pedales de aluminio</td>
+                            <td>12</td>
+                            <td><button class="btn-editar"><img src="imgs/editar.png" alt="Editar"></button></td>
+                        </tr>
+                        <tr>
+                            <td>005</td>
+                            <td>Asiento</td>
+                            <td>Asiento ergonómico</td>
+                            <td>7</td>
+                            <td><button class="btn-editar"><img src="imgs/editar.png" alt="Editar"></button></td>
+                        </tr>
+                        <tr>
+                            <td>006</td>
+                            <td>Manubrio</td>
+                            <td>Manubrio carbono</td>
+                            <td>4</td>
+                            <td><button class="btn-editar"><img src="imgs/editar.png" alt="Editar"></button></td>
+                        </tr>
+                        <tr>
+                            <td>007</td>
+                            <td>Horquilla</td>
+                            <td>Horquilla suspensión aire</td>
+                            <td>3</td>
+                            <td><button class="btn-editar"><img src="imgs/editar.png" alt="Editar"></button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        </div>
+
+
+        <!-- Modal -->
+        <div id="modalAcciones" class="modal">
+            <div class="modal-contenido">
+                <h2>Acciones</h2>
+                <div class="modal-botones">
+                    <button id="btnEditarModal" class="btn-accion btn-azul">Editar</button>
+                    <button id="btnEliminarModal" class="btn-accion btn-rojo">Eliminar</button>
+                </div>
+                <button id="cerrarModal" class="btn-cerrar">X</button>
+            </div>
+        </div>
+    </main>
+</body>
+
+<script src="js/script.js"></script>
+
+</html>
