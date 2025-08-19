@@ -45,7 +45,7 @@ header {
 .nombre-usuario {
     font-weight: bold;
     font-size: 16px;
-    color: #0026ff;
+    color: black;
 }
 
 .user-btn {
@@ -60,6 +60,7 @@ header {
     object-fit: contain;
 }
 
+/* Menú usuario */
 .menu-usuario {
     display: none;
     position: absolute;
@@ -85,11 +86,72 @@ header {
     display: block;
 }
 
-/* Layout */
+/* Layout principal */
 main {
-    display: flex;
     flex: 1;
-    padding: 20px;
-    gap: 40px;
-    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Grid menú */
+.grid-menu {
+    display: grid;
+    grid-template-columns: repeat(3, 200px);
+    grid-gap: 100px;
+    justify-content: center;
+    align-items: center;
+}
+
+.grid-menu a {
+    text-decoration: none;   /* quita la línea */
+    color: black;            
+    font-weight: bold;       
+}
+
+
+.item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+}
+
+.item img {
+    width: 100px;   /* Tamaño ideal */
+    height: 120px;
+    object-fit: contain;
+}
+
+.item p {
+    font-size: 16px;
+}
+
+/* --------------------- */
+/* 🔹 Responsivo */
+/* --------------------- */
+@media (max-width: 1024px) {
+    .grid-menu {
+        grid-template-columns: repeat(2, 180px); /* 2 columnas en pantallas medianas */
+        grid-gap: 40px;
+    }
+    .item img {
+        width: 65px;
+        height: 65px;
+    }
+}
+
+@media (max-width: 600px) {
+    .grid-menu {
+        grid-template-columns: 1fr; /* 1 columna en móviles */
+        grid-gap: 30px;
+    }
+    .item img {
+        width: 60px;
+        height: 60px;
+    }
+    .item p {
+        font-size: 14px;
+    }
 }
