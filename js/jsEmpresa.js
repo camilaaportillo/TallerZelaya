@@ -43,7 +43,7 @@ function cargarEmpresas() {
                 // Al dar clic en editar
                 fila.querySelector(".btn-editar").addEventListener("click", (e) => {
                     filaSeleccionada = e.target.closest("tr");
-                    idSeleccionado = e.target.closest("button").dataset.id; // ⚡ guardamos id
+                    idSeleccionado = e.target.closest("button").dataset.id;
 
                     modal.style.display = "flex";
                 });
@@ -163,7 +163,7 @@ btnEliminar.addEventListener("click", () => {
 
 
 function irInicio() {
-    alert("Volviendo a la pantalla de inicio...");
+    window.location.href = "index.html";
 }
 
 function toggleMenu() {
@@ -209,15 +209,25 @@ function renderTabla(datos) {
     tablaBody.innerHTML = "";
     datos.forEach(empresa => {
         const fila = document.createElement("tr");
-        fila.innerHTML = `
-            <td>${empresa.nombre}</td>
-            <td>${empresa.correo}</td>
-            <td>${empresa.telefono}</td>
-            <td>
-                <button class="btn-editar"><img src="imgs/editar.png" alt="Editar"></button>
-            </td>
-        `;
-        tablaBody.appendChild(fila);
+
+                fila.innerHTML = `
+                    <td>${empresa.nombre}</td>
+                    <td>${empresa.correo}</td>
+                    <td>${empresa.telefono}</td>
+                    <td>
+                        <button class="btn-editar" data-id="${empresa.id_empresa}"><img src="imgs/editar.png" alt="Editar"></button>
+                    </td>
+                `;
+
+                // Al dar clic en editar
+                fila.querySelector(".btn-editar").addEventListener("click", (e) => {
+                    filaSeleccionada = e.target.closest("tr");
+                    idSeleccionado = e.target.closest("button").dataset.id;
+
+                    modal.style.display = "flex";
+                });
+
+                tablaBody.appendChild(fila);
     });
 }
 

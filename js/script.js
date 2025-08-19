@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
 let filaSeleccionada = null;
 
     function irInicio() {
-        alert("Volviendo a la pantalla de inicio...");
+        window.location.href = "index.html";
     }
 
     function toggleMenu() {

@@ -1,7 +1,7 @@
 <?php
 include "conexion.php";
 
-$sql = "SELECT * FROM empresa";
+$sql = "SELECT * FROM `empresa` WHERE `empresa`.`estado`= 1;";
 $result = $conn->query($sql);
 
 $empresas = [];
