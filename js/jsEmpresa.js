@@ -8,18 +8,25 @@ const btnEditarModal = document.getElementById("btnEditarModal");
 const btnEliminarModal = document.getElementById("btnEliminarModal");
 const inputs = document.querySelectorAll(".formulario input, .formulario select");
 
+const formInputs = document.querySelectorAll(".formulario input");
 const tablaBody = document.querySelector(".tabla tbody");
 const btnRegistrar = document.querySelector(".btn-registrar");
+const btnEditar = document.querySelector(".btn-actualizar");
+
+const inputBuscar = document.getElementById("inputBuscar");
+const btnLimpiar = document.getElementById("btnLimpiar"); 
+let empresasData = []; // arreglo global para guardar empresas
+
 
 
 // Cargar datos al iniciar
 document.addEventListener("DOMContentLoaded", cargarEmpresas);
 
-
 function cargarEmpresas() {
     fetch("http://localhost/TallerZelaya/php/obtenerEmpresas.php")
         .then(res => res.json())
         .then(data => {
+            empresasData = data;
             tablaBody.innerHTML = ""; // Limpia tabla
             data.forEach(empresa => {
                 const fila = document.createElement("tr");
@@ -122,6 +129,8 @@ btnEditarModal.addEventListener("click", () => {
         inputs[2].value = celdas[2].innerText; // Teléfono
 
         modal.style.display = "none";
+
+        
     }
 });
 
@@ -166,3 +175,75 @@ window.onclick = function (e) {
         document.getElementById("menuUsuario").classList.remove("mostrar");
     }
 }
+
+// Hacer focus en el primer input al cargar la página
+document.addEventListener("DOMContentLoaded", () => {
+    if (formInputs.length > 0) {
+        formInputs[0].focus();
+    }
+});
+
+// Navegación con Enter
+formInputs.forEach((input, index) => {
+    input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault(); // evitar submit accidental
+
+            // Si no es el último input → pasar al siguiente
+            if (index < formInputs.length - 1) {
+                formInputs[index + 1].focus();
+            } else {
+                // Si es el último input → enfocar botón correcto
+                if (btnRegistrar.style.display !== "none") {
+                    btnRegistrar.focus();
+                } else if (btnEditar.style.display !== "none") {
+                    btnEditar.focus();
+                }
+            }
+        }
+    });
+});
+
+//Relleno de tabla al buscar
+function renderTabla(datos) {
+    tablaBody.innerHTML = "";
+    datos.forEach(empresa => {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+            <td>${empresa.nombre}</td>
+            <td>${empresa.correo}</td>
+            <td>${empresa.telefono}</td>
+            <td>
+                <button class="btn-editar"><img src="imgs/editar.png" alt="Editar"></button>
+            </td>
+        `;
+        tablaBody.appendChild(fila);
+    });
+}
+
+
+// Filtrar en tiempo real
+inputBuscar.addEventListener("input", () => {
+    const texto = inputBuscar.value.toLowerCase();
+
+    if (texto.trim() !== "") {
+        btnLimpiar.style.display = "inline"; // mostrar X
+        const filtrados = empresasData.filter(emp =>
+            emp.nombre.toLowerCase().includes(texto) ||
+            emp.correo.toLowerCase().includes(texto) ||
+            emp.telefono.toLowerCase().includes(texto)
+        );
+        renderTabla(filtrados);
+    } else {
+        btnLimpiar.style.display = "none"; // ocultar X
+        renderTabla(empresasData);
+    }
+});
+
+// Limpiar búsqueda
+btnLimpiar.addEventListener("click", () => {
+    inputBuscar.value = "";
+    btnLimpiar.style.display = "none";
+    renderTabla(empresasData);
+    inputBuscar.focus();
+});

@@ -178,10 +178,12 @@ main {
     cursor: pointer;
 }
 
+
 .buscador img {
     width: 24px;
     height: 24px;
 }
+
 
 /* Contenedor tabla */
 .tabla-contenedor {
