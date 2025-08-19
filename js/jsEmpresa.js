@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", cargarEmpresas);
 
 
 function cargarEmpresas() {
-    fetch("http://localhost/Taller%20de%20bicicletas%20Zelaya/php/obtenerEmpresas.php")
+    fetch("http://localhost/TallerZelaya/php/obtenerEmpresas.php")
         .then(res => res.json())
         .then(data => {
             tablaBody.innerHTML = ""; // Limpia tabla
@@ -56,7 +56,7 @@ btnRegistrar.addEventListener("click", () => {
 
     alert("Datos a enviar:\n" + `Nombre: ${nombre}\nCorreo: ${correo}\nTeléfono: ${telefono}`);
 
-    fetch("http://localhost/Taller%20de%20bicicletas%20Zelaya/php/ingresarEmpresa.php", {
+    fetch("http://localhost/TallerZelaya/php/ingresarEmpresa.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `nombre=${nombre}&correo=${correo}&telefono=${telefono}`
@@ -77,7 +77,7 @@ btnActualizar.addEventListener("click", () => {
     const correo = inputs[1].value;
     const telefono = inputs[2].value;
 
-    fetch("http://localhost/Taller%20de%20bicicletas%20Zelaya/php/editarEmpresa.php", {
+    fetch("http://localhost/TallerZelaya/php/editarEmpresa.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `id=${idSeleccionado}&nombre=${nombre}&correo=${correo}&telefono=${telefono}`
@@ -125,14 +125,6 @@ btnEditarModal.addEventListener("click", () => {
     }
 });
 
-// Acción Eliminar (por ahora solo quita la fila en pantalla)
-/*btnEliminarModal.addEventListener("click", () => {
-    if (filaSeleccionada) {
-        filaSeleccionada.remove();
-        modal.style.display = "none";
-    }
-});*/
-
 const btnEliminar = document.getElementById("btnEliminarModal");
 
 btnEliminar.addEventListener("click", () => {
@@ -144,7 +136,7 @@ btnEliminar.addEventListener("click", () => {
     // Confirmación antes de eliminar
     if (!confirm("¿Estás seguro de que deseas eliminar esta empresa?")) return;
 
-    fetch("http://localhost/Taller%20de%20bicicletas%20Zelaya/php/eliminarEmpresa.php", {
+    fetch("http://localhost/TallerZelaya/php/eliminarEmpresa.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `id=${idSeleccionado}`
