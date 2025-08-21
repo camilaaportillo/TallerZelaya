@@ -311,3 +311,53 @@ table tbody tr:hover {
     cursor: pointer;
     color: #555;
 }
+
+/* Modal de mensajes */
+.modal-mensaje-contenido {
+    background: white;
+    padding: 20px 30px;
+    border-radius: 15px;
+    width: 420px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
+}
+
+.modal-mensaje-icono {
+    flex-shrink: 0;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 35px;
+    font-weight: bold;
+    color: white;
+}
+
+.modal-mensaje-texto h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.modal-mensaje-texto p {
+    margin: 5px 0 0 0;
+    font-size: 16px;
+}
+
+/* Colores de los tipos */
+.icono-error {
+    background: red;
+}
+
+.icono-advertencia {
+    background: #f1c40f;
+    color: black;
+}
+
+.icono-exito {
+    background: green;
+}

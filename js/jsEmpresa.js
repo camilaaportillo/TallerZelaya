@@ -15,9 +15,13 @@ const btnEditar = document.querySelector(".btn-actualizar");
 
 const inputBuscar = document.getElementById("inputBuscar");
 const btnLimpiar = document.getElementById("btnLimpiar"); 
-let empresasData = []; // arreglo global para guardar empresas
+let empresasData = []; 
 
-
+const modalMensaje = document.getElementById("modalMensaje");
+const modalIcono = document.getElementById("modalIcono");
+const modalTitulo = document.getElementById("modalTitulo");
+const modalTexto = document.getElementById("modalTexto");
+const cerrarMensaje = document.getElementById("cerrarMensaje");
 
 // Cargar datos al iniciar
 document.addEventListener("DOMContentLoaded", cargarEmpresas);
@@ -61,8 +65,6 @@ btnRegistrar.addEventListener("click", () => {
     const correo = document.querySelectorAll(".formulario input")[1].value;
     const telefono = document.querySelectorAll(".formulario input")[2].value;
 
-    alert("Datos a enviar:\n" + `Nombre: ${nombre}\nCorreo: ${correo}\nTeléfono: ${telefono}`);
-
     fetch("http://localhost/TallerZelaya/php/ingresarEmpresa.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -70,7 +72,7 @@ btnRegistrar.addEventListener("click", () => {
     })
         .then(res => res.text())
         .then(data => {
-            alert(data);
+            showModalMensaje("exito", "Éxito", "La empresa se registró correctamente");
             cargarEmpresas(); // refrescar tabla después de insertar
             document.querySelectorAll(".formulario input").forEach(input => input.value = ""); // Limpiar inputs
         });
@@ -256,4 +258,43 @@ btnLimpiar.addEventListener("click", () => {
     btnLimpiar.style.display = "none";
     renderTabla(empresasData);
     inputBuscar.focus();
+});
+
+
+function showModalMensaje(tipo, titulo, texto) {
+    // Resetear icono
+    modalIcono.className = "modal-mensaje-icono";
+
+    if (tipo === "error") {
+        modalIcono.classList.add("icono-error");
+        modalIcono.innerHTML = "✖";
+    } else if (tipo === "advertencia") {
+        modalIcono.classList.add("icono-advertencia");
+        modalIcono.innerHTML = "⚠";
+    } else if (tipo === "exito") {
+        modalIcono.classList.add("icono-exito");
+        modalIcono.innerHTML = "✔";
+    }
+
+    modalTitulo.innerText = titulo;
+    modalTexto.innerText = texto;
+
+    modalMensaje.style.display = "flex";
+
+    // Cerrar automático en 3 segundos
+    setTimeout(() => {
+        modalMensaje.style.display = "none";
+    }, 3000);
+}
+
+// Botón de cerrar
+cerrarMensaje.addEventListener("click", () => {
+    modalMensaje.style.display = "none";
+});
+
+// Cerrar si se hace click fuera
+window.addEventListener("click", (e) => {
+    if (e.target === modalMensaje) {
+        modalMensaje.style.display = "none";
+    }
 });
