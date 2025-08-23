@@ -8,11 +8,13 @@ $telefono = $_POST['telefono'];
 $sql = "INSERT INTO empresa (nombre, correo, telefono) 
         VALUES ('$nombre', '$correo', '$telefono')";
 
-if ($conn->query($sql) === TRUE) {
-    echo "Empresa agregada correctamente.";
+$result = mysqli_query($conn, $sql);
+
+if ($result) {
+    echo json_encode(["status" => "exito", "mensaje" => "Empresa ingresada correctamente."]);
 } else {
-    echo "Error: " . $conn->error;
+    echo json_encode(["status" => "error", "mensaje" => "Error al ingresar: " . $conn->error]);
 }
 
-$conn->close();
+exit;
 ?>

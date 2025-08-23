@@ -14,8 +14,8 @@ const btnRegistrar = document.querySelector(".btn-registrar");
 const btnEditar = document.querySelector(".btn-actualizar");
 
 const inputBuscar = document.getElementById("inputBuscar");
-const btnLimpiar = document.getElementById("btnLimpiar"); 
-let empresasData = []; 
+const btnLimpiar = document.getElementById("btnLimpiar");
+let empresasData = [];
 
 const modalMensaje = document.getElementById("modalMensaje");
 const modalIcono = document.getElementById("modalIcono");
@@ -31,7 +31,7 @@ function cargarEmpresas() {
         .then(res => res.json())
         .then(data => {
             empresasData = data;
-            tablaBody.innerHTML = ""; // Limpia tabla
+            tablaBody.innerHTML = "";
             data.forEach(empresa => {
                 const fila = document.createElement("tr");
 
@@ -59,6 +59,7 @@ function cargarEmpresas() {
 }
 
 
+
 // Registrar nueva empresa
 btnRegistrar.addEventListener("click", () => {
     const nombre = document.querySelectorAll(".formulario input")[0].value;
@@ -69,15 +70,20 @@ btnRegistrar.addEventListener("click", () => {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `nombre=${nombre}&correo=${correo}&telefono=${telefono}`
-    })
-        .then(res => res.text())
+    }).then(res => res.json())
         .then(data => {
-            showModalMensaje("exito", "Éxito", "La empresa se registró correctamente");
-            cargarEmpresas(); // refrescar tabla después de insertar
-            document.querySelectorAll(".formulario input").forEach(input => input.value = ""); // Limpiar inputs
+            if (data.status === "exito") {
+                showModalMensaje("exito", "Éxito", data.mensaje);
+                cargarEmpresas(); // refrescar tabla
+                document.querySelectorAll(".formulario input").forEach(input => input.value = "");
+            } else {
+                showModalMensaje("error", "Error", data.mensaje);
+            }
+        })
+        .catch(err => {
+            showModalMensaje("error", "Error", "No se pudo insertar el registro.");
         });
 });
-
 
 const btnActualizar = document.querySelector(".btn-actualizar");
 
@@ -91,14 +97,17 @@ btnActualizar.addEventListener("click", () => {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `id=${idSeleccionado}&nombre=${nombre}&correo=${correo}&telefono=${telefono}`
     })
-        .then(res => res.text())
+        .then(res => res.json())
         .then(data => {
-            alert(data);
-            cargarEmpresas();
-            document.querySelectorAll(".formulario input").forEach(input => input.value = ""); // Limpiar inputs
-            // Reset botones
-            btnActualizar.style.display = "none";
-            btnRegistrar.style.display = "inline-block";
+            if (data.status === "exito") {
+                showModalMensaje("exito", "Éxito", data.mensaje);
+                cargarEmpresas();
+            } else {
+                showModalMensaje("error", "Error", data.mensaje);
+            }
+        })
+        .catch(err => {
+            showModalMensaje("error", "Error", "No se pudo editar el registro.");
         });
 });
 
@@ -132,7 +141,7 @@ btnEditarModal.addEventListener("click", () => {
 
         modal.style.display = "none";
 
-        
+
     }
 });
 
@@ -145,24 +154,30 @@ btnEliminar.addEventListener("click", () => {
     }
 
     // Confirmación antes de eliminar
-    if (!confirm("¿Estás seguro de que deseas eliminar esta empresa?")) return;
-
-    fetch("http://localhost/TallerZelaya/php/eliminarEmpresa.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `id=${idSeleccionado}`
-    })
-    .then(res => res.text())
-    .then(data => {
-        alert(data);
-        cargarEmpresas(); // recarga la tabla
-        modal.style.display = "none"; // cerrar modal
-        idSeleccionado = null; // limpiar selección
+    abrirModalConfirmar();
+    document.getElementById("btnConfirmarEliminar").addEventListener("click", () => {
+        cerrarModalConfirmar();
+        fetch("http://localhost/TallerZelaya/php/eliminarEmpresa.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `id=${idSeleccionado}`
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "exito") {
+                    showModalMensaje("exito", "Éxito", data.mensaje);
+                    cargarEmpresas(); // recarga la tabla
+                    modal.style.display = "none"; // cerrar modal
+                    idSeleccionado = null; // limpiar selección
+                } else {
+                    showModalMensaje("error", "Error", data.mensaje);
+                }
+            })
+            .catch(err => {
+                showModalMensaje("error", "Error", "No se pudo eliminar el registro.");
+            });
     });
 });
-
-
-
 
 function irInicio() {
     window.location.href = "index.html";
@@ -212,7 +227,7 @@ function renderTabla(datos) {
     datos.forEach(empresa => {
         const fila = document.createElement("tr");
 
-                fila.innerHTML = `
+        fila.innerHTML = `
                     <td>${empresa.nombre}</td>
                     <td>${empresa.correo}</td>
                     <td>${empresa.telefono}</td>
@@ -221,15 +236,15 @@ function renderTabla(datos) {
                     </td>
                 `;
 
-                // Al dar clic en editar
-                fila.querySelector(".btn-editar").addEventListener("click", (e) => {
-                    filaSeleccionada = e.target.closest("tr");
-                    idSeleccionado = e.target.closest("button").dataset.id;
+        // Al dar clic en editar
+        fila.querySelector(".btn-editar").addEventListener("click", (e) => {
+            filaSeleccionada = e.target.closest("tr");
+            idSeleccionado = e.target.closest("button").dataset.id;
 
-                    modal.style.display = "flex";
-                });
+            modal.style.display = "flex";
+        });
 
-                tablaBody.appendChild(fila);
+        tablaBody.appendChild(fila);
     });
 }
 
@@ -298,3 +313,13 @@ window.addEventListener("click", (e) => {
         modalMensaje.style.display = "none";
     }
 });
+
+// Función para abrir modal
+function abrirModalConfirmar() {
+  document.getElementById("modalConfirmar").style.display = "block";
+}
+
+// Función para cerrar modal
+function cerrarModalConfirmar() {
+  document.getElementById("modalConfirmar").style.display = "none";
+}
