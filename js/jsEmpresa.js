@@ -23,6 +23,52 @@ const modalTitulo = document.getElementById("modalTitulo");
 const modalTexto = document.getElementById("modalTexto");
 const cerrarMensaje = document.getElementById("cerrarMensaje");
 
+// Referencias directas a los 3 inputs
+const inputNombre = document.querySelectorAll(".formulario input")[0];
+const inputCorreo = document.querySelectorAll(".formulario input")[1];
+const inputTelefono = document.querySelectorAll(".formulario input")[2];
+
+// Correo solo minúsculas
+inputCorreo.addEventListener("input", () => {
+    inputCorreo.value = inputCorreo.value.toLowerCase();
+});
+
+// Teléfono: solo dígitos y máximo 8
+inputTelefono.setAttribute("inputmode", "numeric");
+inputTelefono.setAttribute("maxlength", "8");
+inputTelefono.addEventListener("input", () => {
+    inputTelefono.value = inputTelefono.value.replace(/\D/g, "").slice(0, 8);
+});
+
+
+function validarEmpresa() {
+    const nombre = inputNombre.value.trim();
+    const correo = inputCorreo.value.trim();
+    const telefono = inputTelefono.value.trim();
+
+    const regexCorreo = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+    const regexTelefono = /^\d{8}$/;
+
+    if (!nombre) {
+        showModalMensaje("advertencia", "Falta nombre", "El nombre no puede estar vacío.");
+        inputNombre.focus();
+        return false;
+    }
+    if (!regexCorreo.test(correo)) {
+        showModalMensaje("advertencia", "Correo inválido", "Usa solo minúsculas y formato válido (ej: usuario@dominio.com).");
+        inputCorreo.focus();
+        return false;
+    }
+    if (!regexTelefono.test(telefono)) {
+        showModalMensaje("advertencia", "Teléfono inválido", "Debe contener exactamente 8 dígitos.");
+        inputTelefono.focus();
+        return false;
+    }
+
+    return { nombre, correo, telefono };
+}
+
+
 // Cargar datos al iniciar
 document.addEventListener("DOMContentLoaded", cargarEmpresas);
 
@@ -60,30 +106,41 @@ function cargarEmpresas() {
 
 
 
-// Registrar nueva empresa
-btnRegistrar.addEventListener("click", () => {
-    const nombre = document.querySelectorAll(".formulario input")[0].value;
-    const correo = document.querySelectorAll(".formulario input")[1].value;
-    const telefono = document.querySelectorAll(".formulario input")[2].value;
+btnRegistrar.addEventListener("click", (e) => {
+    e.preventDefault(); // asegura que no ocurra ninguna acción por defecto
+
+    // Evita doble clic mientras se procesa
+    if (btnRegistrar.dataset.busy === "1") return;
+
+    const datos = validarEmpresa();
+    if (!datos) return; // <-- si falla, NO se ejecuta el fetch
+
+    btnRegistrar.dataset.busy = "1";
 
     fetch("http://localhost/TallerZelaya/php/ingresarEmpresa.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `nombre=${nombre}&correo=${correo}&telefono=${telefono}`
-    }).then(res => res.json())
+        body: new URLSearchParams(datos) // serializa seguro
+    })
+        .then(res => res.json())
         .then(data => {
             if (data.status === "exito") {
                 showModalMensaje("exito", "Éxito", data.mensaje);
-                cargarEmpresas(); // refrescar tabla
-                document.querySelectorAll(".formulario input").forEach(input => input.value = "");
+                cargarEmpresas();
+                [inputNombre, inputCorreo, inputTelefono].forEach(i => i.value = "");
+                inputNombre.focus();
             } else {
-                showModalMensaje("error", "Error", data.mensaje);
+                showModalMensaje("error", "Error", data.mensaje || "No se pudo insertar el registro.");
             }
         })
-        .catch(err => {
-            showModalMensaje("error", "Error", "No se pudo insertar el registro.");
+        .catch(() => {
+            showModalMensaje("error", "Error", "No se pudo conectar con el servidor.");
+        })
+        .finally(() => {
+            btnRegistrar.dataset.busy = "0";
         });
 });
+
 
 const btnActualizar = document.querySelector(".btn-actualizar");
 
@@ -316,10 +373,10 @@ window.addEventListener("click", (e) => {
 
 // Función para abrir modal
 function abrirModalConfirmar() {
-  document.getElementById("modalConfirmar").style.display = "block";
+    document.getElementById("modalConfirmar").style.display = "block";
 }
 
 // Función para cerrar modal
 function cerrarModalConfirmar() {
-  document.getElementById("modalConfirmar").style.display = "none";
+    document.getElementById("modalConfirmar").style.display = "none";
 }
