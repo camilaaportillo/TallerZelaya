@@ -295,9 +295,17 @@ table tbody tr:hover {
     color: white;
 }
 
+.btn-azul:hover {
+    background: #3b4fff;
+}
+
 .btn-rojo {
     background: red;
     color: white;
+}
+
+.btn-rojo:hover {
+    background: darkred;
 }
 
 .btn-cerrar {
@@ -426,6 +434,6 @@ table tbody tr:hover {
 }
 
 .btn-cancelar:hover {
-  background: #95a5a6;
+  background: #3b4fff;
 }
 
