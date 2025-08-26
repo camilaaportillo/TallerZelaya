@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="imgs/favicon.png" type="image/png">
+    <title>Empresas</title>
+    <link rel="stylesheet" href="css/proveedorStyle.css">
+</head>
+
+<body>
+
+    <!-- Encabezado -->
+    <header>
+        <button class="logo-btn" onclick="irInicio()">
+            <img src="imgs/bicicleta.png" alt="Logo bicicleta">
+        </button>
+        <h1>Proveedores</h1>
+        <div class="usuario">
+            <span class="nombre-usuario">Usuario</span>
+            <button class="user-btn" onclick="toggleMenu()">
+                <img src="imgs/logo_user.png" alt="Usuario">
+            </button>
+            <div id="menuUsuario" class="menu-usuario">
+                <a href="#">Cerrar sesión</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- Formulario -->
+        <section class="formulario">
+            <button class="btn-registrar">Agregar Proveedor</button>
+            <button class="btn-actualizar" style="display:none;">Editar Proveedor</button>
+
+            <label>Nombre del Proveedor</label>
+            <input type="text" placeholder="Escriba aquí">
+            <label>Teléfono de Empresa</label>
+            <input type="number" placeholder="Escriba aquí">
+            <label>Correo de Empresa</label>
+            <input type="email" placeholder="Escriba aquí">
+            
+        </section>
+
+        <!-- Tabla -->
+        <section class="tabla">
+
+            <div class="buscador">
+                <input type="text" id="inputBuscar" placeholder="Buscar...">
+
+                <button id="btnLimpiar" style="display:none;">❌</button>
+            </div>
+
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre Empresa</th>
+                            <th>Correo Empresa</th>
+                            <th>Telefono Empresa</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+
+        <!-- Modal de acciones -->
+        <div id="modalAcciones" class="modal">
+            <div class="modal-contenido">
+                <h2>Acciones</h2>
+                <div class="modal-botones">
+                    <button id="btnEditarModal" class="btn-accion btn-azul">Editar</button>
+                    <button id="btnEliminarModal" class="btn-accion btn-rojo">Eliminar</button>
+
+                </div>
+                <button id="cerrarModal" class="btn-cerrar">X</button>
+            </div>
+        </div>
+
+        <!-- Modal de mensajes -->
+        <div id="modalMensaje" class="modal">
+            <div class="modal-mensaje-contenido">
+                <div class="modal-mensaje-icono" id="modalIcono"></div>
+                <div class="modal-mensaje-texto">
+                    <h2 id="modalTitulo"></h2>
+                    <p id="modalTexto"></p>
+                </div>
+                <button id="cerrarMensaje" class="btn-cerrar">X</button>
+            </div>
+        </div>
+
+        <!-- Modal de Confirmación -->
+        <div id="modalConfirmar" class="modal">
+            <div class="modal-content warning">
+                <span class="close" onclick="cerrarModalConfirmar()">&times;</span>
+                <h1>⚠</h1>
+                <p>¿Seguro que deseas eliminar este registro?</p>
+                <div class="modal-actions">
+                    <button id="btnConfirmarEliminar" class="btn-confirmar">Sí, eliminar</button>
+                    <button onclick="cerrarModalConfirmar()" class="btn-cancelar">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+<script src="js/jsEmpresa.js"></script>
+
+</html>
