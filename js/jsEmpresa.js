@@ -158,7 +158,11 @@ btnActualizar.addEventListener("click", () => {
         .then(data => {
             if (data.status === "exito") {
                 showModalMensaje("exito", "Éxito", data.mensaje);
+                document.querySelector(".btn-registrar").style.display = "inline-block";
+                document.querySelector(".btn-actualizar").style.display = "none";
                 cargarEmpresas();
+                [inputNombre, inputCorreo, inputTelefono].forEach(i => i.value = "");
+                inputNombre.focus();
             } else {
                 showModalMensaje("error", "Error", data.mensaje);
             }
@@ -185,7 +189,6 @@ window.addEventListener("click", (e) => {
 btnEditarModal.addEventListener("click", () => {
 
     if (filaSeleccionada && idSeleccionado) {
-        alert("Editando empresa con ID: " + idSeleccionado);
         // Cambiar botones
         document.querySelector(".btn-registrar").style.display = "none";
         document.querySelector(".btn-actualizar").style.display = "inline-block";
@@ -226,6 +229,8 @@ btnEliminar.addEventListener("click", () => {
                     cargarEmpresas(); // recarga la tabla
                     modal.style.display = "none"; // cerrar modal
                     idSeleccionado = null; // limpiar selección
+                    [inputNombre, inputCorreo, inputTelefono].forEach(i => i.value = "");
+                    inputNombre.focus();
                 } else {
                     showModalMensaje("error", "Error", data.mensaje);
                 }

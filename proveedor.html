@@ -36,12 +36,25 @@
             <button class="btn-actualizar" style="display:none;">Editar Proveedor</button>
 
             <label>Nombre del Proveedor</label>
-            <input type="text" placeholder="Escriba aquí">
-            <label>Teléfono de Empresa</label>
-            <input type="number" placeholder="Escriba aquí">
-            <label>Correo de Empresa</label>
-            <input type="email" placeholder="Escriba aquí">
+            <input type="text" id="inputNombreProveedor" placeholder="Escriba aquí">
+
+            <label>Teléfono del Proveedor</label>
+            <input type="text" id="inputTelefonoProveedor" placeholder="Escriba aquí">
+
+            <label>Correo del Proveedor</label>
+            <input type="email" id="inputCorreoProveedor" placeholder="Escriba aquí">
             
+            
+            <label>Empresa</label>
+            <select id="selectEmpresa">
+                <option value="" disabled selected>Seleccionar empresa</option>
+            </select>
+            
+            <p style="font-size: 15px; color: rgb(0, 0, 0); margin-top: -10px; margin-bottom: 10px;">Presione "Enter" para cambiar de campo</p>
+            </select>
+
+
+
         </section>
 
         <!-- Tabla -->
@@ -57,9 +70,10 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Nombre Empresa</th>
-                            <th>Correo Empresa</th>
-                            <th>Telefono Empresa</th>
+                            <th>Nombre Proveedor</th>
+                            <th>Correo Proveedor</th>
+                            <th>Telefono Proveedor</th>
+                            <th>Empresa Proveedor</th>
                             <th>Acción</th>
                         </tr>
                     </thead>
@@ -111,6 +125,6 @@
     </main>
 </body>
 
-<script src="js/jsEmpresa.js"></script>
+<script src="js/jsProveedor.js"></script>
 
 </html>
