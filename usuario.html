@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="imgs/favicon.png" type="image/png">
+    <title>Usuarios</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+    <!-- Encabezado -->
+    <header>
+        <button class="logo-btn" onclick="irInicio()">
+            <img src="imgs/bicicleta.png" alt="Logo bicicleta">
+        </button>
+        <h1>Usuarios</h1>
+        <div class="usuario">
+            <span class="nombre-usuario">Usuario</span>
+            <button class="user-btn" onclick="toggleMenu()">
+                <img src="imgs/logo_user.png" alt="Usuario">
+            </button>
+            <div id="menuUsuario" class="menu-usuario">
+                <a href="#">Cerrar sesión</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- Formulario -->
+        <section class="formulario">
+            <button class="btn-registrar">Agregar Usuario</button>
+            <button class="btn-actualizar" style="display:none;">Editar Usuario</button>
+
+            <label>Nombre: </label>
+            <input type="text" id="nombre" placeholder="Escriba aquí">
+            <label>Correo eléctronico: </label>
+            <input type="email" id="correo" placeholder="Escriba aquí">
+            <label>Usuario: </label>
+            <input type="text" id="usuario" placeholder="Escriba aquí">
+            <label>Contraseña: </label>
+            <input type="password" id="password" placeholder="Escriba aquí">
+            <label>Rol del usuario: </label>
+            <select id="rol">
+                <option value="" disabled selected>Seleccionar Rol</option>
+                <option value="1">Administrador</option>
+                <option value="2">Empleado</option>
+            </select>
+        </section>
+
+
+        <!-- Tabla -->
+        <section class="tabla">
+            <div class="buscador">
+                <input type="text" placeholder="Buscar...">
+                <button><img src="imgs/lupa.png" alt="Buscar"></button>
+            </div>
+
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Correo </th>
+                            <th>Usuario</th>
+                            <th>Rol</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+
+        <!-- Modal -->
+        <div id="modalAcciones" class="modal">
+            <div class="modal-contenido">
+                <h2>Acciones</h2>
+                <div class="modal-botones">
+                    <button id="btnEditarModal" class="btn-accion btn-azul">Editar</button>
+                    <button id="btnEliminarModal" class="btn-accion btn-rojo">Eliminar</button>
+                </div>
+                <button id="cerrarModal" class="btn-cerrar">X</button>
+            </div>
+        </div>
+    </main>
+</body>
+
+<script src="js/usuarios.js"></script>
+
+</html>
