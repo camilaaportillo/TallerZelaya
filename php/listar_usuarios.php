@@ -2,7 +2,7 @@
 header('Content-Type: application/json');
 include "conexion.php"; 
 
-$sql = "SELECT u.nombre, u.correo, u.usuario, r.nombre_rol AS rol
+$sql = "SELECT u.id_usuario, u.nombre, u.correo, u.usuario, u.estado, r.id_rol, r.nombre_rol AS rol
         FROM usuario u
         JOIN rol r ON u.id_rol = r.id_rol
         ORDER BY u.id_usuario ASC";
