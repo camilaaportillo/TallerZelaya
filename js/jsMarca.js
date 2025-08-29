@@ -45,12 +45,12 @@ function cargarMarcas() {
         .then(res => res.json())
         .then(data => {
             marcasData = data;
-            renderTabla(data);
+            mostrarDTabla(data);
         })
         .catch(err => console.error("Error cargando marcas:", err));
 }
 
-function renderTabla(datos) {
+function mostrarDTabla(datos) {
     tablaBody.innerHTML = "";
     datos.forEach(marca => {
         const fila = document.createElement("tr");
@@ -180,17 +180,17 @@ inputBuscar.addEventListener("input", () => {
             m.nombre.toLowerCase().includes(texto) ||
             m.estado.toLowerCase().includes(texto)
         );
-        renderTabla(filtrados);
+        mostrarDTabla(filtrados);
     } else {
         btnLimpiar.style.display = "none";
-        renderTabla(marcasData);
+        mostrarDTabla(marcasData);
     }
 });
 
 btnLimpiar.addEventListener("click", () => {
     inputBuscar.value = "";
     btnLimpiar.style.display = "none";
-    renderTabla(marcasData);
+    mostrarDTabla(marcasData);
     inputBuscar.focus();
 });
 
