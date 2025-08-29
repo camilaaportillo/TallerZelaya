@@ -35,18 +35,22 @@
         <section class="formulario">
             <button class="btn-registrar">Agregar Usuario</button>
             <button class="btn-actualizar" style="display:none;">Actualizar Usuario</button>
+            <button id="btnCancelar" class="btn-cancelar" style="display:none;">Cancelar</button>
+
 
             <label>Nombre: </label>
             <input type="text" id="nombre" placeholder="Escriba aquí">
+            <span id="error-nombre" class="mensaje-error"></span>
             <label>Correo eléctronico: </label>
             <input type="email" id="correo" placeholder="Escriba aquí">
-
-            <div id="campo-usuario-contrasena" style=" display: flex; flex-direction: column; gap: 15px; ">
+            <span id="error-correo" class="mensaje-error"></span>
+            <div id="campo-usuario-contrasena">
                 <label>Usuario: </label>
                 <input type="text" id="usuario" placeholder="Escriba aquí">
+                <span id="error-usuario" class="mensaje-error"></span>
                 <label>Contraseña: </label>
                 <input type="password" id="password" placeholder="Escriba aquí">
-
+                <span id="error-password" class="mensaje-error"></span>
             </div>
             <label>Rol del usuario: </label>
             <select id="rol">
@@ -56,24 +60,31 @@
             </select>
 
             <div id="campo-estado" style="display:none;">
-                <label>Estado</label>
+                <label>Estado: </label>
                 <select name="estado" id="estado">
                     <option value="Activo">Activo</option>
                     <option value="Inactivo">Inactivo</option>
                 </select>
             </div>
             <div id="mensaje-usuario-contrasena" style="display:none; color:#555; font-size:0.9em; margin-bottom:10px;">
-                ⚠ Usuario y contraseña no se pueden modificar aquí. Cada usuario puede cambiar su contraseña desde su
+                ⚠ Usuario y Contraseña no se pueden modificar aquí. Cada usuario puede cambiar su Contraseña desde su
                 inicio de sesión.
             </div>
         </section>
 
-
         <!-- Tabla -->
+
         <section class="tabla">
             <div class="buscador">
                 <input type="text" id="inputBuscar" placeholder="Buscar...">
                 <button><img src="imgs/lupa.png" alt="Buscar"></button>
+            </div>
+            <div class="filtros">
+                <button id="btnActivos" class="btn-filtro">Usuarios Activos</button>
+                <button id="btnInactivos" class="btn-filtro">Usuarios Inactivos</button>
+            </div>
+            <div class="tabla-info">
+                <span id="estadoTabla">Mostrando usuarios Activos</span>
             </div>
 
             <div class="tabla-contenedor">
@@ -92,6 +103,7 @@
                     </tbody>
                 </table>
             </div>
+
         </section>
 
 

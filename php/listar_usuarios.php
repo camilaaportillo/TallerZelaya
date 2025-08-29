@@ -1,20 +1,38 @@
 <?php
-header('Content-Type: application/json');
-include "conexion.php"; 
+header('Content-Type: application/json; charset=UTF-8');
+include "conexion.php";
 
-$sql = "SELECT u.id_usuario, u.nombre, u.correo, u.usuario, u.estado, r.id_rol, r.nombre_rol AS rol
+$estado = isset($_GET['estado']) ? $_GET['estado'] : null;
+$filtrar = in_array($estado, ['Activo','Inactivo'], true);
+
+$sql = "SELECT 
+            u.id_usuario, 
+            u.nombre, 
+            u.correo, 
+            u.usuario, 
+            u.estado, 
+            u.id_rol, 
+            r.nombre_rol AS rol
         FROM usuario u
-        JOIN rol r ON u.id_rol = r.id_rol
-        ORDER BY u.id_usuario ASC";
+        JOIN rol r ON u.id_rol = r.id_rol";
 
-$result = $conn->query($sql);
+if ($filtrar) {
+    $sql .= " WHERE u.estado = ?";
+}
+$sql .= " ORDER BY u.id_usuario ASC";
+
+$stmt = $conn->prepare($sql);
+if ($filtrar) {
+    $stmt->bind_param("s", $estado);
+}
+$stmt->execute();
+$result = $stmt->get_result();
 
 $usuarios = [];
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $usuarios[] = $row;
-    }
+while ($row = $result->fetch_assoc()) {
+    $usuarios[] = $row;
 }
 
 echo json_encode($usuarios);
+$stmt->close();
 $conn->close();
