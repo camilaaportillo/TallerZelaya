@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="imgs/favicon.png" type="image/png">
-    <title>Empresas</title>
+    <title>Proveedores</title>
     <link rel="stylesheet" href="css/proveedorStyle.css">
 </head>
 
@@ -49,17 +49,18 @@
             <select id="selectEmpresa">
                 <option value="" disabled selected>Seleccionar empresa</option>
             </select>
-            
             <p style="font-size: 15px; color: rgb(0, 0, 0); margin-top: -10px; margin-bottom: 10px;">Presione "Enter" para cambiar de campo</p>
-            </select>
 
-
+            <button id="btn-habilitar-registro" class="btn-habilitar-registro">Habilitar registro</button>
 
         </section>
 
         <!-- Tabla -->
         <section class="tabla">
 
+            <button id="btnCancelarEdicion" class="btn-cancelar-edicion" style="display:none;">Cancelar edición</button>
+            <button id="btn-volver" class="btn-volver" style="display:none;">Volver</button>
+            
             <div class="buscador">
                 <input type="text" id="inputBuscar" placeholder="Buscar...">
 

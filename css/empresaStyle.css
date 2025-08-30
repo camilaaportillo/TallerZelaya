@@ -437,3 +437,23 @@ table tbody tr:hover {
   background: #3b4fff;
 }
 
+ .btn-habilitar-registro {
+    margin-top: auto;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 20px; 
+    cursor: pointer;
+    font-size: 14px;
+    padding: 5px 10px;
+    height: 36px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    
+}
+
+.btn-habilitar-registro:hover {
+    background-color: #218838;
+}

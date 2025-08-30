@@ -1,12 +1,12 @@
 let filaSeleccionada = null;
 let idSeleccionado = null;
 
-
 const modal = document.getElementById("modalAcciones");
 const cerrarModal = document.getElementById("cerrarModal");
 const btnEditarModal = document.getElementById("btnEditarModal");
 const btnEliminarModal = document.getElementById("btnEliminarModal");
 const inputs = document.querySelectorAll(".formulario input, .formulario select");
+const btnCancelarEdicion = document.getElementById("btnCancelarEdicion");
 
 const formInputs = document.querySelectorAll(".formulario input");
 const tablaBody = document.querySelector(".tabla tbody");
@@ -15,7 +15,7 @@ const btnEditar = document.querySelector(".btn-actualizar");
 
 const inputBuscar = document.getElementById("inputBuscar");
 const btnLimpiar = document.getElementById("btnLimpiar");
-let empresasData = [];
+let proveedoresData = [];
 
 const modalMensaje = document.getElementById("modalMensaje");
 const modalIcono = document.getElementById("modalIcono");
@@ -101,6 +101,7 @@ function cargarProveedores() {
     fetch("http://localhost/TallerZelaya/php/obtenerProveedores.php")
         .then(res => res.json())
         .then(data => {
+            proveedoresData = data;
             const tbody = document.querySelector(".tabla tbody");
             tbody.innerHTML = "";
             data.forEach(prov => {
@@ -114,7 +115,16 @@ function cargarProveedores() {
                         <button class="btn-editar" data-id="${prov.id_proveedor}"><img src="imgs/editar.png"></button>
                     </td>
                 `;
-                tbody.appendChild(fila);
+
+                // Al dar clic en editar
+                fila.querySelector(".btn-editar").addEventListener("click", (e) => {
+                    filaSeleccionada = e.target.closest("tr");
+                    idSeleccionado = e.target.closest("button").dataset.id;
+
+                    modal.style.display = "flex";
+                });
+
+                tablaBody.appendChild(fila);
             });
         })
         .catch(err => console.error("Error cargando proveedores:", err));
@@ -127,8 +137,14 @@ btnRegistrar.addEventListener("click", (e) => {
     if (btnRegistrar.dataset.busy === "1") return;
 
     const datos = validarEmpresa();
-    alert("los datos son:" + datos.nombre + datos.correo + datos.telefono + datos.empresa);
     if (!datos) return; // <-- si falla, NO se ejecuta el fetch
+
+    empresa = document.getElementById("selectEmpresa").value;
+
+    if (empresa === "0" || !empresa) {
+        showModalMensaje("advertencia", "Falta empresa", "Debe seleccionar una empresa.");
+        return;
+    }
 
     btnRegistrar.dataset.busy = "1";
 
@@ -165,19 +181,34 @@ const btnActualizar = document.querySelector(".btn-actualizar");
 
 btnActualizar.addEventListener("click", () => {
     const nombre = inputs[0].value;
-    const correo = inputs[1].value;
-    const telefono = inputs[2].value;
+    const correo = inputs[2].value;
+    const telefono = inputs[1].value;
+    const empresa = document.getElementById("selectEmpresa").value;
 
-    fetch("http://localhost/TallerZelaya/php/editarEmpresa.php", {
+
+    if (empresa === "0" || !empresa) {
+        showModalMensaje("advertencia", "Falta empresa", "Debe seleccionar una empresa.");
+        return;
+    }
+
+    fetch("http://localhost/TallerZelaya/php/editarProveedor.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `id=${idSeleccionado}&nombre=${nombre}&correo=${correo}&telefono=${telefono}`
+        body: `id=${idSeleccionado}&nombre=${nombre}&correo=${correo}&telefono=${telefono}&id_empresa=${empresa}`
     })
         .then(res => res.json())
         .then(data => {
+            modal.style.display = "none";
+            btnActualizar.style.display = "none";
+            btnRegistrar.style.display = "inline-block";
+            btnCancelarEdicion.style.display = "none";
+            [inputNombre, inputCorreo, inputTelefono].forEach(i => i.value = "");
+            document.getElementById("selectEmpresa").selectedIndex = 0;
+            inputNombre.focus();
+
             if (data.status === "exito") {
                 showModalMensaje("exito", "Éxito", data.mensaje);
-                cargarEmpresas();
+                cargarProveedores();
             } else {
                 showModalMensaje("error", "Error", data.mensaje);
             }
@@ -200,23 +231,31 @@ window.addEventListener("click", (e) => {
     }
 });
 
-// Acción Editar → Poner datos en el formulario
-btnEditarModal.addEventListener("click", () => {
 
+btnEditarModal.addEventListener("click", () => {
     if (filaSeleccionada && idSeleccionado) {
         // Cambiar botones
-        document.querySelector(".btn-registrar").style.display = "none";
-        document.querySelector(".btn-actualizar").style.display = "inline-block";
+        btnRegistrar.style.display = "none";
+        btnActualizar.style.display = "inline-block";
+        btnCancelarEdicion.style.display = "inline-block";
 
         const celdas = filaSeleccionada.querySelectorAll("td");
 
-        inputs[0].value = celdas[0].innerText; // Nombre empresa
-        inputs[1].value = celdas[1].innerText; // Correo
-        inputs[2].value = celdas[2].innerText; // Teléfono
+        inputNombre.value = celdas[0].innerText; // Nombre
+        inputCorreo.value = celdas[1].innerText; // Correo
+        inputTelefono.value = celdas[2].innerText; // Teléfono
+
+        // Establecer empresa en el select (buscando por nombre)
+        const nombreEmpresa = celdas[3].innerText;
+        const select = document.getElementById("selectEmpresa");
+        for (let option of select.options) {
+            if (option.text === nombreEmpresa) {
+                select.value = option.value;
+                break;
+            }
+        }
 
         modal.style.display = "none";
-
-
     }
 });
 
@@ -224,35 +263,12 @@ const btnEliminar = document.getElementById("btnEliminarModal");
 
 btnEliminar.addEventListener("click", () => {
     if (!idSeleccionado) {
-        showModalMensaje("advertencia", "No hay selección", "No se ha seleccionado ninguna empresa..");
-        return false;
+        showModalMensaje("advertencia", "No hay selección", "No se ha seleccionado ningún proveedor.");
+        return;
     }
-
-    // Confirmación antes de eliminar
     abrirModalConfirmar();
-    document.getElementById("btnConfirmarEliminar").addEventListener("click", () => {
-        cerrarModalConfirmar();
-        fetch("http://localhost/TallerZelaya/php/eliminarEmpresa.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `id=${idSeleccionado}`
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === "exito") {
-                    showModalMensaje("exito", "Éxito", data.mensaje);
-                    cargarEmpresas(); // recarga la tabla
-                    modal.style.display = "none"; // cerrar modal
-                    idSeleccionado = null; // limpiar selección
-                } else {
-                    showModalMensaje("error", "Error", data.mensaje);
-                }
-            })
-            .catch(err => {
-                showModalMensaje("error", "Error", "No se pudo eliminar el registro.");
-            });
-    });
 });
+
 
 function irInicio() {
     window.location.href = "index.html";
@@ -299,23 +315,23 @@ formInputs.forEach((input, index) => {
 //Relleno de tabla al buscar
 function renderTabla(datos) {
     tablaBody.innerHTML = "";
-    datos.forEach(empresa => {
+    datos.forEach(prov => {
         const fila = document.createElement("tr");
-
         fila.innerHTML = `
-                    <td>${empresa.nombre}</td>
-                    <td>${empresa.correo}</td>
-                    <td>${empresa.telefono}</td>
-                    <td>
-                        <button class="btn-editar" data-id="${empresa.id_empresa}"><img src="imgs/editar.png" alt="Editar"></button>
-                    </td>
-                `;
+            <td>${prov.nombre}</td>
+            <td>${prov.correo}</td>
+            <td>${prov.telefono}</td>
+            <td>${prov.empresa}</td>
+            <td>
+                <button class="btn-editar" data-id="${prov.id_proveedor}">
+                    <img src="imgs/editar.png" alt="Editar">
+                </button>
+            </td>
+        `;
 
-        // Al dar clic en editar
         fila.querySelector(".btn-editar").addEventListener("click", (e) => {
             filaSeleccionada = e.target.closest("tr");
             idSeleccionado = e.target.closest("button").dataset.id;
-
             modal.style.display = "flex";
         });
 
@@ -323,22 +339,20 @@ function renderTabla(datos) {
     });
 }
 
-
-// Filtrar en tiempo real
 inputBuscar.addEventListener("input", () => {
     const texto = inputBuscar.value.toLowerCase();
-
     if (texto.trim() !== "") {
-        btnLimpiar.style.display = "inline"; // mostrar X
-        const filtrados = empresasData.filter(emp =>
-            emp.nombre.toLowerCase().includes(texto) ||
-            emp.correo.toLowerCase().includes(texto) ||
-            emp.telefono.toLowerCase().includes(texto)
+        btnLimpiar.style.display = "inline";
+        const filtrados = proveedoresData.filter(p =>
+            p.nombre.toLowerCase().includes(texto) ||
+            p.correo.toLowerCase().includes(texto) ||
+            p.telefono.toLowerCase().includes(texto) ||
+            p.empresa.toLowerCase().includes(texto)
         );
         renderTabla(filtrados);
     } else {
-        btnLimpiar.style.display = "none"; // ocultar X
-        renderTabla(empresasData);
+        btnLimpiar.style.display = "none";
+        renderTabla(proveedoresData);
     }
 });
 
@@ -398,3 +412,146 @@ function abrirModalConfirmar() {
 function cerrarModalConfirmar() {
     document.getElementById("modalConfirmar").style.display = "none";
 }
+
+document.getElementById("btnConfirmarEliminar").addEventListener("click", () => {
+    cerrarModalConfirmar();
+    if (!idSeleccionado) return;
+
+    fetch("http://localhost/TallerZelaya/php/eliminarProveedor.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `id=${idSeleccionado}`
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "exito") {
+                showModalMensaje("exito", "Éxito", data.mensaje);
+                cargarProveedores(); // actualiza
+                modal.style.display = "none";
+                idSeleccionado = null;
+            } else {
+                showModalMensaje("error", "Error", data.mensaje);
+            }
+        })
+        .catch(err => {
+            showModalMensaje("error", "Error", "No se pudo eliminar el registro.");
+        });
+});
+
+
+btnCancelarEdicion.addEventListener("click", () => {
+    // Restaurar botones
+    btnRegistrar.style.display = "inline-block";
+    btnActualizar.style.display = "none";
+    btnCancelarEdicion.style.display = "none";
+
+    // Limpiar inputs
+    [inputNombre, inputCorreo, inputTelefono].forEach(i => i.value = "");
+    document.getElementById("selectEmpresa").selectedIndex = 0;
+
+    // Resetear variables
+    filaSeleccionada = null;
+    idSeleccionado = null;
+
+    inputNombre.focus();
+});
+
+
+const btnHabilitarRegistro = document.getElementById("btn-habilitar-registro");
+
+// Al dar clic en "Habilitar registro"
+btnHabilitarRegistro.addEventListener("click", () => {
+    // Ocultar formulario
+    document.querySelector(".formulario").style.display = "none";
+
+    // Cargar proveedores inactivos
+    fetch("http://localhost/TallerZelaya/php/obtenerProveedoresInactivos.php")
+        .then(res => res.json())
+        .then(data => {
+            renderTablaInactivos(data);
+        })
+        .catch(err => console.error("Error cargando inactivos:", err));
+});
+
+// Render tabla con proveedores inactivos
+function renderTablaInactivos(datos) {
+    tablaBody.innerHTML = "";
+    if (datos.length === 0) {
+        tablaBody.innerHTML = `<tr><td colspan="5">No hay proveedores inactivos</td></tr>`;
+        return;
+    }
+
+    datos.forEach(prov => {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+            <td>${prov.nombre}</td>
+            <td>${prov.correo}</td>
+            <td>${prov.telefono}</td>
+            <td>${prov.empresa}</td>
+            <td>
+                <button class="btn-habilitar" data-id="${prov.id_proveedor}">
+                    HABILITAR
+                </button>
+            </td>
+        `;
+
+        fila.querySelector(".btn-habilitar").addEventListener("click", (e) => {
+            const id = e.target.closest("button").dataset.id;
+            habilitarProveedor(id);
+        });
+
+        tablaBody.appendChild(fila);
+    });
+}
+
+// Función para habilitar proveedor
+function habilitarProveedor(id) {
+    fetch("http://localhost/TallerZelaya/php/habilitarProveedor.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `id=${id}`
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "exito") {
+                showModalMensaje("exito", "Éxito", data.mensaje);
+
+                // Recargar lista de inactivos
+                fetch("http://localhost/TallerZelaya/php/obtenerProveedoresInactivos.php")
+                    .then(res => res.json())
+                    .then(datos => renderTablaInactivos(datos));
+            } else {
+                showModalMensaje("error", "Error", data.mensaje);
+            }
+        })
+        .catch(() => {
+            showModalMensaje("error", "Error", "No se pudo habilitar el registro.");
+        });
+}
+
+const btnVolver = document.getElementById("btn-volver");
+
+btnHabilitarRegistro.addEventListener("click", () => {
+    // Ocultar formulario y mostrar botón volver
+    document.querySelector(".formulario").style.display = "none";
+    btnHabilitarRegistro.style.display = "none";
+    btnVolver.style.display = "inline-block";
+
+    // Cargar proveedores inactivos
+    fetch("http://localhost/TallerZelaya/php/obtenerProveedoresInactivos.php")
+        .then(res => res.json())
+        .then(data => {
+            renderTablaInactivos(data);
+        })
+        .catch(err => console.error("Error cargando inactivos:", err));
+});
+
+btnVolver.addEventListener("click", () => {
+    // Mostrar formulario y ocultar botón volver
+    document.querySelector(".formulario").style.display = "flex";
+    btnHabilitarRegistro.style.display = "inline-block";
+    btnVolver.style.display = "none";
+
+    // Cargar proveedores activos
+    cargarProveedores();
+});
