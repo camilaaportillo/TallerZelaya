@@ -437,3 +437,14 @@ table tbody tr:hover {
   background: #3b4fff;
 }
 
+
+   /* Estilo general del select */
+select {
+        padding: 8px 12px;
+        border-radius: 40px;  /* 🔹 bordes redondeados */
+        border: 1px solid #888;
+        font-size: 14px;
+        cursor: pointer;
+        outline: none;  /* quita el borde azul feo al seleccionar */
+}
+
