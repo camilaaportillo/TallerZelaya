@@ -45,7 +45,7 @@ header {
 .nombre-usuario {
     font-weight: bold;
     font-size: 16px;
-    color: #0026ff;
+    color: black;
 }
 
 .user-btn {
@@ -60,6 +60,7 @@ header {
     object-fit: contain;
 }
 
+/* Menú usuario */
 .menu-usuario {
     display: none;
     position: absolute;
@@ -85,225 +86,72 @@ header {
     display: block;
 }
 
-/* Layout */
+/* Layout principal */
 main {
-    display: flex;
-    flex: 1;
-    padding: 20px;
-    gap: 40px;
-    overflow: hidden;
-}
-
-/* Formulario */
-.formulario {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    width: 280px;
-}
-
-.formulario label {
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.formulario input,
-.formulario select {
-    padding: 12px;
-    font-size: 16px;
-    border: 2px solid #0026ff;
-    border-radius: 20px;
-    outline: none;
-}
-
-/* Select estilizado */
-.formulario select {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    cursor: pointer;
-}
-
-.formulario option {
-    border-radius: 10px;
-    padding: 8px;
-}
-
-/* Botón registrar */
-.btn-registrar,
-.btn-actualizar {
-    background: #0026ff;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    padding: 18px;
-    font-size: 18px;
-    cursor: pointer;
-    margin-bottom: 15px;
-    font-weight: bold;
-
-}
-
-.btn-actualizar {
-    display: none;
-}
-
-/* Tabla */
-.tabla {
     flex: 1;
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    min-height: 0;
-}
-
-.buscador {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 5px;
-    gap: 5px;
-}
-
-.buscador input {
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 20px;
-    border: 2px solid #0026ff;
-    outline: none;
-    width: 250px;
-}
-
-.buscador button {
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
-.buscador img {
-    width: 24px;
-    height: 24px;
-}
-
-/* Contenedor tabla */
-.tabla-contenedor {
-    flex: 1;
-    overflow-y: auto;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    margin: 15px 0;
-}
-
-/* Tabla */
-table {
-    width: 100%;
-    border: 2px solid #aaa;
-    border-collapse: collapse; /* cambio aquí */
-    font-size: 15px;
-    min-width: 600px;
-    table-layout: fixed; /* para que respete el ancho */
-}
-
-table th {
-    background: #e5e5e5;
-    padding: 12px;
-    font-weight: bold;
-    color: #333;
-    border: 1px solid #aaa;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-}
-
-table td {
-    padding: 10px;
-    border: 1px solid #aaa;
-    text-align: center;
-    color: #333;
-
-    /* 🔹 Hace que el texto baje de línea */
-    word-wrap: break-word;
-    white-space: normal;
-    overflow-wrap: break-word;
-}
-
-table tbody tr:hover {
-    background-color: #cfe1fd;
-}
-
-
-.nota {
-    font-size: 12px;
-    color: #0026ff;
-    text-align: right;
-}
-
-/* Modal */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
     justify-content: center;
     align-items: center;
 }
 
-.modal-contenido {
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    width: 350px;
-    text-align: center;
-    position: relative;
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+/* Grid menú */
+.grid-menu {
+    display: grid;
+    grid-template-columns: repeat(3, 200px);
+    grid-gap: 100px;
+    justify-content: center;
+    align-items: center;
 }
 
-.modal-contenido h2 {
-    margin-bottom: 20px;
+.grid-menu a {
+    text-decoration: none;   /* quita la línea */
+    color: black;            
+    font-weight: bold;       
 }
 
-.modal-botones {
-    display: flex;
-    justify-content: space-around;
-    gap: 15px;
-}
 
-.btn-accion {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 25px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.btn-azul {
-    background: #0026ff;
-    color: white;
-}
-
-.btn-rojo {
-    background: red;
-    color: white;
-}
-
-.btn-cerrar {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-    color: #555;
-}
-
-.input-usuario-contra {
+.item {
     display: flex;
     flex-direction: column;
-    gap: 15px; 
+    align-items: center;
+    text-align: center;
+    gap: 10px;
 }
 
+.item img {
+    width: 100px;   /* Tamaño ideal */
+    height: 120px;
+    object-fit: contain;
+}
+
+.item p {
+    font-size: 16px;
+}
+
+/* --------------------- */
+/* 🔹 Responsivo */
+/* --------------------- */
+@media (max-width: 1024px) {
+    .grid-menu {
+        grid-template-columns: repeat(2, 180px); /* 2 columnas en pantallas medianas */
+        grid-gap: 40px;
+    }
+    .item img {
+        width: 65px;
+        height: 65px;
+    }
+}
+
+@media (max-width: 600px) {
+    .grid-menu {
+        grid-template-columns: 1fr; /* 1 columna en móviles */
+        grid-gap: 30px;
+    }
+    .item img {
+        width: 60px;
+        height: 60px;
+    }
+    .item p {
+        font-size: 14px;
+    }
+}
