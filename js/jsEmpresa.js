@@ -7,6 +7,8 @@ const cerrarModal = document.getElementById("cerrarModal");
 const btnEditarModal = document.getElementById("btnEditarModal");
 const btnEliminarModal = document.getElementById("btnEliminarModal");
 const inputs = document.querySelectorAll(".formulario input, .formulario select");
+const btnCancelarEdicion = document.getElementById("btnCancelarEdicion");
+
 
 const formInputs = document.querySelectorAll(".formulario input");
 const tablaBody = document.querySelector(".tabla tbody");
@@ -160,6 +162,7 @@ btnActualizar.addEventListener("click", () => {
                 showModalMensaje("exito", "Éxito", data.mensaje);
                 document.querySelector(".btn-registrar").style.display = "inline-block";
                 document.querySelector(".btn-actualizar").style.display = "none";
+                btnCancelarEdicion.style.display = "none";
                 cargarEmpresas();
                 [inputNombre, inputCorreo, inputTelefono].forEach(i => i.value = "");
                 inputNombre.focus();
@@ -192,6 +195,7 @@ btnEditarModal.addEventListener("click", () => {
         // Cambiar botones
         document.querySelector(".btn-registrar").style.display = "none";
         document.querySelector(".btn-actualizar").style.display = "inline-block";
+        btnCancelarEdicion.style.display = "inline-block";
 
         const celdas = filaSeleccionada.querySelectorAll("td");
 
@@ -204,6 +208,23 @@ btnEditarModal.addEventListener("click", () => {
 
     }
 });
+
+btnCancelarEdicion.addEventListener("click", () => {
+    // Restaurar botones
+    btnRegistrar.style.display = "inline-block";
+    btnActualizar.style.display = "none";
+    btnCancelarEdicion.style.display = "none";
+
+    // Limpiar inputs
+    [inputNombre, inputCorreo, inputTelefono].forEach(i => i.value = "");
+
+    // Resetear variables
+    filaSeleccionada = null;
+    idSeleccionado = null;
+
+    inputNombre.focus();
+});
+
 
 const btnEliminar = document.getElementById("btnEliminarModal");
 
@@ -385,3 +406,88 @@ function abrirModalConfirmar() {
 function cerrarModalConfirmar() {
     document.getElementById("modalConfirmar").style.display = "none";
 }
+
+const btnHabilitarRegistro = document.getElementById("btn-habilitar-registro");
+
+// Al dar clic en "Habilitar registro"
+btnHabilitarRegistro.addEventListener("click", () => {
+    // Ocultar formulario y mostrar botón volver
+    document.querySelector(".formulario").style.display = "none";
+    btnHabilitarRegistro.style.display = "none";
+    btnVolver.style.display = "inline-block";
+
+    // Cargar proveedores inactivos
+    fetch("http://localhost/TallerZelaya/php/obtenerEmpresasInactivas.php")
+        .then(res => res.json())
+        .then(data => {
+            renderTablaInactivos(data);
+        })
+        .catch(err => console.error("Error cargando inactivos:", err));
+});
+
+// Render tabla con proveedores inactivos
+function renderTablaInactivos(datos) {
+    tablaBody.innerHTML = "";
+    if (datos.length === 0) {
+        tablaBody.innerHTML = `<tr><td colspan="5">No hay proveedores inactivos</td></tr>`;
+        return;
+    }
+
+    datos.forEach(prov => {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+            <td>${prov.nombre}</td>
+            <td>${prov.correo}</td>
+            <td>${prov.telefono}</td>
+            <td>
+                <button class="btn-habilitar" data-id="${prov.id_empresa}">
+                    HABILITAR
+                </button>
+            </td>
+        `;
+
+        fila.querySelector(".btn-habilitar").addEventListener("click", (e) => {
+            const id = e.target.closest("button").dataset.id;
+            habilitarProveedor(id);
+        });
+
+        tablaBody.appendChild(fila);
+    });
+}
+
+// Función para habilitar proveedor
+function habilitarProveedor(id) {
+    fetch("http://localhost/TallerZelaya/php/habilitarEmpresa.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `id=${id}`
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "exito") {
+                showModalMensaje("exito", "Éxito", data.mensaje);
+
+                // Recargar lista de inactivos
+                fetch("http://localhost/TallerZelaya/php/obtenerEmpresasInactivas.php")
+                    .then(res => res.json())
+                    .then(datos => renderTablaInactivos(datos));
+            } else {
+                showModalMensaje("error", "Error", data.mensaje);
+            }
+        })
+        .catch(() => {
+            showModalMensaje("error", "Error", "No se pudo habilitar el registro.");
+        });
+}
+
+const btnVolver = document.getElementById("btn-volver");
+
+btnVolver.addEventListener("click", () => {
+    // Mostrar formulario y ocultar botón volver
+    document.querySelector(".formulario").style.display = "flex";
+    btnHabilitarRegistro.style.display = "inline-block";
+    btnVolver.style.display = "none";
+
+    // Cargar proveedores activos
+    cargarEmpresas();
+});

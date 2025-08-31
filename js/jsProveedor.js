@@ -360,7 +360,7 @@ inputBuscar.addEventListener("input", () => {
 btnLimpiar.addEventListener("click", () => {
     inputBuscar.value = "";
     btnLimpiar.style.display = "none";
-    renderTabla(empresasData);
+    renderTabla(proveedoresData);
     inputBuscar.focus();
 });
 
