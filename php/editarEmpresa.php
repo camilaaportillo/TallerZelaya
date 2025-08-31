@@ -8,10 +8,13 @@ $telefono = $_POST['telefono'];
 
 $sql = "UPDATE empresa SET nombre='$nombre', correo='$correo', telefono='$telefono' WHERE id_empresa=$id";
 
-if ($conn->query($sql) === TRUE) {
-    echo "Empresa actualizada correctamente";
+$result = mysqli_query($conn, $sql);
+
+if ($result) {
+    echo json_encode(["status" => "exito", "mensaje" => "Empresa editada correctamente."]);
 } else {
-    echo "Error: " . $conn->error;
+    echo json_encode(["status" => "error", "mensaje" => "Error al editar: " . $conn->error]);
 }
-$conn->close();
+
+exit;
 ?>
