@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="imgs/favicon.png" type="image/png">
+    <title>Medidas de Bicicletas</title>
+    <link rel="stylesheet" href="css/styles_medida.css">
+</head>
+
+<body>
+    <!-- Encabezado -->
+    <header>
+        <button class="logo-btn" onclick="irInicio()">
+            <img src="imgs/bicicleta.png" alt="Logo bicicleta">
+        </button>
+        <h1>Medidas de Bicicletas</h1>
+        <div class="usuario">
+            <span class="nombre-usuario">Medidas</span>
+            <button class="user-btn" onclick="toggleMenu()">
+                <img src="imgs/logo_user.png" alt="Usuario">
+            </button>
+            <div id="menuUsuario" class="menu-usuario">
+                <a href="#">Cerrar sesión</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="contenedor-principal">
+            <!-- Formulario -->
+            <section class="formulario">
+                <h2>Gestión de Medidas</h2>
+                <!-- En la sección del formulario -->
+                <div class="campo-formulario">
+                    <label for="nombre">
+                        Medida:
+                        <span class="tooltip">ℹ️
+                            <span class="tooltiptext">
+                                Ejemplos válidos: 26", 27.5", 54cm, S, M, L, 26x1.95, 700x25c, 175
+                            </span>
+                        </span>
+                    </label>
+                    <input type="text" id="nombre" placeholder="Ej: 26″, 54cm, M, 26x1.95">
+                    <span id="error-nombre" class="mensaje-error"></span>
+                </div>
+
+                <div class="botones-formulario">
+                    <button class="btn-registrar" onclick="crearMedida()">Agregar Nueva Medida</button>
+                    <button class="btn-actualizar" onclick="actualizarMedida()">Actualizar Medida</button>
+                    <button id="btnCancelar" class="btn-cancelar" onclick="cancelarEdicion()">Cancelar</button>
+                </div>
+            </section>
+
+            <!-- Tabla -->
+            <section class="tabla">
+                <div class="tabla-header">
+                    <h2>Lista de Medidas</h2>
+                    <div class="buscador">
+                        <input type="text" id="inputBuscar" placeholder="Buscar medida...">
+                        <button><img src="imgs/lupa.png" alt="Buscar"></button>
+                    </div>
+                </div>
+
+                <div class="tabla-contenedor">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="70%">Medida</th>
+                                <th width="30%">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Los datos se cargarán dinámicamente con JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- Modal de mensajes -->
+        <div id="modalMensaje" class="modal">
+            <div class="modal-contenido">
+                <div class="modal-icono" id="modalIcono"></div>
+                <h2 id="modalTitulo"></h2>
+                <p id="modalTexto"></p>
+                <div class="modal-botones">
+                    <button id="btnAceptar" class="btn-aceptar">Aceptar</button>
+                    <button id="btnCancelarModal" class="btn-cancelar-modal" style="display:none;">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de confirmación -->
+        <div id="modalConfirmacion" class="modal">
+            <div class="modal-contenido">
+                <div class="modal-icono">?</div>
+                <h2>Confirmar Eliminación</h2>
+                <p id="textoConfirmacion">¿Estás seguro de que deseas eliminar esta medida?</p>
+                <div class="modal-botones">
+                    <button id="btnConfirmarEliminar" class="btn-eliminar-modal">Eliminar</button>
+                    <button id="btnCancelarEliminar" class="btn-cancelar-modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/medidas.js"></script>
+</body>
+
+</html>

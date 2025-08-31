@@ -1,5 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
     configurarEnterParaSiguienteInput();
+    configurarBuscadorUsuarios();
+    agregarBotonLimpiarBusqueda();
+
     document.getElementById("btnActivos").addEventListener("click", () => {
         cargarUsuarios("Activo");
     });
@@ -27,7 +30,203 @@ document.addEventListener("DOMContentLoaded", () => {
             return { valido: false, mensaje: `Error al validar ${tipo}` };
         }
     }
+    //buscador
+    function configurarBuscadorUsuarios() {
+        const inputBuscar = document.getElementById('inputBuscarUsuarios');
+        const btnBuscar = document.querySelector('.buscador button');
 
+        if (inputBuscar) {
+            inputBuscar.addEventListener('input', filtrarUsuarios);
+        }
+
+        if (btnBuscar) {
+            btnBuscar.addEventListener('click', filtrarUsuarios);
+        }
+    }
+    // Función para agregar botón de limpiar búsqueda
+    function agregarBotonLimpiarBusqueda() {
+        const buscador = document.querySelector('.buscador');
+        if (!buscador) return;
+
+        // Verificar si ya existe el botón de limpiar
+        if (buscador.querySelector('.btn-limpiar')) return;
+
+        const botonLimpiar = document.createElement('button');
+        botonLimpiar.className = 'btn-limpiar';
+        botonLimpiar.innerHTML = '✕';
+        botonLimpiar.title = 'Limpiar búsqueda';
+        botonLimpiar.style.display = 'none';
+
+        botonLimpiar.addEventListener('click', () => {
+            const inputBuscar = document.getElementById('inputBuscarUsuarios');
+            inputBuscar.value = '';
+            inputBuscar.focus();
+            filtrarUsuarios();
+            botonLimpiar.style.display = 'none';
+        });
+
+        buscador.appendChild(botonLimpiar);
+
+        // Mostrar/ocultar botón de limpiar según si hay texto
+        const inputBuscar = document.getElementById('inputBuscarUsuarios');
+        inputBuscar.addEventListener('input', function () {
+            botonLimpiar.style.display = this.value ? 'flex' : 'none';
+        });
+    }
+    // Función mejorada para filtrar usuarios con mensaje de "no hay resultados"
+    function filtrarUsuarios() {
+        const texto = document.getElementById('inputBuscarUsuarios').value.toLowerCase();
+        const tbody = document.querySelector('.tabla-contenedor tbody');
+        const filas = tbody.querySelectorAll('tr');
+        let resultadosEncontrados = 0;
+
+        filas.forEach(fila => {
+            // Omitir filas de mensajes
+            if (fila.classList.contains('fila-mensaje')) {
+                fila.remove(); // Eliminar mensajes anteriores
+                return;
+            }
+
+            // Omitir filas vacías o de "no hay datos"
+            if (fila.cells.length <= 1) return;
+
+            // Buscar en cada columna específica
+            const nombre = fila.cells[0].textContent.toLowerCase();
+            const correo = fila.cells[1].textContent.toLowerCase();
+            const usuario = fila.cells[2].textContent.toLowerCase();
+            const rol = fila.cells[3].textContent.toLowerCase();
+
+            // Mostrar la fila si coincide con alguna columna
+            const coincide = nombre.includes(texto) ||
+                correo.includes(texto) ||
+                usuario.includes(texto) ||
+                rol.includes(texto);
+
+            if (coincide) {
+                fila.style.display = '';
+                resultadosEncontrados++;
+            } else {
+                fila.style.display = 'none';
+            }
+        });
+
+        // Mostrar mensaje si no hay resultados
+        if (resultadosEncontrados === 0 && texto) {
+            mostrarMensajeNoResultados(texto);
+        } else {
+            ocultarMensajeNoResultados();
+        }
+    }
+
+    // Función para mostrar mensaje de no resultados
+    function mostrarMensajeNoResultados(textoBusqueda) {
+        const tbody = document.querySelector('.tabla-contenedor tbody');
+
+        // Verificar si ya existe un mensaje
+        const mensajeExistente = tbody.querySelector('.fila-mensaje');
+        if (mensajeExistente) {
+            mensajeExistente.remove();
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = 'fila-mensaje';
+        tr.innerHTML = `
+        <td colspan="5" class="mensaje-no-resultados">
+            <div class="icono-busqueda">🔍</div>
+            <div class="texto-mensaje">
+                <h3>No se encontraron resultados</h3>
+                <p>No hay usuarios que coincidan con "<strong>${textoBusqueda}</strong>"</p>
+                <small>Intenta con otros términos de búsqueda</small>
+            </div>
+        </td>
+    `;
+
+        tbody.appendChild(tr);
+    }
+
+    // Función para ocultar mensaje de no resultados
+    function ocultarMensajeNoResultados() {
+        const tbody = document.querySelector('.tabla-contenedor tbody');
+        const mensajes = tbody.querySelectorAll('.fila-mensaje');
+
+        mensajes.forEach(mensaje => {
+            mensaje.remove();
+        });
+    }
+
+    // Modificar la función cargarUsuarios para manejar mensajes
+    function cargarUsuarios(estado = estadoActual) {
+        console.log("🔄 Cargando usuarios con estado:", estado);
+        estadoActual = estado;
+
+        fetch(`php/listar_usuarios.php?estado=${estado}`)
+            .then(res => {
+                console.log("📊 Respuesta de listar_usuarios:", res.status);
+                return res.json();
+            })
+            .then(data => {
+                console.log("👥 Usuarios cargados:", data.length, "registros");
+                usuariosData = data;
+                tbody.innerHTML = ""; // limpiar tabla
+
+                // Actualizar texto de estado
+                estadoTabla.textContent = estado === "Activo" ? "Mostrando usuarios Activos" : "Mostrando usuarios Inactivos";
+                console.log("📝 Estado actualizado:", estadoTabla.textContent);
+
+                // Actualizar botones
+                actualizarBotones(estado);
+                console.log("🎛️ Botones actualizados");
+
+                // Si no hay usuarios, mostrar mensaje
+                if (data.length === 0) {
+                    tbody.innerHTML = `
+                    <tr class="fila-mensaje">
+                        <td colspan="5" class="mensaje-no-datos">
+                            <div class="icono-datos">📋</div>
+                            <div class="texto-mensaje">
+                                <h3>No hay usuarios ${estado.toLowerCase()}s</h3>
+                                <p>No se encontraron usuarios en estado "${estado}"</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                    return;
+                }
+
+                data.forEach(user => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                    <td>${user.nombre}</td>
+                    <td>${user.correo}</td>
+                    <td>${user.usuario}</td>
+                    <td>${user.rol}</td>
+                    <td>
+                        <button class="btn-editar" data-id="${user.id_usuario}" style="background: #0026ff; color: white">Editar</button>
+                    </td>
+                `;
+                    tbody.appendChild(tr);
+
+                    // Evento editar
+                    tr.querySelector(".btn-editar").addEventListener("click", () => {
+                        // ... (código existente para editar) ...
+                    });
+                });
+
+                console.log("✅ Tabla cargada exitosamente");
+
+                // Aplicar filtro si hay texto en el buscador
+                const textoBusqueda = document.getElementById('inputBuscarUsuarios').value;
+                if (textoBusqueda) {
+                    setTimeout(() => {
+                        filtrarUsuarios();
+                    }, 100);
+                }
+            })
+            .catch(err => {
+                console.error("❌ Error cargando usuarios:", err);
+                showModalMensaje("error", "Error", "No se pudieron cargar los usuarios: " + err.message);
+            });
+    }
     // Función para mostrar error en un campo
     function mostrarErrorCampo(campoId, mensaje) {
         const campo = document.getElementById(campoId);
@@ -253,6 +452,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 console.log("✅ Tabla cargada exitosamente");
+                // Aplicar filtro si hay texto en el buscador
+                const textoBusqueda = document.getElementById('inputBuscarUsuarios').value;
+                if (textoBusqueda) {
+                    setTimeout(() => {
+                        filtrarUsuarios();
+                    }, 100);
+                }
             })
             .catch(err => {
                 console.error("❌ Error cargando usuarios:", err);
