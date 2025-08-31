@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="imgs/favicon.png" type="image/png">
-    <title>Marcas</title>
-    <link rel="stylesheet" href="css/marcaStyle.css">
+    <title>Empresas</title>
+    <link rel="stylesheet" href="css/empresaStyle.css">
 </head>
 
 <body>
@@ -16,14 +16,14 @@
         <button class="logo-btn" onclick="irInicio()">
             <img src="imgs/bicicleta.png" alt="Logo bicicleta">
         </button>
-        <h1>Marcas</h1>
+        <h1>Empresas</h1>
         <div class="usuario">
             <span class="nombre-usuario">Usuario</span>
             <button class="user-btn" onclick="toggleMenu()">
                 <img src="imgs/logo_user.png" alt="Usuario">
             </button>
             <div id="menuUsuario" class="menu-usuario">
-                <a href="#">Cerrar sesion</a>
+                <a href="#">Cerrar sesión</a>
             </div>
         </div>
     </header>
@@ -32,24 +32,31 @@
 
         <!-- Formulario -->
         <section class="formulario">
-            <button class="btn-registrar">Agregar marca</button>
-            <button class="btn-actualizar" style="display:none;">Editar marca</button>
+            <button class="btn-registrar">Agregar empresa</button>
+            <button class="btn-actualizar" style="display:none;">Editar empresa</button>
+            <button id="btnCancelarEdicion" class="btn-cancelar-edicion" style="display:none;">Cancelar edición</button>
 
-            <label>Nombre de Marca</label>
-            <input type="text" id="inputNombre" placeholder="Escriba aquí">
+            <label>Nombre de Empresa</label>
+            <input type="text" placeholder="Escriba aquí">
+            <label>Correo de Empresa</label>
+            <input type="email" placeholder="Escriba aquí">
+            <label>Teléfono de Empresa</label>
+            <input type="text" placeholder="Escriba aquí">
 
-            <label>Estado</label>
-            <select id="inputEstado">
-                <option value="Activo">Activo</option>
-                <option value="Inactivo">Inactivo</option>
-            </select>
+            <p style="font-size: 15px; color: rgb(0, 0, 0); margin-top: -10px; margin-bottom: 10px;">Presione "Enter" para cambiar de campo</p>
+
+            <button id="btn-habilitar-registro" class="btn-habilitar-registro">Habilitar registro</button>
+
         </section>
 
         <!-- Tabla -->
         <section class="tabla">
 
+            <button id="btn-volver" class="btn-volver" style="display:none;">Volver</button>
+
             <div class="buscador">
                 <input type="text" id="inputBuscar" placeholder="Buscar...">
+
                 <button id="btnLimpiar" style="display:none;">❌</button>
             </div>
 
@@ -57,17 +64,19 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Nombre Marca</th>
-                            <th>Estado</th>
+                            <th>Nombre Empresa</th>
+                            <th>Correo Empresa</th>
+                            <th>Telefono Empresa</th>
                             <th>Acción</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Se rellena con JS -->
+
                     </tbody>
                 </table>
             </div>
         </section>
+
 
         <!-- Modal de acciones -->
         <div id="modalAcciones" class="modal">
@@ -76,6 +85,7 @@
                 <div class="modal-botones">
                     <button id="btnEditarModal" class="btn-accion btn-azul">Editar</button>
                     <button id="btnEliminarModal" class="btn-accion btn-rojo">Eliminar</button>
+
                 </div>
                 <button id="cerrarModal" class="btn-cerrar">X</button>
             </div>
@@ -97,6 +107,7 @@
         <div id="modalConfirmar" class="modal">
             <div class="modal-content warning">
                 <span class="close" onclick="cerrarModalConfirmar()">&times;</span>
+                <h1>⚠</h1>
                 <p>¿Seguro que deseas eliminar este registro?</p>
                 <div class="modal-actions">
                     <button id="btnConfirmarEliminar" class="btn-confirmar">Sí, eliminar</button>
@@ -107,6 +118,6 @@
     </main>
 </body>
 
-<script src="js/jsMarca.js?v=1.0.0"></script>
+<script src="js/jsEmpresa.js"></script>
 
 </html>
