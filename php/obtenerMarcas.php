@@ -1,12 +1,9 @@
 <?php
 include "conexion.php";
 
-$sql = "SELECT * FROM `marca` 
-        ORDER BY CASE 
-                    WHEN estado='Activo' THEN 1
-                    WHEN estado='Inactivo' THEN 2
-                    ELSE 3
-                 END, nombre ASC";
+$sql = "SELECT * FROM `marca`
+        WHERE estado = 'Activo'
+        ORDER BY nombre ASC";
 
 $result = $conn->query($sql);
 
@@ -22,3 +19,4 @@ echo json_encode($marcas, JSON_UNESCAPED_UNICODE);
 
 $conn->close();
 ?>
+

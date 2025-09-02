@@ -3,10 +3,10 @@ include "conexion.php";
 
 $id = $_POST['id'];
 $nombre = $_POST['nombre'];
-$estado = $_POST['estado']; 
 
 
-$sql = "UPDATE marca SET nombre='$nombre', estado='$estado' WHERE id_marca=$id";
+
+$sql = "UPDATE marca SET nombre='$nombre'WHERE id_marca=$id";
 
 
 
