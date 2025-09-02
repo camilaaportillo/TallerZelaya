@@ -230,7 +230,7 @@ const btnEliminar = document.getElementById("btnEliminarModal");
 
 btnEliminar.addEventListener("click", () => {
     if (!idSeleccionado) {
-        alert("No se ha seleccionado ninguna empresa.");
+        showModalMensaje("advertencia", "Falta nombre", "No se ha seleccionado ninguna empresa.");
         return;
     }
 
@@ -429,7 +429,7 @@ btnHabilitarRegistro.addEventListener("click", () => {
 function renderTablaInactivos(datos) {
     tablaBody.innerHTML = "";
     if (datos.length === 0) {
-        tablaBody.innerHTML = `<tr><td colspan="5">No hay proveedores inactivos</td></tr>`;
+        tablaBody.innerHTML = `<tr><td colspan="4">No hay proveedores inactivos</td></tr>`;
         return;
     }
 
