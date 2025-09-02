@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="imgs/favicon.png" type="image/png">
+    <title>Marcas Inactivas</title>
+    <link rel="stylesheet" href="css/marcaStyle.css">
+</head>
+
+<body>
+
+    <!-- Encabezado -->
+    <header>
+        <button class="logo-btn" onclick="irInicio()">
+            <img src="imgs/Bicicleta2.png" alt="Logo bicicleta">
+        </button>
+        <h1>Marcas Inactivas</h1>
+        <div class="usuario">
+            <span class="nombre-usuario">Usuario</span>
+            <button class="user-btn" onclick="toggleMenu()">
+                <img src="imgs/logo_user.png" alt="Usuario">
+            </button>
+            <div id="menuUsuario" class="menu-usuario">
+                <a href="#">Cerrar sesión</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- Botón para regresar -->
+        <section class="formulario">
+            <button id="btnVolver" class="btn-cancelar" onclick="window.location.href='marcas.html'">
+                Volver a Marcas
+            </button>
+        </section>
+
+        <!-- Tabla de marcas inactivas -->
+        <section class="tabla">
+
+            <div class="buscador">
+                <input type="text" id="inputBuscarInactivas" placeholder="Buscar...">
+                <button id="btnLimpiarInactivas" style="display:none;">❌</button>
+            </div>
+
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre Marca</th>
+                            <th>Estado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyMarcasInactivas">
+                        <!-- Se rellena con JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Modal de acciones -->
+        <div id="modalAccionesInactivas" class="modal">
+            <div class="modal-contenido">
+                <h2>Acciones</h2>
+                <div class="modal-botones">
+                    <button id="btnHabilitarModal" class="btn-accion btn-azul">Habilitar</button>
+                </div>
+                <button id="cerrarModalInactivas" class="btn-cerrar">X</button>
+            </div>
+        </div>
+
+        <!-- Modal de mensajes -->
+        <div id="modalMensajeInactivas" class="modal">
+            <div class="modal-mensaje-contenido">
+                <div class="modal-mensaje-icono" id="modalIconoInactivas"></div>
+                <div class="modal-mensaje-texto">
+                    <h2 id="modalTituloInactivas"></h2>
+                    <p id="modalTextoInactivas"></p>
+                </div>
+                <button id="cerrarMensajeInactivas" class="btn-cerrar">X</button>
+            </div>
+        </div>
+    </main>
+</body>
+
+<!-- Conectar JS específico para marcas inactivas -->
+<script src="js/jsMarcasInactivas.js?v=1.0.0"></script>
+
+</html>
