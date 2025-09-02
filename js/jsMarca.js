@@ -5,6 +5,7 @@ const modal = document.getElementById("modalAcciones");
 const cerrarModal = document.getElementById("cerrarModal");
 const btnEditarModal = document.getElementById("btnEditarModal");
 const btnEliminarModal = document.getElementById("btnEliminarModal");
+const btnCancelarEdicion = document.getElementById("btnCancelarEdicion");
 
 const tablaBody = document.querySelector(".tabla tbody");
 const btnRegistrar = document.querySelector(".btn-registrar");
@@ -103,13 +104,14 @@ btnRegistrar.addEventListener("click", (e) => {
 
 // Actualizar marca
 btnActualizar.addEventListener("click", () => {
+    
     const nombre = inputNombre.value;
-    const estado = inputEstado.value;
+    
 
     fetch("http://localhost/TallerZelaya/php/editarMarca.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `id=${idSeleccionado}&nombre=${nombre}&estado=${estado}`
+        body: `id=${idSeleccionado}&nombre=${nombre}`
     })
         .then(res => res.json())
         .then(data => {
@@ -163,13 +165,25 @@ btnEditarModal.addEventListener("click", () => {
     if (filaSeleccionada && idSeleccionado) {
         const celdas = filaSeleccionada.querySelectorAll("td");
         inputNombre.value = celdas[0].innerText;
-        inputEstado.value = celdas[1].innerText;
 
         btnRegistrar.style.display = "none";
         btnActualizar.style.display = "inline-block";
+        document.getElementById("btnCancelarEdicion").style.display = "inline-block";
+
         modal.style.display = "none";
     }
 });
+
+
+btnCancelarEdicion.addEventListener("click", () => {
+    inputNombre.value = ""; 
+    idSeleccionado = null;  
+
+    btnRegistrar.style.display = "inline-block";
+    btnActualizar.style.display = "none";
+    btnCancelarEdicion.style.display = "none"; 
+});
+
 
 // Búsqueda en tabla
 inputBuscar.addEventListener("input", () => {
