@@ -413,6 +413,7 @@ const btnHabilitarRegistro = document.getElementById("btn-habilitar-registro");
 btnHabilitarRegistro.addEventListener("click", () => {
     // Ocultar formulario y mostrar botón volver
     document.querySelector(".formulario").style.display = "none";
+    document.querySelector(".buscador-derecha").style.sisplay = "none";
     btnHabilitarRegistro.style.display = "none";
     btnVolver.style.display = "inline-block";
 
@@ -485,6 +486,7 @@ const btnVolver = document.getElementById("btn-volver");
 btnVolver.addEventListener("click", () => {
     // Mostrar formulario y ocultar botón volver
     document.querySelector(".formulario").style.display = "flex";
+    document.querySelector(".buscador-derecha").style.display = "flex";
     btnHabilitarRegistro.style.display = "inline-block";
     btnVolver.style.display = "none";
 

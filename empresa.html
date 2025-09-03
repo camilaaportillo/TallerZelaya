@@ -43,9 +43,10 @@
             <label>Teléfono de Empresa</label>
             <input type="text" placeholder="Escriba aquí">
 
-            <p style="font-size: 15px; color: rgb(0, 0, 0); margin-top: -10px; margin-bottom: 10px;">Presione "Enter" para cambiar de campo</p>
+            <p style="font-size: 15px; color: rgb(0, 0, 0); margin-top: -10px; margin-bottom: 10px;">Presione "Enter"
+                para cambiar de campo</p>
             <br>
-            
+
             <br>
             <button id="btn-habilitar-registro" class="btn-habilitar-registro">Habilitar registro</button>
 
@@ -54,12 +55,16 @@
         <!-- Tabla -->
         <section class="tabla">
 
-            <button id="btn-volver" class="btn-volver" style="display:none;">Volver</button>
-
             <div class="buscador">
-                <input type="text" id="inputBuscar" placeholder="Buscar...">
+                <button id="btn-volver" class="btn-volver" style="display:none;">Volver</button>
+                <p></p>
 
-                <button id="btnLimpiar" style="display:none;">❌</button>
+                <!-- Grupo de búsqueda -->
+                <div class="buscador-derecha">
+                    <input type="text" id="inputBuscar" placeholder="Buscar...">
+                    <button id="btnLimpiar" style="display:none;">❌</button>
+                       
+                </div>
             </div>
 
             <div class="tabla-contenedor">
