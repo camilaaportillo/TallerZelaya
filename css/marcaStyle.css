@@ -478,3 +478,46 @@ select {
     justify-content: center;
     line-height: 1;
 }
+
+/* Botón Habilitar en la tabla */
+.btn-habilitar {
+    background-color: #28a745; /* verde */
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.btn-habilitar:hover {
+    background-color: #218838; /* verde más oscuro */
+    transform: scale(1.05);
+}
+
+.btn-habilitar:active {
+    background-color: #1e7e34;
+    transform: scale(0.95);
+}
+
+/* Modal estilo éxito (habilitar) */
+.modal-content.success {
+    border-left: 6px solid #28a745;
+}
+
+.btn-confirmar {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.btn-confirmar:hover {
+    background-color: #218838;
+}
+
+

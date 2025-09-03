@@ -153,7 +153,7 @@ btnEliminarModal.addEventListener("click", () => {
                 }
             })
             .catch(() => {
-                showModalMensaje("error", "Error", "No se pudo eliminar el registro.");
+                showModalMensaje("error", "Error", "No se pudo deshabilitar el registro.");
             });
     });
 });

@@ -14,7 +14,7 @@
     <!-- Encabezado -->
     <header>
         <button class="logo-btn" onclick="irInicio()">
-            <img src="imgs/Bicicleta2.png" alt="Logo bicicleta">
+            <img src="imgs/bicicleta.png" alt="Logo bicicleta">
         </button>
         <h1>Marcas Inactivas</h1>
         <div class="usuario">
@@ -83,8 +83,23 @@
                 <button id="cerrarMensajeInactivas" class="btn-cerrar">X</button>
             </div>
         </div>
+
+        <!-- Modal de Confirmación Habilitar -->
+         <div id="modalConfirmarHabilitar" class="modal">
+            <div class="modal-content success">
+                <span class="close" onclick="cerrarModalConfirmarHabilitar()">&times;</span>
+                <p>¿Seguro que deseas habilitar este registro?</p>
+                <div class="modal-actions">
+                  <button id="btnConfirmarHabilitar" class="btn-confirmar">Sí, habilitar</button>
+                  <button onclick="cerrarModalConfirmarHabilitar()" class="btn-cancelar">Cancelar</button>
+                 </div> 
+            </div>
+         </div>
+
+
     </main>
 </body>
+
 
 <!-- Conectar JS específico para marcas inactivas -->
 <script src="js/jsMarcasInactivas.js?v=1.0.0"></script>
