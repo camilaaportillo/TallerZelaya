@@ -832,3 +832,7 @@ document.addEventListener("DOMContentLoaded", () => {
         menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     }
 });
+
+function irInicio() {
+    window.location.href = "index.html";
+}

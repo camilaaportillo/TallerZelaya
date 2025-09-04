@@ -504,3 +504,25 @@ table tbody tr:hover {
     pointer-events: none; 
     opacity: 0.8;         
 }
+
+
+.btn-habilitar {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-habilitar:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+}
+
+.btn-habilitar:active {
+    transform: translateY(0);
+}
