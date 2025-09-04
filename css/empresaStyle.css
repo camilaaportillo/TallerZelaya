@@ -490,3 +490,11 @@ table tbody tr:hover {
 .btn-habilitar-registro:hover {
     background-color: #218838;
 }
+
+.error-msg {
+    color: red;
+    font-size: 13px;
+    margin-top: -8px;
+    margin-bottom: 8px;
+    display: block;
+}

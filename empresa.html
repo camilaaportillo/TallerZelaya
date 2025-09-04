@@ -37,19 +37,24 @@
             <button id="btnCancelarEdicion" class="btn-cancelar-edicion" style="display:none;">Cancelar edición</button>
 
             <label>Nombre de Empresa</label>
-            <input type="text" placeholder="Escriba aquí">
+            <input type="text" id="inputNombre" placeholder="Escriba aquí" autocomplete="off">
+            <small id="errorNombre" class="error-msg"></small>
+
             <label>Correo de Empresa</label>
-            <input type="email" placeholder="Escriba aquí">
-            <!--<p style="font-size: 15px; color: rgb(255, 0, 0); margin-top: -10px; margin-bottom: 10px;">Correo correcto</p>-->
+            <input type="email" id="inputCorreo" placeholder="Escriba aquí" autocomplete="off">
+            <small id="errorCorreo" class="error-msg"></small>
+
             <label>Teléfono de Empresa</label>
-            <input type="text" placeholder="Escriba aquí">
+            <input type="text" id="inputTelefono" placeholder="Escriba aquí" autocomplete="off">
+            <small id="errorTelefono" class="error-msg"></small>
+
 
             <p style="font-size: 15px; color: rgb(0, 0, 0); margin-top: -10px; margin-bottom: 10px;">Presione "Enter"
                 para cambiar de campo</p>
             <br>
 
             <br>
-            
+
 
         </section>
 
@@ -84,9 +89,9 @@
             </div>
             <div style="display: flex; justify-content: right; margin-top: 10px;">
                 <p> </p>
-            <button id="btn-habilitar-registro" class="btn-habilitar-registro">Habilitar Empresa</button>
+                <button id="btn-habilitar-registro" class="btn-habilitar-registro">Habilitar Empresa</button>
             </div>
-            
+
         </section>
 
 
