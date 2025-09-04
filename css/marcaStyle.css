@@ -434,7 +434,7 @@ table tbody tr:hover {
 }
 
 .btn-cancelar:hover {
-  background: #3b4fff;
+  background: #c0392b;
 }
 
 
@@ -463,21 +463,7 @@ select {
     line-height: 1;
 }
 
-.btn-habilitar-registro {
-    margin-top: auto;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 20px; 
-    cursor: pointer;
-    font-size: 14px;
-    padding: 5px 10px;
-    height: 36px; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-}
+
 
 /* Botón Habilitar en la tabla */
 .btn-habilitar {
@@ -520,4 +506,59 @@ select {
     background-color: #218838;
 }
 
+/* ===== Tabla exclusiva para Marcas Inactivas ===== */
+.tabla-inactivas {
+    width: 100%;
+    margin-top: 10px; /* pequeño margen debajo del botón Volver */
+}
 
+.tabla-contenedor-inactivas {
+    width: 100%;
+    overflow-x: auto; /* scroll horizontal si es necesario */
+}
+
+.tabla-inactivas-table {
+    width: 100%; /* que ocupe todo el ancho */
+    border-collapse: collapse;
+}
+
+.tabla-inactivas-table th,
+.tabla-inactivas-table td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.tabla-inactivas-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+
+.tabla-bloqueada {
+    pointer-events: none;   /* bloquea clics */
+    opacity: 0.6;           /* opcional: se ve más apagada */
+}
+
+/* Contenedor para alinear el botón a la derecha */
+.contenedor-boton-habilitar {
+    display: flex;
+    justify-content: flex-end; /* alineado a la derecha */
+    margin: 10px 20px 10px 0; /* arriba - derecha - abajo - izquierda */
+}
+
+/* Estilo del botón */
+.btn-habilitar-registro {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 8px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn-habilitar-registro:hover {
+    background-color: #218838;
+}

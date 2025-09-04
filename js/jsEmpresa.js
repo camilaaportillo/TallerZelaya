@@ -25,10 +25,15 @@ const modalTitulo = document.getElementById("modalTitulo");
 const modalTexto = document.getElementById("modalTexto");
 const cerrarMensaje = document.getElementById("cerrarMensaje");
 
-// Referencias directas a los 3 inputs
-const inputNombre = document.querySelectorAll(".formulario input")[0];
-const inputCorreo = document.querySelectorAll(".formulario input")[1];
-const inputTelefono = document.querySelectorAll(".formulario input")[2];
+// Inputs con IDs directos
+const inputNombre = document.getElementById("inputNombre");
+const inputCorreo = document.getElementById("inputCorreo");
+const inputTelefono = document.getElementById("inputTelefono");
+
+// Mensajes de error
+const errorNombre = document.getElementById("errorNombre");
+const errorCorreo = document.getElementById("errorCorreo");
+const errorTelefono = document.getElementById("errorTelefono");
 
 // Correo solo minúsculas
 inputCorreo.addEventListener("input", () => {
@@ -40,6 +45,38 @@ inputTelefono.setAttribute("inputmode", "numeric");
 inputTelefono.setAttribute("maxlength", "8");
 inputTelefono.addEventListener("input", () => {
     inputTelefono.value = inputTelefono.value.replace(/\D/g, "").slice(0, 8);
+});
+
+
+// Regex
+const regexCorreo = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+const regexTelefono = /^\d{8}$/;
+
+// Validación en tiempo real
+inputNombre.addEventListener("input", () => {
+    if (inputNombre.value.trim() === "") {
+        errorNombre.textContent = "El nombre no puede estar vacío.";
+    } else {
+        errorNombre.textContent = "";
+    }
+});
+
+inputCorreo.addEventListener("input", () => {
+    inputCorreo.value = inputCorreo.value.toLowerCase();
+    if (!regexCorreo.test(inputCorreo.value.trim())) {
+        errorCorreo.textContent = "Formato de correo inválido.";
+    } else {
+        errorCorreo.textContent = "";
+    }
+});
+
+inputTelefono.addEventListener("input", () => {
+    inputTelefono.value = inputTelefono.value.replace(/\D/g, "").slice(0, 8);
+    if (!regexTelefono.test(inputTelefono.value.trim())) {
+        errorTelefono.textContent = "El teléfono debe tener 8 dígitos.";
+    } else {
+        errorTelefono.textContent = "";
+    }
 });
 
 
@@ -109,15 +146,35 @@ function cargarEmpresas() {
 
 
 btnRegistrar.addEventListener("click", (e) => {
-    e.preventDefault(); // asegura que no ocurra ninguna acción por defecto
-
-    // Evita doble clic mientras se procesa
-    if (btnRegistrar.dataset.busy === "1") return;
-
+    e.preventDefault();
     const datos = validarEmpresa();
-    if (!datos) return; // <-- si falla, NO se ejecuta el fetch
+    if (!datos) return;
 
-    btnRegistrar.dataset.busy = "1";
+    // 🔎 Validar duplicados en empresasData
+    const duplicado = empresasData.find(emp =>
+        emp.nombre.toLowerCase() === datos.nombre.toLowerCase() ||
+        emp.correo.toLowerCase() === datos.correo.toLowerCase() ||
+        emp.telefono === datos.telefono
+    );
+
+    if (duplicado) {
+        if (duplicado.nombre.toLowerCase() === datos.nombre.toLowerCase()) {
+            showModalMensaje("advertencia", "Nombre duplicado", "Ya existe una empresa con este nombre.");
+            inputNombre.focus();
+            return;
+        }
+        if (duplicado.correo.toLowerCase() === datos.correo.toLowerCase()) {
+            showModalMensaje("advertencia", "Correo duplicado", "Este correo ya está registrado.");
+            inputCorreo.focus();
+            return;
+        }
+        if (duplicado.telefono === datos.telefono) {
+            showModalMensaje("advertencia", "Teléfono duplicado", "Este teléfono ya está registrado.");
+            inputTelefono.focus();
+            return;
+        }
+    }
+
 
     fetch("http://localhost/TallerZelaya/php/ingresarEmpresa.php", {
         method: "POST",
@@ -151,6 +208,26 @@ btnActualizar.addEventListener("click", () => {
     const correo = inputs[1].value;
     const telefono = inputs[2].value;
 
+    if (nombre.trim() === "") {
+        showModalMensaje("advertencia", "Falta nombre", "El nombre no puede estar vacío.");
+        inputNombre.focus();
+        return;
+    }
+    if (!regexCorreo.test(correo.trim())) {
+        showModalMensaje("advertencia", "Correo inválido", "Usa solo minúsculas y un formato válido.");
+        inputCorreo.focus();
+        return;
+    }
+    if (!regexTelefono.test(telefono.trim())) {
+        showModalMensaje("advertencia", "Teléfono inválido", "El teléfono debe contener exactamente 8 dígitos.");
+        inputTelefono.focus();
+        return;
+    }
+    if (!idSeleccionado) {
+        showModalMensaje("advertencia", "Falta selección", "No se ha seleccionado ninguna empresa.");
+        return;
+    }
+
     fetch("http://localhost/TallerZelaya/php/editarEmpresa.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -166,6 +243,8 @@ btnActualizar.addEventListener("click", () => {
                 cargarEmpresas();
                 [inputNombre, inputCorreo, inputTelefono].forEach(i => i.value = "");
                 inputNombre.focus();
+
+                document.querySelector(".tabla-contenedor").classList.remove("bloqueada");
             } else {
                 showModalMensaje("error", "Error", data.mensaje);
             }
@@ -197,6 +276,8 @@ btnEditarModal.addEventListener("click", () => {
         document.querySelector(".btn-actualizar").style.display = "inline-block";
         btnCancelarEdicion.style.display = "inline-block";
 
+        document.querySelector(".tabla-contenedor").classList.add("bloqueada");
+
         const celdas = filaSeleccionada.querySelectorAll("td");
 
         inputs[0].value = celdas[0].innerText; // Nombre empresa
@@ -223,6 +304,7 @@ btnCancelarEdicion.addEventListener("click", () => {
     idSeleccionado = null;
 
     inputNombre.focus();
+    document.querySelector(".tabla-contenedor").classList.remove("bloqueada");
 });
 
 
@@ -257,7 +339,7 @@ btnEliminar.addEventListener("click", () => {
                 }
             })
             .catch(err => {
-                showModalMensaje("error", "Error", "No se pudo eliminar el registro.");
+                showModalMensaje("error", "Error", "No se pudo deshabilitar el registro.");
             });
     });
 });
@@ -413,6 +495,7 @@ const btnHabilitarRegistro = document.getElementById("btn-habilitar-registro");
 btnHabilitarRegistro.addEventListener("click", () => {
     // Ocultar formulario y mostrar botón volver
     document.querySelector(".formulario").style.display = "none";
+    document.querySelector(".buscador-derecha").style.display = "none";
     btnHabilitarRegistro.style.display = "none";
     btnVolver.style.display = "inline-block";
 
@@ -485,6 +568,7 @@ const btnVolver = document.getElementById("btn-volver");
 btnVolver.addEventListener("click", () => {
     // Mostrar formulario y ocultar botón volver
     document.querySelector(".formulario").style.display = "flex";
+    document.querySelector(".buscador-derecha").style.display = "flex";
     btnHabilitarRegistro.style.display = "inline-block";
     btnVolver.style.display = "none";
 

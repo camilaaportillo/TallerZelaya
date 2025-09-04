@@ -146,20 +146,17 @@ main {
     display: none;
 }
 
-/* Tabla */
-.tabla {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    min-height: 0;
-}
-
 .buscador {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between; /* botón a la izq, buscador a la der */
     margin-bottom: 5px;
-    gap: 5px;
+    align-items: center;
+}
+
+.buscador-derecha {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* espacio entre input y limpiar */
 }
 
 .buscador input {
@@ -172,15 +169,32 @@ main {
 }
 
 .buscador button {
-    background: none;
     border: none;
     cursor: pointer;
 }
 
+.btn-volver {
+    background-color: #007bff; /* azul */
+    color: white;
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    width: 200px;
+}
 
-.buscador img {
-    width: 24px;
-    height: 24px;
+.btn-volver:hover {
+    background-color: #0056b3; /* azul más oscuro al pasar mouse */
+}
+
+
+/* Tabla */
+.tabla {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
 }
 
 
@@ -485,15 +499,16 @@ table tbody tr:hover {
     background-color: #218838;
 }
 
-.btn-volver {
-    background-color: #777;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
+.error-msg {
+    color: red;
+    font-size: 13px;
+    margin-top: -8px;
+    margin-bottom: 8px;
+    display: block;
 }
-.btn-volver:hover {
-    background-color: #555;
+
+
+.tabla-contenedor.bloqueada {
+    pointer-events: none; 
+    opacity: 0.8;         
 }
