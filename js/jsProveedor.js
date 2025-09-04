@@ -463,7 +463,7 @@ const btnHabilitarRegistro = document.getElementById("btn-habilitar-registro");
 btnHabilitarRegistro.addEventListener("click", () => {
     // Ocultar formulario
     document.querySelector(".formulario").style.display = "none";
-
+    document.querySelector(".buscador-derecha").style.display = "none";
     // Cargar proveedores inactivos
     fetch("http://localhost/TallerZelaya/php/obtenerProveedoresInactivos.php")
         .then(res => res.json())

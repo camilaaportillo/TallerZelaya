@@ -257,7 +257,7 @@ btnEliminar.addEventListener("click", () => {
                 }
             })
             .catch(err => {
-                showModalMensaje("error", "Error", "No se pudo eliminar el registro.");
+                showModalMensaje("error", "Error", "No se pudo deshabilitar el registro.");
             });
     });
 });
@@ -413,7 +413,7 @@ const btnHabilitarRegistro = document.getElementById("btn-habilitar-registro");
 btnHabilitarRegistro.addEventListener("click", () => {
     // Ocultar formulario y mostrar botón volver
     document.querySelector(".formulario").style.display = "none";
-    document.querySelector(".buscador-derecha").style.sisplay = "none";
+    document.querySelector(".buscador-derecha").style.display = "none";
     btnHabilitarRegistro.style.display = "none";
     btnVolver.style.display = "inline-block";
 

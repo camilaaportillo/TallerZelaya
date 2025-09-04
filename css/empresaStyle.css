@@ -148,7 +148,7 @@ main {
 
 .buscador {
     display: flex;
-    justify-content: space-between; /* botón a la izq, buscador a la der */
+    justify-content: space-between;
     margin-bottom: 5px;
     align-items: center;
 }
@@ -156,7 +156,7 @@ main {
 .buscador-derecha {
     display: flex;
     align-items: center;
-    gap: 5px; /* espacio entre input y limpiar */
+    gap: 5px;
 }
 
 .buscador input {
@@ -470,6 +470,7 @@ table tbody tr:hover {
 }
 
  .btn-habilitar-registro {
+    justify-content: space-between;
     margin-top: auto;
     background-color: #28a745;
     color: white;
@@ -483,7 +484,7 @@ table tbody tr:hover {
     align-items: center;
     justify-content: center;
     line-height: 1;
-    
+    width: 200px;
 }
 
 .btn-habilitar-registro:hover {

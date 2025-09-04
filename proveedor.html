@@ -34,6 +34,7 @@
         <section class="formulario">
             <button class="btn-registrar">Agregar Proveedor</button>
             <button class="btn-actualizar" style="display:none;">Editar Proveedor</button>
+            <button id="btnCancelarEdicion" class="btn-cancelar-edicion" style="display:none;">Cancelar edición</button>
 
             <label>Nombre del Proveedor</label>
             <input type="text" id="inputNombreProveedor" placeholder="Escriba aquí">
@@ -57,14 +58,17 @@
 
         <!-- Tabla -->
         <section class="tabla">
-
-            <button id="btnCancelarEdicion" class="btn-cancelar-edicion" style="display:none;">Cancelar edición</button>
-            <button id="btn-volver" class="btn-volver" style="display:none;">Volver</button>
             
             <div class="buscador">
-                <input type="text" id="inputBuscar" placeholder="Buscar...">
+                <button id="btn-volver" class="btn-volver" style="display:none;">Volver</button>
+                <p></p>
 
-                <button id="btnLimpiar" style="display:none;">❌</button>
+                <!-- Grupo de búsqueda -->
+                <div class="buscador-derecha">
+                    <input type="text" id="inputBuscar" placeholder="Buscar...">
+                    <button id="btnLimpiar" style="display:none;">❌</button>
+                       
+                </div>
             </div>
 
             <div class="tabla-contenedor">
