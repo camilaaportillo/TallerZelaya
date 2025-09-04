@@ -167,9 +167,11 @@ btnEditarModal.addEventListener("click", () => {
         btnRegistrar.style.display = "none";
         btnActualizar.style.display = "inline-block";
         document.getElementById("btnCancelarEdicion").style.display = "inline-block";
+        
 
         modal.style.display = "none";
     }
+    
 });
 
 

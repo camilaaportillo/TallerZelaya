@@ -520,4 +520,8 @@ select {
     background-color: #218838;
 }
 
+.tabla-bloqueada {
+    pointer-events: none;   /* bloquea clics */
+    opacity: 0.6;           /* opcional: se ve más apagada */
+}
 
