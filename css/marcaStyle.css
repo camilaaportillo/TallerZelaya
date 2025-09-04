@@ -437,6 +437,19 @@ table tbody tr:hover {
   background: #c0392b;
 }
 
+.btn-volver {
+  background: #00f;
+  color: #ffffff;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-volver:hover {
+  background: #3b4fff;
+}
+
 
    /* Estilo general del select */
 select {
