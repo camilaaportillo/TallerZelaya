@@ -85,20 +85,26 @@ btnRegistrar.addEventListener("click", (e) => {
     fetch("http://localhost/TallerZelaya/php/ingresarMarca.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `nombre=${datos.nombre}`
+        body: `nombre=${encodeURIComponent(datos.nombre)}`
     })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === "exito") {
-                showModalMensaje("exito", "Éxito", data.mensaje);
-                cargarMarcas();
-                inputNombre.value = "";
-            } else {
-                showModalMensaje("error", "Error", data.mensaje);
-            }
-        })
-        .catch(() => showModalMensaje("error", "Error", "No se pudo conectar con el servidor."));
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "exito") {
+            showModalMensaje("exito", "Éxito", data.mensaje);
+            cargarMarcas();
+            inputNombre.value = "";
+        } else if (data.status === "duplicado") {
+            showModalMensaje("advertencia", "Duplicado", data.mensaje);
+            inputNombre.focus();
+        } else {
+            showModalMensaje("error", "Error", data.mensaje);
+        }
+    })
+    .catch(() => {
+        showModalMensaje("error", "Error", "No se pudo conectar con el servidor.");
+    });
 });
+
 
 // Actualizar marca
 
