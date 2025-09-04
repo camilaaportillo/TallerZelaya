@@ -101,10 +101,9 @@ btnRegistrar.addEventListener("click", (e) => {
 });
 
 // Actualizar marca
+
 btnActualizar.addEventListener("click", () => {
-    
     const nombre = inputNombre.value;
-    
 
     fetch("http://localhost/TallerZelaya/php/editarMarca.php", {
         method: "POST",
@@ -116,6 +115,14 @@ btnActualizar.addEventListener("click", () => {
             if (data.status === "exito") {
                 showModalMensaje("exito", "Éxito", data.mensaje);
                 cargarMarcas();
+
+                // ✅ Limpiar input y resetear botones
+                inputNombre.value = "";
+                idSeleccionado = null;
+                btnRegistrar.style.display = "inline-block";
+                btnActualizar.style.display = "none";
+                btnCancelarEdicion.style.display = "none"; 
+                document.querySelector(".tabla-contenedor").classList.remove("tabla-bloqueada");
             } else {
                 showModalMensaje("error", "Error", data.mensaje);
             }
@@ -124,6 +131,7 @@ btnActualizar.addEventListener("click", () => {
             showModalMensaje("error", "Error", "No se pudo editar el registro.");
         });
 });
+
 
 // Eliminar marca
 btnEliminarModal.addEventListener("click", () => {
@@ -167,12 +175,14 @@ btnEditarModal.addEventListener("click", () => {
         btnRegistrar.style.display = "none";
         btnActualizar.style.display = "inline-block";
         document.getElementById("btnCancelarEdicion").style.display = "inline-block";
-        
+
+        // 🔒 Bloquear tabla
+        document.querySelector(".tabla-contenedor").classList.add("tabla-bloqueada");
 
         modal.style.display = "none";
     }
-    
 });
+
 
 
 btnCancelarEdicion.addEventListener("click", () => {
@@ -182,6 +192,7 @@ btnCancelarEdicion.addEventListener("click", () => {
     btnRegistrar.style.display = "inline-block";
     btnActualizar.style.display = "none";
     btnCancelarEdicion.style.display = "none"; 
+    document.querySelector(".tabla-contenedor").classList.remove("tabla-bloqueada");
 });
 
 
@@ -191,8 +202,8 @@ inputBuscar.addEventListener("input", () => {
     if (texto.trim() !== "") {
         btnLimpiar.style.display = "inline";
         const filtrados = marcasData.filter(m =>
-            m.nombre.toLowerCase().includes(texto) ||
-            m.estado.toLowerCase().includes(texto)
+            m.nombre.toLowerCase().includes(texto) 
+            
         );
         mostrarDTabla(filtrados);
     } else {
