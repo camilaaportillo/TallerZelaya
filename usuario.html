@@ -1,13 +1,36 @@
 <!DOCTYPE html>
 <html lang="es">
 
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="imgs/favicon.png" type="image/png">
     <title>Usuarios</title>
     <link rel="stylesheet" href="css/styles_usuario.css">
+    <style>
+       /* Estilos específicos para el checkbox de mostrar contraseña */
+        .mostrar-contrasena {
+            display: flex;
+            align-items: center;
+            margin: 0px 0 5px 0;
+        }
+        
+        .mostrar-contrasena input[type="checkbox"] {
+            margin: 0 8px 0 0;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        .mostrar-contrasena label {
+            margin: 0;
+            font-size: 14px;
+            color: #555;
+            cursor: pointer;
+            font-weight: normal;
+        }
+    </style>
 </head>
 
 <body>
@@ -38,7 +61,6 @@
                 <button class="btn-actualizar" style="display:none;">Actualizar Usuario</button>
                 <button id="btnCancelar" class="btn-cancelar" style="display:none;">Cancelar</button>
 
-
                 <label>Nombre: </label>
                 <input type="text" id="nombre" placeholder="Escriba aquí" autocomplete="off">
                 <span id="error-nombre" class="mensaje-error"></span>
@@ -52,6 +74,12 @@
                     <label>Contraseña: </label>
                     <input type="password" id="password" placeholder="Escriba aquí" autocomplete="new-password">
                     <span id="error-password" class="mensaje-error"></span>
+                    
+                    <!-- Checkbox para mostrar contraseña -->
+                    <div class="mostrar-contrasena">
+                        <input type="checkbox" id="mostrarPassword">
+                        <label for="mostrarPassword">Mostrar contraseña</label>
+                    </div>
                 </div>
                 <label>Rol del usuario: </label>
                 <select id="rol">
@@ -90,17 +118,14 @@
                     ← Volver
                 </button>
 
-
-
                 <!-- Buscador (derecha) -->
                 <div class="buscador" style="margin-left: auto;">
                     <input type="text" id="inputBuscarUsuarios" placeholder="Buscar..." autocomplete="off">
                     <button><img src="imgs/lupa.png" alt="Buscar"></button>
                 </div>
-                 <div>
-                
-                <button id="btnInactivos" class="btn-filtro">👥 Habilitar Usuarios</button>
-            </div>
+                <div>
+                    <button id="btnInactivos" class="btn-filtro">👥 Habilitar Usuarios</button>
+                </div>
             </div>
 
             <!-- Filtros -->
@@ -129,7 +154,6 @@
             </div>
         </section>
 
-
         <!-- Modal de mensajes -->
         <div id="modalMensaje" class="modal">
             <div class="modal-mensaje-contenido">
@@ -141,17 +165,7 @@
                 <button id="cerrarMensaje" class="btn-cerrar">X</button>
             </div>
         </div>
-        <!-- Modal 
-        /*<div id="modalAcciones" class="modal">
-            <div class="modal-contenido">
-                <h2>Acciones</h2>
-                <div class="modal-botones">
-                    <button id="btnEditarModal" class="btn-accion btn-azul">Editar</button>   
-                </div>
-                <button id="cerrarModal" class="btn-cerrar">X</button>
-            </div>
-        </div>-->
-        <!-- Modal de Confirmación -->
+
         <!-- Modal de Confirmación -->
         <div id="modalConfirmacion" class="modal-mensaje" style="display: none;">
             <div class="modal-contenido">
@@ -174,5 +188,23 @@
 <script src="js/usuarios.js"></script>
 <!-- Incluir SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // Función para mostrar/ocultar contraseña
+    document.addEventListener('DOMContentLoaded', function() {
+        const mostrarPasswordCheckbox = document.getElementById('mostrarPassword');
+        const passwordInput = document.getElementById('password');
+        
+        if (mostrarPasswordCheckbox && passwordInput) {
+            mostrarPasswordCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    passwordInput.type = 'text';
+                } else {
+                    passwordInput.type = 'password';
+                }
+            });
+        }
+    });
+</script>
 
 </html>

@@ -249,7 +249,7 @@ select:focus {
 
 .tabla-contenedor {
     flex: 1;
-    max-height: 500px;  
+    max-height: 500px;
     overflow-y: auto;
     overflow-x: auto;
     border: 2px solid #ddd;
@@ -857,7 +857,32 @@ body *:not(input):not(textarea):not(select) {
         font-size: 15px;
     }
 }
+
 .tabla-bloqueada {
-    pointer-events: none;   /* bloquea clics */
-    opacity: 0.6;           /* opcional: se ve más apagada */
+    pointer-events: none;
+    /* bloquea clics */
+    opacity: 0.6;
+    /* opcional: se ve más apagada */
 }
+
+.input-password {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+input[type="password"],
+input[type="text"] {
+    width: 100%;
+    padding-right: 120px;
+    /* espacio para checkbox + texto */
+}
+
+
+/* Mostrar mensaje solo cuando hay algo escrito */
+input[type="password"]:not(:placeholder-shown)~.toggle-password,
+input[type="text"]:not(:placeholder-shown)~.toggle-password {
+    display: flex;
+}
+
+
