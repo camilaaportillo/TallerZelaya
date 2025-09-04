@@ -14,12 +14,12 @@ $sql = "SELECT
             u.id_rol, 
             r.nombre_rol AS rol
         FROM usuario u
-        JOIN rol r ON u.id_rol = r.id_rol";
+        JOIN rol r ON u.id_rol = r.id_rol" ;
 
 if ($filtrar) {
     $sql .= " WHERE u.estado = ?";
 }
-$sql .= " ORDER BY u.id_usuario ASC";
+$sql .= " ORDER BY u.id_usuario DESC";
 
 $stmt = $conn->prepare($sql);
 if ($filtrar) {

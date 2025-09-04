@@ -32,78 +32,101 @@
     <main>
 
         <!-- Formulario -->
-        <section class="formulario">
-            <button class="btn-registrar">Agregar Usuario</button>
-            <button class="btn-actualizar" style="display:none;">Actualizar Usuario</button>
-            <button id="btnCancelar" class="btn-cancelar" style="display:none;">Cancelar</button>
+        <div id="contenedorFormulario">
+            <section class="formulario" autocomplete="off">
+                <button class="btn-registrar">Agregar Usuario</button>
+                <button class="btn-actualizar" style="display:none;">Actualizar Usuario</button>
+                <button id="btnCancelar" class="btn-cancelar" style="display:none;">Cancelar</button>
 
 
-            <label>Nombre: </label>
-            <input type="text" id="nombre" placeholder="Escriba aquí">
-            <span id="error-nombre" class="mensaje-error"></span>
-            <label>Correo eléctronico: </label>
-            <input type="email" id="correo" placeholder="Escriba aquí">
-            <span id="error-correo" class="mensaje-error"></span>
-            <div id="campo-usuario-contrasena">
-                <label>Usuario: </label>
-                <input type="text" id="usuario" placeholder="Escriba aquí">
-                <span id="error-usuario" class="mensaje-error"></span>
-                <label>Contraseña: </label>
-                <input type="password" id="password" placeholder="Escriba aquí">
-                <span id="error-password" class="mensaje-error"></span>
-            </div>
-            <label>Rol del usuario: </label>
-            <select id="rol">
-                <option value="" disabled selected>Seleccionar Rol</option>
-                <option value="1">Administrador</option>
-                <option value="2">Empleado</option>
-            </select>
-
-            <div id="campo-estado" style="display:none;">
-                <label>Estado: </label>
-                <select name="estado" id="estado">
-                    <option value="Activo">Activo</option>
-                    <option value="Inactivo">Inactivo</option>
+                <label>Nombre: </label>
+                <input type="text" id="nombre" placeholder="Escriba aquí" autocomplete="off">
+                <span id="error-nombre" class="mensaje-error"></span>
+                <label>Correo eléctronico: </label>
+                <input type="email" id="correo" placeholder="Escriba aquí" autocomplete="off">
+                <span id="error-correo" class="mensaje-error"></span>
+                <div id="campo-usuario-contrasena" autocomplete="off">
+                    <label>Usuario: </label>
+                    <input type="text" id="usuario" placeholder="Escriba aquí" autocomplete="new-user">
+                    <span id="error-usuario" class="mensaje-error"></span>
+                    <label>Contraseña: </label>
+                    <input type="password" id="password" placeholder="Escriba aquí" autocomplete="new-password">
+                    <span id="error-password" class="mensaje-error"></span>
+                </div>
+                <label>Rol del usuario: </label>
+                <select id="rol">
+                    <option value="" disabled selected>Seleccionar Rol</option>
+                    <option value="1">Administrador</option>
+                    <option value="2">Empleado</option>
                 </select>
-            </div>
-            <div id="mensaje-usuario-contrasena" style="display:none; color:#555; font-size:0.9em; margin-bottom:10px;">
-                ⚠ Usuario y Contraseña no se pueden modificar aquí. Cada usuario puede cambiar su Contraseña desde su
-                inicio de sesión.
-            </div>
-        </section>
+
+                <p
+                    style="font-size: 13px; color: rgb(0, 0, 0); margin-top: 5px; margin-bottom: 10px; text-align: center;">
+                    Presione
+                    "Enter" para cambiar de campo</p>
+                <div id="campo-estado" style="display:none;">
+                    <label>Estado: </label>
+                    <select name="estado" id="estado">
+                        <option value="Activo">Activo</option>
+                        <option value="Inactivo">Inactivo</option>
+                    </select>
+                </div>
+                <div id="mensaje-usuario-contrasena"
+                    style="display:none; color:#555; font-size:0.9em; margin-bottom:10px;">
+                    ⚠ Usuario y Contraseña no se pueden modificar aquí. Cada usuario puede cambiar su Contraseña desde
+                    su
+                    inicio de sesión.
+                </div>
+            </section>
+        </div>
 
         <!-- Tabla -->
-
         <section class="tabla">
-            <div class="buscador">
-                <input type="text" id="inputBuscarUsuarios" placeholder="Buscar...">
-                <button><img src="imgs/lupa.png" alt="Buscar"></button>
+            <!-- Header con botón volver, título y buscador -->
+            <div class="tabla-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <!-- Botón volver (izquierda) -->
+                <button id="btnVolver" class="btn-volver" style="display: none; margin-right: auto;">
+                    ← Volver
+                </button>
+
+
+
+                <!-- Buscador (derecha) -->
+                <div class="buscador" style="margin-left: auto;">
+                    <input type="text" id="inputBuscarUsuarios" placeholder="Buscar..." autocomplete="off">
+                    <button><img src="imgs/lupa.png" alt="Buscar"></button>
+                </div>
+                 <div>
+                
+                <button id="btnInactivos" class="btn-filtro">👥 Habilitar Usuarios</button>
             </div>
-            <div class="filtros">
-                <button id="btnActivos" class="btn-filtro">Usuarios Activos</button>
-                <button id="btnInactivos" class="btn-filtro">Usuarios Inactivos</button>
-            </div>
-            <div class="tabla-info">
-                <span id="estadoTabla">Mostrando usuarios Activos</span>
             </div>
 
+            <!-- Filtros -->
+
+            <!-- Título centrado -->
+            <h2 id="estadoTabla" style="margin: 0 auto; color: #050505; font-size: 16px;">
+                Mostrando usuarios Activos
+            </h2>
+
+            <!-- Contenedor de la tabla -->
             <div class="tabla-contenedor">
                 <table>
                     <thead>
                         <tr>
                             <th>Nombre</th>
-                            <th>Correo </th>
+                            <th>Correo</th>
                             <th>Usuario</th>
                             <th>Rol</th>
                             <th>Acción</th>
                         </tr>
                     </thead>
                     <tbody>
-
+                        <!-- Los datos se cargarán aquí -->
                     </tbody>
                 </table>
             </div>
-
         </section>
 
 
@@ -128,9 +151,28 @@
                 <button id="cerrarModal" class="btn-cerrar">X</button>
             </div>
         </div>-->
+        <!-- Modal de Confirmación -->
+        <!-- Modal de Confirmación -->
+        <div id="modalConfirmacion" class="modal-mensaje" style="display: none;">
+            <div class="modal-contenido">
+                <div class="modal-mensaje-icono icono-advertencia">⚠️</div>
+                <h3 id="confirmacionTitulo">Confirmar activación</h3>
+                <p id="confirmacionMensaje"></p>
+                <div class="botones-confirmacion">
+                    <button id="btnConfirmarSi" class="btn btn-primary">
+                        <i class="fas fa-check"></i> Sí, activar
+                    </button>
+                    <button id="btnConfirmarNo" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
     </main>
 </body>
 
 <script src="js/usuarios.js"></script>
+<!-- Incluir SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </html>

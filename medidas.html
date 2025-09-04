@@ -7,6 +7,8 @@
     <link rel="icon" href="imgs/favicon.png" type="image/png">
     <title>Medidas de Bicicletas</title>
     <link rel="stylesheet" href="css/styles_medida.css">
+    <!-- Añade SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -38,11 +40,11 @@
                         Medida:
                         <span class="tooltip">ℹ️
                             <span class="tooltiptext">
-                                Ejemplos válidos: 26", 27.5", 54cm, S, M, L, 26x1.95, 700x25c, 175
+                                Ejemplos válidos: 26", 27.5", 26x1.95, 700x25c, 175
                             </span>
                         </span>
                     </label>
-                    <input type="text" id="nombre" placeholder="Ej: 26″, 54cm, M, 26x1.95">
+                    <input type="text" id="nombre" placeholder="Ej: 26″, 26x1.95" autocomplete="off">
                     <span id="error-nombre" class="mensaje-error"></span>
                 </div>
 
@@ -55,11 +57,27 @@
 
             <!-- Tabla -->
             <section class="tabla">
-                <div class="tabla-header">
-                    <h2>Lista de Medidas</h2>
-                    <div class="buscador">
-                        <input type="text" id="inputBuscar" placeholder="Buscar medida...">
-                        <button><img src="imgs/lupa.png" alt="Buscar"></button>
+                <div class="tabla-header-container">
+                    <!-- Botón volver (izquierda) -->
+                    <button id="btnVolverMedidas" class="btn-volver" style="display: none; margin-right: auto;">
+                        ← Volver
+                    </button>
+
+                    <!-- Título centrado -->
+                    <h2 id="estadoTablaMedidas" style="margin: 0 auto; color: #050505; font-size: 16px;">
+                        Mostrando medidas Activas
+                    </h2>
+
+                    <!-- Contenedor para buscador y filtros -->
+                    <div style="display: flex; gap: 10px; margin-left: auto;">
+                        <!-- Buscador (derecha) -->
+                        <div class="buscador">
+                            <input type="text" id="inputBuscarMedidas" placeholder="Buscar...">
+                            <button><img src="imgs/lupa.png" alt="Buscar"></button>
+                        </div>
+                        <div class="filtros">
+                            <button id="btnInactivasMedidas" class="btn-filtro">📋 Habilitar Medidas</button>
+                        </div>
                     </div>
                 </div>
 
@@ -82,12 +100,13 @@
         <!-- Modal de mensajes -->
         <div id="modalMensaje" class="modal">
             <div class="modal-contenido">
-                <div class="modal-icono" id="modalIcono"></div>
+                <!-- Botón de cierre X -->
+                <span class="cerrar-modal">&times;</span>
+                <div class="modal-icono" id="modalIcono"></div> <!-- Cambiado a modal-icono -->
                 <h2 id="modalTitulo"></h2>
                 <p id="modalTexto"></p>
                 <div class="modal-botones">
                     <button id="btnAceptar" class="btn-aceptar">Aceptar</button>
-                    <button id="btnCancelarModal" class="btn-cancelar-modal" style="display:none;">Cancelar</button>
                 </div>
             </div>
         </div>
@@ -95,11 +114,13 @@
         <!-- Modal de confirmación -->
         <div id="modalConfirmacion" class="modal">
             <div class="modal-contenido">
-                <div class="modal-icono">?</div>
-                <h2>Confirmar Eliminación</h2>
-                <p id="textoConfirmacion">¿Estás seguro de que deseas eliminar esta medida?</p>
+                <!-- Botón de cierre X -->
+                <span class="cerrar-modal">&times;</span>
+                <div class="modal-icono" id="modalConfirmacionIcono">?</div> <!-- Agregado ID -->
+                <h2 id="modalConfirmacionTitulo">Confirmar Acción</h2>
+                <p id="textoConfirmacion">¿Estás seguro de que deseas realizar esta acción?</p>
                 <div class="modal-botones">
-                    <button id="btnConfirmarEliminar" class="btn-eliminar-modal">Eliminar</button>
+                    <button id="btnConfirmarEliminar" class="btn-eliminar-modal">Confirmar</button>
                     <button id="btnCancelarEliminar" class="btn-cancelar-modal">Cancelar</button>
                 </div>
             </div>

@@ -7,7 +7,21 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
-        if (isset($_GET['id'])) {
+        // Verificar si se solicita un estado específico
+        if (isset($_GET['estado'])) {
+            $estado = $_GET['estado'];
+            $stmt = $conn->prepare("SELECT * FROM medida WHERE estado = ? ORDER BY id_medida DESC");
+            $stmt->bind_param("s", $estado);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $medidas = [];
+            while ($row = $result->fetch_assoc()) {
+                $medidas[] = $row;
+            }
+            echo json_encode($medidas);
+        } 
+        // Obtener medida específica por ID
+        else if (isset($_GET['id'])) {
             $id = $_GET['id'];
             $stmt = $conn->prepare("SELECT * FROM medida WHERE id_medida = ?");
             $stmt->bind_param("i", $id);
@@ -15,9 +29,10 @@ switch ($method) {
             $result = $stmt->get_result();
             $medida = $result->fetch_assoc();
             echo json_encode($medida);
-        } else {
-            // Obtener todas las medidas
-            $result = $conn->query("SELECT * FROM medida ORDER BY id_medida DESC");
+        } 
+        // Obtener todas las medidas (activas por defecto)
+        else {
+            $result = $conn->query("SELECT * FROM medida WHERE estado = 'Activo' ORDER BY id_medida DESC");
             $medidas = [];
             while ($row = $result->fetch_assoc()) {
                 $medidas[] = $row;
@@ -29,8 +44,19 @@ switch ($method) {
     case 'POST':
         $data = json_decode(file_get_contents('php://input'), true);
         
-        if (isset($data['id_medida'])) {
-            // Actualizar medida existente
+        // Si se envía estado, es una activación/desactivación
+        if (isset($data['id_medida']) && isset($data['estado'])) {
+            $stmt = $conn->prepare("UPDATE medida SET estado = ? WHERE id_medida = ?");
+            $stmt->bind_param("si", $data['estado'], $data['id_medida']);
+            
+            if ($stmt->execute()) {
+                echo json_encode(["success" => true, "message" => "Estado de medida actualizado correctamente"]);
+            } else {
+                echo json_encode(["success" => false, "message" => "Error al actualizar estado de medida"]);
+            }
+        }
+        // Actualizar medida existente (nombre)
+        else if (isset($data['id_medida'])) {
             $stmt = $conn->prepare("UPDATE medida SET medida_bicicleta = ? WHERE id_medida = ?");
             $stmt->bind_param("si", $data['medida_bicicleta'], $data['id_medida']);
             
@@ -39,9 +65,11 @@ switch ($method) {
             } else {
                 echo json_encode(["success" => false, "message" => "Error al actualizar medida"]);
             }
-        } else {
-            // Crear nueva medida
-            $stmt = $conn->prepare("INSERT INTO medida (medida_bicicleta) VALUES (?)");
+        } 
+        // Crear nueva medida
+        else {
+            // Establecer estado como Activo por defecto
+            $stmt = $conn->prepare("INSERT INTO medida (medida_bicicleta, estado) VALUES (?, 'Activo')");
             $stmt->bind_param("s", $data['medida_bicicleta']);
             
             if ($stmt->execute()) {
@@ -53,17 +81,17 @@ switch ($method) {
         break;
     
     case 'DELETE':
-        // Eliminar medida
+        // En lugar de eliminar, cambiamos el estado a Inactivo
         parse_str(file_get_contents("php://input"), $data);
         $id = $data['id'];
         
-        $stmt = $conn->prepare("DELETE FROM medida WHERE id_medida = ?");
+        $stmt = $conn->prepare("UPDATE medida SET estado = 'Inactivo' WHERE id_medida = ?");
         $stmt->bind_param("i", $id);
         
         if ($stmt->execute()) {
-            echo json_encode(["success" => true, "message" => "Medida eliminada correctamente"]);
+            echo json_encode(["success" => true, "message" => "Medida desactivada correctamente"]);
         } else {
-            echo json_encode(["success" => false, "message" => "Error al eliminar medida"]);
+            echo json_encode(["success" => false, "message" => "Error al desactivar medida"]);
         }
         break;
     
