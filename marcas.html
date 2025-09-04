@@ -42,35 +42,43 @@
 
 
             
-           <button id="btn-habilitar-registro" class="btn-habilitar-registro" onclick="window.location.href='marcasInactivas.html'">
-    Habilitar marcas
-</button>
+          
 
         </section>
 
-        <!-- Tabla -->
-        <section class="tabla">
+        <!-- Tabla de marcas inactivas -->
+<section class="tabla">
 
-            <div class="buscador">
-                <input type="text" id="inputBuscar" placeholder="Buscar...">
-                <button id="btnLimpiar" style="display:none;">❌</button>
-            </div>
+    <div class="buscador">
+        <input type="text" id="inputBuscarInactivas" placeholder="Buscar...">
+        <button id="btnLimpiarInactivas" style="display:none;">❌</button>
+    </div>
 
-            <div class="tabla-contenedor">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nombre Marca</th>
-                            <th>Estado</th>
-                            <th>Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Se rellena con JS -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
+    <div class="tabla-contenedor">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre Marca</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="tbodyMarcasInactivas">
+                <!-- Se rellena con JS -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Botón alineado a la derecha debajo de la tabla -->
+    <div class="contenedor-boton-habilitar">
+        <button id="btn-habilitar-registro" class="btn-habilitar-registro" 
+                onclick="window.location.href='marcasInactivas.html'">
+            Habilitar marcas
+        </button>
+    </div>
+
+</section>
+
 
         <!-- Modal de acciones -->
         <div id="modalAcciones" class="modal">
