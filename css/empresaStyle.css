@@ -174,7 +174,7 @@ main {
 }
 
 .btn-volver {
-    background-color: #007bff; /* azul */
+    background-color: #007bff; 
     color: white;
     padding: 8px 15px;
     border-radius: 8px;
@@ -184,7 +184,7 @@ main {
 }
 
 .btn-volver:hover {
-    background-color: #0056b3; /* azul más oscuro al pasar mouse */
+    background-color: #0056b3; 
 }
 
 

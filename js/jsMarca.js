@@ -28,14 +28,13 @@ const cerrarMensaje = document.getElementById("cerrarMensaje");
 
 function validarMarca() {
     const nombre = inputNombre.value.trim();
-    const estado = inputEstado.value;
 
     if (!nombre) {
         showModalMensaje("advertencia", "Falta nombre", "El nombre no puede estar vacío.");
         inputNombre.focus();
         return false;
     }
-    return { nombre, estado };
+    return { nombre };
 }
 
 // Cargar datos
@@ -86,7 +85,7 @@ btnRegistrar.addEventListener("click", (e) => {
     fetch("http://localhost/TallerZelaya/php/ingresarMarca.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams(datos)
+        body: `nombre=${datos.nombre}`
     })
         .then(res => res.json())
         .then(data => {
@@ -94,7 +93,6 @@ btnRegistrar.addEventListener("click", (e) => {
                 showModalMensaje("exito", "Éxito", data.mensaje);
                 cargarMarcas();
                 inputNombre.value = "";
-                inputEstado.value = "Activo";
             } else {
                 showModalMensaje("error", "Error", data.mensaje);
             }
