@@ -36,15 +36,18 @@
             <button class="btn-actualizar" style="display:none;">Editar Proveedor</button>
             <button id="btnCancelarEdicion" class="btn-cancelar-edicion" style="display:none;">Cancelar edición</button>
 
+
             <label>Nombre del Proveedor</label>
             <input type="text" id="inputNombreProveedor" placeholder="Escriba aquí">
+            <small id="errorNombre" class="error-msg"></small>
 
             <label>Teléfono del Proveedor</label>
             <input type="text" id="inputTelefonoProveedor" placeholder="Escriba aquí">
+            <small id="errorTelefono" class="error-msg"></small>
 
             <label>Correo del Proveedor</label>
             <input type="email" id="inputCorreoProveedor" placeholder="Escriba aquí">
-            
+            <small id="errorCorreo" class="error-msg"></small>
             
             <label>Empresa</label>
             <select id="selectEmpresa">

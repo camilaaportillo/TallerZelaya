@@ -498,3 +498,9 @@ table tbody tr:hover {
     margin-bottom: 8px;
     display: block;
 }
+
+
+.tabla-contenedor.bloqueada {
+    pointer-events: none; 
+    opacity: 0.8;         
+}

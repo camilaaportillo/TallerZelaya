@@ -25,12 +25,6 @@ const modalTitulo = document.getElementById("modalTitulo");
 const modalTexto = document.getElementById("modalTexto");
 const cerrarMensaje = document.getElementById("cerrarMensaje");
 
-// Referencias directas a los 3 inputs
-//const inputNombre = document.querySelectorAll(".formulario input")[0];
-//const inputCorreo = document.querySelectorAll(".formulario input")[1];
-//const inputTelefono = document.querySelectorAll(".formulario input")[2];
-
-
 // Inputs con IDs directos
 const inputNombre = document.getElementById("inputNombre");
 const inputCorreo = document.getElementById("inputCorreo");
@@ -229,6 +223,8 @@ btnActualizar.addEventListener("click", () => {
                 cargarEmpresas();
                 [inputNombre, inputCorreo, inputTelefono].forEach(i => i.value = "");
                 inputNombre.focus();
+
+                document.querySelector(".tabla-contenedor").classList.remove("bloqueada");
             } else {
                 showModalMensaje("error", "Error", data.mensaje);
             }
@@ -260,6 +256,8 @@ btnEditarModal.addEventListener("click", () => {
         document.querySelector(".btn-actualizar").style.display = "inline-block";
         btnCancelarEdicion.style.display = "inline-block";
 
+        document.querySelector(".tabla-contenedor").classList.add("bloqueada");
+
         const celdas = filaSeleccionada.querySelectorAll("td");
 
         inputs[0].value = celdas[0].innerText; // Nombre empresa
@@ -286,6 +284,7 @@ btnCancelarEdicion.addEventListener("click", () => {
     idSeleccionado = null;
 
     inputNombre.focus();
+    document.querySelector(".tabla-contenedor").classList.remove("bloqueada");
 });
 
 
