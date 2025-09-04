@@ -237,6 +237,25 @@ btnActualizar.addEventListener("click", () => {
     const telefono = inputs[1].value;
     const empresa = document.getElementById("selectEmpresa").value;
 
+    if (nombre.trim() === "") {
+        showModalMensaje("advertencia", "Falta nombre", "El nombre no puede estar vacío.");
+        inputNombre.focus();
+        return;
+    }
+    if (!regexCorreo.test(correo.trim())) {
+        showModalMensaje("advertencia", "Correo inválido", "correo inválido. Usa solo minúsculas y formato válido).");
+        inputCorreo.focus();
+        return;
+    }
+    if (!regexTelefono.test(telefono.trim())) {
+        showModalMensaje("advertencia", "Teléfono inválido", "El teléfono debe contener exactamente 8 dígitos.");
+        inputTelefono.focus();
+        return;
+    }
+    if (!idSeleccionado) {
+        showModalMensaje("advertencia", "Falta selección", "No se ha seleccionado ninguna empresa.");
+        return;
+    }
 
     if (empresa === "0" || !empresa) {
         showModalMensaje("advertencia", "Falta empresa", "Debe seleccionar una empresa.");

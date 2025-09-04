@@ -208,6 +208,26 @@ btnActualizar.addEventListener("click", () => {
     const correo = inputs[1].value;
     const telefono = inputs[2].value;
 
+    if (nombre.trim() === "") {
+        showModalMensaje("advertencia", "Falta nombre", "El nombre no puede estar vacío.");
+        inputNombre.focus();
+        return;
+    }
+    if (!regexCorreo.test(correo.trim())) {
+        showModalMensaje("advertencia", "Correo inválido", "Usa solo minúsculas y un formato válido.");
+        inputCorreo.focus();
+        return;
+    }
+    if (!regexTelefono.test(telefono.trim())) {
+        showModalMensaje("advertencia", "Teléfono inválido", "El teléfono debe contener exactamente 8 dígitos.");
+        inputTelefono.focus();
+        return;
+    }
+    if (!idSeleccionado) {
+        showModalMensaje("advertencia", "Falta selección", "No se ha seleccionado ninguna empresa.");
+        return;
+    }
+
     fetch("http://localhost/TallerZelaya/php/editarEmpresa.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
