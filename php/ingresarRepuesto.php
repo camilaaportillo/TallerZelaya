@@ -12,7 +12,7 @@ $sql = "INSERT INTO `repuesto`(`codigo`, `nombre`, `descripcion`, `stock_minimo`
         VALUES ('$codigo','$nombre','$descripcion','$stock','$id_marca','$id_medida')";
 
 if (mysqli_query($conn, $sql)) {
-    echo json_encode(["status" => "exito", "mensaje" => "Proveedor registrado correctamente."]);
+    echo json_encode(["status" => "exito", "mensaje" => "Repuesto registrado correctamente."]);
 } else {
     echo json_encode(["status" => "error", "mensaje" => "Error: " . mysqli_error($conn)]);
     echo $sql;

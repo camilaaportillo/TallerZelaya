@@ -8,6 +8,7 @@ const btnEliminarModal = document.getElementById("btnEliminarModal");
 const btnCancelarEdicion = document.getElementById("btnCancelarEdicion");
 const btnHabilitarModal = document.getElementById("btnHabilitarModal");
 const btnDeshabilitarModal = document.getElementById("btnDeshabilitarModal");
+const btnEliminar = document.getElementById("btnEliminarModal");
 
 const tablaBody = document.querySelector(".tabla tbody");
 const btnRegistrar = document.querySelector(".btn-registrar");
@@ -315,46 +316,17 @@ btnEditarModal.addEventListener("click", () => {
     }
 });
 
-//-------------------------------------------------------------------------------------------
-
 
 const btnActualizar = document.querySelector(".btn-actualizar");
 
 btnActualizar.addEventListener("click", () => {
-    const nombre = inputs[0].value;
-    const correo = inputs[2].value;
-    const telefono = inputs[1].value;
-    const empresa = document.getElementById("selectEmpresa").value;
+    const datos = validarRepuesto();
+    if (!datos) return;
 
-    if (nombre.trim() === "") {
-        showModalMensaje("advertencia", "Falta nombre", "El nombre no puede estar vacío.");
-        inputNombre.focus();
-        return;
-    }
-    if (!regexCorreo.test(correo.trim())) {
-        showModalMensaje("advertencia", "Correo inválido", "correo inválido. Usa solo minúsculas y formato válido).");
-        inputCorreo.focus();
-        return;
-    }
-    if (!regexTelefono.test(telefono.trim())) {
-        showModalMensaje("advertencia", "Teléfono inválido", "El teléfono debe contener exactamente 8 dígitos.");
-        inputTelefono.focus();
-        return;
-    }
-    if (!idSeleccionado) {
-        showModalMensaje("advertencia", "Falta selección", "No se ha seleccionado ninguna empresa.");
-        return;
-    }
-
-    if (empresa === "0" || !empresa) {
-        showModalMensaje("advertencia", "Falta empresa", "Debe seleccionar una empresa.");
-        return;
-    }
-
-    fetch("http://localhost/TallerZelaya/php/editarProveedor.php", {
+    fetch("http://localhost/TallerZelaya/php/editarProducto.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `id=${idSeleccionado}&nombre=${nombre}&correo=${correo}&telefono=${telefono}&id_empresa=${empresa}`
+        body: `id=${idSeleccionado}&nombre=${datos.nombre}&descripcion=${datos.descripcion}&stock=${datos.stock}&id_marca=${datos.marca}&id_medida=${datos.medida}`
     })
         .then(res => res.json())
         .then(data => {
@@ -362,14 +334,13 @@ btnActualizar.addEventListener("click", () => {
             btnActualizar.style.display = "none";
             btnRegistrar.style.display = "inline-block";
             btnCancelarEdicion.style.display = "none";
-            [inputNombre, inputCorreo, inputTelefono].forEach(i => i.value = "");
-            document.getElementById("selectEmpresa").selectedIndex = 0;
+            limpiarFormulario();
             inputNombre.focus();
             document.querySelector(".tabla-contenedor").classList.remove("bloqueada");
 
             if (data.status === "exito") {
                 showModalMensaje("exito", "Éxito", data.mensaje);
-                cargarProveedores();
+                cargarRepuestos();
             } else {
                 showModalMensaje("error", "Error", data.mensaje);
             }
@@ -381,22 +352,20 @@ btnActualizar.addEventListener("click", () => {
 
 
 
-
-const btnEliminar = document.getElementById("btnEliminarModal");
-
 btnEliminar.addEventListener("click", () => {
     if (!idSeleccionado) {
-        showModalMensaje("advertencia", "No hay selección", "No se ha seleccionado ningún proveedor.");
+        showModalMensaje("advertencia", "No hay selección", "No se ha seleccionado ningún producto.");
         return;
     }
     abrirModalConfirmar();
 });
 
 
+
 function irInicio() {
     window.location.href = "index.html";
 }
-
+/*
 function toggleMenu() {
     document.getElementById("menuUsuario").classList.toggle("mostrar");
 }
@@ -433,8 +402,9 @@ formInputs.forEach((input, index) => {
             }
         }
     });
-});
+});*/
 
+//-------------------------------------------------------------------------------------------
 
 
 inputBuscar.addEventListener("input", () => {
@@ -515,7 +485,7 @@ document.getElementById("btnConfirmarEliminar").addEventListener("click", () => 
     cerrarModalConfirmar();
     if (!idSeleccionado) return;
 
-    fetch("http://localhost/TallerZelaya/php/eliminarProveedor.php", {
+    fetch("http://localhost/TallerZelaya/php/eliminarRepuesto.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `id=${idSeleccionado}`
@@ -524,7 +494,7 @@ document.getElementById("btnConfirmarEliminar").addEventListener("click", () => 
         .then(data => {
             if (data.status === "exito") {
                 showModalMensaje("exito", "Éxito", data.mensaje);
-                cargarProveedores(); // actualiza
+                cargarRepuestos();
                 modal.style.display = "none";
                 idSeleccionado = null;
             } else {
@@ -536,102 +506,6 @@ document.getElementById("btnConfirmarEliminar").addEventListener("click", () => 
         });
 });
 
-
-const btnHabilitarRegistro = document.getElementById("btn-habilitar-registro");
-
-// Al dar clic en "Habilitar registro"
-btnHabilitarRegistro.addEventListener("click", () => {
-    // Ocultar formulario
-    document.querySelector(".formulario").style.display = "none";
-    document.querySelector(".buscador-derecha").style.display = "none";
-    // Cargar proveedores inactivos
-    fetch("http://localhost/TallerZelaya/php/obtenerProveedoresInactivos.php")
-        .then(res => res.json())
-        .then(data => {
-            renderTablaInactivos(data);
-        })
-        .catch(err => console.error("Error cargando inactivos:", err));
-});
-
-// Render tabla con proveedores inactivos
-function renderTablaInactivos(datos) {
-    tablaBody.innerHTML = "";
-    if (datos.length === 0) {
-        tablaBody.innerHTML = `<tr><td colspan="5">No hay proveedores inactivos</td></tr>`;
-        return;
-    }
-
-    datos.forEach(prov => {
-        const fila = document.createElement("tr");
-        fila.innerHTML = `
-            <td>${prov.nombre}</td>
-            <td>${prov.correo}</td>
-            <td>${prov.telefono}</td>
-            <td>${prov.empresa}</td>
-            <td>
-                <button class="btn-habilitar" data-id="${prov.id_proveedor}">
-                    HABILITAR
-                </button>
-            </td>
-        `;
-
-        fila.querySelector(".btn-habilitar").addEventListener("click", (e) => {
-            const id = e.target.closest("button").dataset.id;
-            habilitarProveedor(id);
-        });
-
-        tablaBody.appendChild(fila);
-    });
-}
-
-// Función para habilitar proveedor
-function habilitarProveedor(id) {
-    fetch("http://localhost/TallerZelaya/php/habilitarProveedor.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `id=${id}`
-    })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === "exito") {
-                showModalMensaje("exito", "Éxito", data.mensaje);
-
-                // Recargar lista de inactivos
-                fetch("http://localhost/TallerZelaya/php/obtenerProveedoresInactivos.php")
-                    .then(res => res.json())
-                    .then(datos => renderTablaInactivos(datos));
-            } else {
-                showModalMensaje("error", "Error", data.mensaje);
-            }
-        })
-        .catch(() => {
-            showModalMensaje("error", "Error", "No se pudo habilitar el registro.");
-        });
-}
-
-const btnVolver = document.getElementById("btn-volver");
-
-btnHabilitarRegistro.addEventListener("click", () => {
-    // Ocultar formulario y mostrar botón volver
-    document.querySelector(".formulario").style.display = "none";
-    btnHabilitarRegistro.style.display = "none";
-    btnVolver.style.display = "inline-block";
-
-    // Cargar proveedores inactivos
-    fetch("http://localhost/TallerZelaya/php/obtenerProveedoresInactivos.php")
-        .then(res => res.json())
-        .then(data => {
-            renderTablaInactivos(data);
-        })
-        .catch(err => console.error("Error cargando inactivos:", err));
-});
-
-btnVolver.addEventListener("click", () => {
-    // Mostrar formulario y ocultar botón volver
-    document.querySelector(".formulario").style.display = "flex";
-    btnHabilitarRegistro.style.display = "inline-block";
-    btnVolver.style.display = "none";
-
-    // Cargar proveedores activos
-    cargarProveedores();
+document.getElementById("btnCancelarEliminar").addEventListener("click", () => {
+    cerrarModalConfirmar();
 });
