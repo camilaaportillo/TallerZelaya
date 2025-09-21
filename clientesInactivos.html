@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="imgs/favicon.png" type="image/png">
+    <title>Clientes Inactivos</title>
+    <link rel="stylesheet" href="css/marcaStyle.css"> <!-- mismo estilo -->
+</head>
+
+<body>
+
+    <!-- Encabezado -->
+    <header>
+        <button class="logo-btn" onclick="irInicio()">
+            <img src="imgs/bicicleta.png" alt="Logo bicicleta">
+        </button>
+        <h1>Clientes Inactivos</h1>
+        <div class="usuario">
+            <span class="nombre-usuario">Usuario</span>
+            <button class="user-btn" onclick="toggleMenu()">
+                <img src="imgs/logo_user.png" alt="Usuario">
+            </button>
+            <div id="menuUsuario" class="menu-usuario">
+                <a href="#">Cerrar sesión</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- Tabla de clientes inactivos -->
+        <section class="tabla">
+
+            <div class="buscador">
+                <input type="text" id="inputBuscarInactivos" placeholder="Buscar...">
+                <button id="btnLimpiarInactivos" style="display:none;">❌</button>
+            </div>
+
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre Cliente</th>
+                            <th>Correo</th>
+                            <th>Teléfono</th>
+                            <th>Estado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyClientesInactivos">
+                        <!-- Se rellena con JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Botón alineado a la derecha debajo de la tabla -->
+            <div class="contenedor-boton-habilitar">
+                <button id="btn-habilitar-registro" class="btn-habilitar-registro"
+                        onclick="window.location.href='clientes.html'">
+                    Volver a clientes
+                </button>
+            </div>
+
+        </section>
+
+        <!-- Modal de acciones -->
+        <div id="modalAcciones" class="modal">
+            <div class="modal-contenido">
+                <h2>Acciones</h2>
+                <div class="modal-botones">
+                    <button id="btnHabilitarModal" class="btn-accion btn-verde">Habilitar</button>
+                </div>
+                <button id="cerrarModal" class="btn-cerrar">X</button>
+            </div>
+        </div>
+
+        <!-- Modal de mensajes -->
+        <div id="modalMensaje" class="modal">
+            <div class="modal-mensaje-contenido">
+                <div class="modal-mensaje-icono" id="modalIcono"></div>
+                <div class="modal-mensaje-texto">
+                    <h2 id="modalTitulo"></h2>
+                    <p id="modalTexto"></p>
+                </div>
+                <button id="cerrarMensaje" class="btn-cerrar">X</button>
+            </div>
+        </div>
+
+        <!-- Modal de Confirmación -->
+        <div id="modalConfirmar" class="modal">
+            <div class="modal-content warning">
+                <span class="close" onclick="cerrarModalConfirmar()">&times;</span>
+                <p>¿Seguro que deseas habilitar este cliente?</p>
+                <div class="modal-actions">
+                    <button id="btnConfirmarHabilitar" class="btn-confirmar">Sí, habilitar</button>
+                    <button onclick="cerrarModalConfirmar()" class="btn-cancelar">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+
+<script src="js/jsClientesInactivos.js?v=1.0.0"></script>
+
+</html>
