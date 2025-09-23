@@ -31,7 +31,7 @@ const cerrarMensaje = document.getElementById("cerrarMensaje");
 
 function validarCliente() {
     const nombre = inputNombre.value.trim();
-    const apellido = inputApellido.value.trim();
+    
     const telefono = inputTelefono.value.trim();
     const correo = inputCorreo.value.trim();
 
@@ -41,7 +41,7 @@ function validarCliente() {
         return false;
     }
 
-    return { nombre, apellido, telefono, correo };
+    return { nombre, telefono, correo };
 }
 
 // Cargar datos
@@ -64,10 +64,10 @@ function mostrarTabla(datos) {
 
         fila.innerHTML = `
             <td>${cliente.nombre}</td>
-            <td>${cliente.apellido}</td>
-            <td>${cliente.telefono ?? ""}</td>
+           
             <td>${cliente.correo ?? ""}</td>
-            <td>${cliente.estado}</td>
+            <td>${cliente.telefono?? ""}</td>
+            
             <td>
                 <button class="btn-editar" data-id="${cliente.id_cliente}">
                     <img src="imgs/editar.png" alt="Editar">
@@ -103,7 +103,6 @@ btnRegistrar.addEventListener("click", (e) => {
             showModalMensaje("exito", "Éxito", data.mensaje);
             cargarClientes();
             inputNombre.value = "";
-            inputApellido.value = "";
             inputTelefono.value = "";
             inputCorreo.value = "";
         } else if (data.status === "duplicado") {
@@ -126,7 +125,8 @@ btnActualizar.addEventListener("click", () => {
     fetch("http://localhost/TallerZelaya/php/editarClientes.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `id=${idSeleccionado}&nombre=${encodeURIComponent(datos.nombre)}&apellido=${encodeURIComponent(datos.apellido)}&telefono=${encodeURIComponent(datos.telefono)}&correo=${encodeURIComponent(datos.correo)}`
+        body: `id_cliente=${idSeleccionado}&nombre=${encodeURIComponent(datos.nombre)}&telefono=${encodeURIComponent(datos.telefono)}&correo=${encodeURIComponent(datos.correo)}`
+
     })
     .then(res => res.json())
     .then(data => {
@@ -136,7 +136,7 @@ btnActualizar.addEventListener("click", () => {
 
             // Resetear formulario
             inputNombre.value = "";
-            inputApellido.value = "";
+            
             inputTelefono.value = "";
             inputCorreo.value = "";
             idSeleccionado = null;
@@ -192,10 +192,9 @@ btnEditarModal.addEventListener("click", () => {
     if (filaSeleccionada && idSeleccionado) {
         const celdas = filaSeleccionada.querySelectorAll("td");
         inputNombre.value = celdas[0].innerText;
-        inputApellido.value = celdas[1].innerText;
+        inputCorreo.value = celdas[1].innerText;
         inputTelefono.value = celdas[2].innerText;
-        inputCorreo.value = celdas[3].innerText;
-
+        
         btnRegistrar.style.display = "none";
         btnActualizar.style.display = "inline-block";
         btnCancelarEdicion.style.display = "inline-block";
@@ -207,7 +206,7 @@ btnEditarModal.addEventListener("click", () => {
 
 btnCancelarEdicion.addEventListener("click", () => {
     inputNombre.value = ""; 
-    inputApellido.value = ""; 
+  
     inputTelefono.value = ""; 
     inputCorreo.value = ""; 
     idSeleccionado = null;  
@@ -224,8 +223,7 @@ inputBuscar.addEventListener("input", () => {
     if (texto.trim() !== "") {
         btnLimpiar.style.display = "inline";
         const filtrados = clientesData.filter(c =>
-            c.nombre.toLowerCase().includes(texto) ||
-            c.apellido.toLowerCase().includes(texto)
+            c.nombre.toLowerCase().includes(texto)
         );
         mostrarTabla(filtrados);
     } else {
