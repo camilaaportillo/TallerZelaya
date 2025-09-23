@@ -365,7 +365,7 @@ btnEliminar.addEventListener("click", () => {
 function irInicio() {
     window.location.href = "index.html";
 }
-/*
+
 function toggleMenu() {
     document.getElementById("menuUsuario").classList.toggle("mostrar");
 }
@@ -375,6 +375,8 @@ window.onclick = function (e) {
         document.getElementById("menuUsuario").classList.remove("mostrar");
     }
 }
+
+const formInputs = document.querySelectorAll("input, select, textarea");
 
 // Hacer focus en el primer input al cargar la página
 document.addEventListener("DOMContentLoaded", () => {
@@ -402,16 +404,13 @@ formInputs.forEach((input, index) => {
             }
         }
     });
-});*/
-
-//-------------------------------------------------------------------------------------------
-
+});
 
 inputBuscar.addEventListener("input", () => {
     const texto = inputBuscar.value.toLowerCase();
     if (texto.trim() !== "") {
         btnLimpiar.style.display = "inline";
-        const filtrados = proveedoresData.filter(p =>
+        const filtrados = repuestosData.filter(p =>
             p.nombre.toLowerCase().includes(texto) ||
             p.correo.toLowerCase().includes(texto) ||
             p.telefono.toLowerCase().includes(texto) ||
@@ -420,7 +419,7 @@ inputBuscar.addEventListener("input", () => {
         renderTabla(filtrados);
     } else {
         btnLimpiar.style.display = "none";
-        renderTabla(proveedoresData);
+        renderTabla(repuestosData);
     }
 });
 
@@ -428,7 +427,7 @@ inputBuscar.addEventListener("input", () => {
 btnLimpiar.addEventListener("click", () => {
     inputBuscar.value = "";
     btnLimpiar.style.display = "none";
-    renderTabla(proveedoresData);
+    renderTabla(repuestosData);
     inputBuscar.focus();
 });
 
@@ -509,3 +508,4 @@ document.getElementById("btnConfirmarEliminar").addEventListener("click", () => 
 document.getElementById("btnCancelarEliminar").addEventListener("click", () => {
     cerrarModalConfirmar();
 });
+
