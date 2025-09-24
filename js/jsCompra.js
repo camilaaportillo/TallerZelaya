@@ -401,3 +401,108 @@ function limpiarCampos() {
 
     inputCantidad.focus();
 }
+
+// Cerrar modal
+cerrarModal.addEventListener("click", () => {
+    modal.style.display = "none";
+});
+
+function irInicio() {
+    window.location.href = "index.html";
+}
+
+function toggleMenu() {
+    document.getElementById("menuUsuario").classList.toggle("mostrar");
+}
+
+window.onclick = function (e) {
+    if (!e.target.closest('.usuario')) {
+        document.getElementById("menuUsuario").classList.remove("mostrar");
+    }
+}
+
+const formInputs = document.querySelectorAll("input, select, textarea");
+
+// Hacer focus en el primer input al cargar la página
+document.addEventListener("DOMContentLoaded", () => {
+    if (formInputs.length > 0) {
+        formInputs[0].focus();
+    }
+});
+
+// Navegación con Enter
+formInputs.forEach((input, index) => {
+    input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault(); // evitar submit accidental
+
+            // Si no es el último input → pasar al siguiente
+            if (index < formInputs.length - 1) {
+                formInputs[index + 1].focus();
+            } else {
+                // Si es el último input → enfocar botón correcto
+                if (btnRegistrar.style.display !== "none") {
+                    btnRegistrar.focus();
+                } else if (btnEditar.style.display !== "none") {
+                    btnEditar.focus();
+                }
+            }
+        }
+    });
+});
+
+
+/* ========== ENVIAR COMPRA COMPLETA ========== */
+const btnEnviar = document.getElementById("btn-registro");
+
+btnEnviar.addEventListener("click", () => {
+    if (productosCompra.length === 0) {
+        alert("Debe agregar al menos un producto antes de enviar la compra.");
+        return;
+    }
+
+    const proveedor = selectProveedor.value;
+    const fecha = inputFecha.value;
+
+    // Armamos el payload
+    const payload = {
+        proveedor: proveedor,
+        fecha: fecha,
+        usuario: 1, // en producción lo obtienes de sesión PHP
+        productos: productosCompra.map(p => ({
+            id_repuesto: p.producto,
+            cantidad: p.cantidad,
+            precio: p.precio
+        }))
+    };
+    fetch("http://localhost/TallerZelaya/php/compra.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "success") {
+            alert("Compra registrada correctamente ✅");
+
+            // Reset de estado
+            productosCompra = [];
+            renderTabla();
+            totalCompra.textContent = "$0.00";
+
+            if (choicesProveedor && typeof choicesProveedor.enable === "function") {
+                choicesProveedor.enable();
+            } else {
+                selectProveedor.removeAttribute("disabled");
+            }
+            inputFecha.removeAttribute("readonly");
+            inputFecha.value = "";
+        } else {
+            alert("Error al registrar la compra ❌");
+        }
+    })
+    .catch(err => {
+        console.error("Error en fetch:", err);
+        alert("Error de conexión con el servidor.");
+    });
+});
