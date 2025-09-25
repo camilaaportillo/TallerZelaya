@@ -7,6 +7,12 @@
     <link rel="icon" href="imgs/favicon.png" type="image/png">
     <title>Sistema del Taller Zelaya</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            visibility: hidden;
+        } /* oculta el body si no se ha iniciado sesion */
+    </style>
+    <script src="js/sesion.js"></script>
 </head>
 
 <body>
@@ -18,12 +24,15 @@
         </button>
         <h1>Taller de bicicletas Zelaya</h1>
         <div class="usuario">
-            <span class="nombre-usuario">Usuario</span>
+            <div class="info-usuario">
+                <span id="nombreUsuario" class="nombre-usuario">Usuario</span>
+                <span id="rolUsuario" class="rol-usuario"></span>
+            </div>
             <button class="user-btn" onclick="toggleMenu()">
                 <img src="imgs/logo_user.png" alt="Usuario">
             </button>
             <div id="menuUsuario" class="menu-usuario">
-                <a href="#">Cerrar sesión</a>
+                <a href="#" onclick="cerrarSesion()">Cerrar sesión</a>
             </div>
         </div>
     </header>
@@ -71,6 +80,7 @@
     </main>
 
     <script src="js/script.js"></script>
+
 </body>
 
 </html>

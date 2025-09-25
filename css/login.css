@@ -1,0 +1,210 @@
+*{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+        /*user-select: none;*/
+    }
+
+    .login-container {
+        display: flex;
+        width: 900px;
+        height: 500px;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+    }
+
+    .image-section {
+        flex: 1;
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../imgs/login.jpg');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .image-section h2 {
+        font-size: 28px;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    .image-section p {
+        font-size: 16px;
+        line-height: 1.6;
+    }
+
+    .form-section {
+        flex: 1;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .logo {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .logo h1 {
+        color: #2c3e50;
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    .logo p {
+        color: #7f8c8d;
+        font-size: 16px;
+        margin-top: 5px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 14px;
+    }
+
+    input[type="email"],
+    input[type="password"] {
+        width: 100%;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 16px;
+        transition: all 0.3s;
+    }
+
+    input[type="email"]:focus,
+    input[type="password"]:focus {
+        border-color: #3498db;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+
+    .password-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 5px;
+        font-size: 14px;
+    }
+
+
+    .forgot-password {
+        color: #3498db;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+
+    .forgot-password:hover {
+        color: #2980b9;
+        text-decoration: underline;
+    }
+
+    .login-button {
+        background-color: #002842;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 15px 20px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 15px;
+        transition: background-color 0.3s;
+    }
+
+    .login-button:hover {
+        background-color: #1e5d88;
+    }
+
+    .password-hints {
+        background-color: #f8f9fa;
+        border-left: 4px solid #3498db;
+        border-radius: 4px;
+        padding: 15px;
+        margin-top: 25px;
+        font-size: 14px;
+    }
+
+    .password-hints p {
+        margin-bottom: 10px;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .password-hints ul {
+        list-style-type: none;
+        padding-left: 5px;
+    }
+
+    .password-hints li {
+        margin-bottom: 5px;
+        color: #7f8c8d;
+        padding-left: 15px;
+        position: relative;
+    }
+
+    .password-hints li::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: #3498db;
+        font-weight: bold;
+    }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        margin: 20px 0;
+        color: #7f8c8d;
+    }
+
+    .divider::before,
+    .divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background-color: #ddd;
+    }
+
+    .divider span {
+        padding: 0 15px;
+        font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+        .login-container {
+            flex-direction: column;
+            height: auto;
+            width: 100%;
+        }
+
+        .image-section {
+            padding: 30px 20px;
+        }
+    }

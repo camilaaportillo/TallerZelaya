@@ -9,22 +9,25 @@
     <link rel="stylesheet" href="css/styles_medida.css">
     <!-- Añade SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+     <style>
+        body { visibility: hidden; } /* oculta el body si no se ha iniciado sesion */
+    </style>
+    <script src="js/sesion.js"></script> 
 </head>
 
 <body>
-    <!-- Encabezado -->
     <header>
         <button class="logo-btn" onclick="irInicio()">
             <img src="imgs/bicicleta.png" alt="Logo bicicleta">
         </button>
-        <h1>Medidas de Bicicletas</h1>
+        <h1>Taller de bicicletas Zelaya</h1>
         <div class="usuario">
-            <span class="nombre-usuario">Medidas</span>
+            <span id="nombreUsuario" class="nombre-usuario">Usuario</span>
             <button class="user-btn" onclick="toggleMenu()">
                 <img src="imgs/logo_user.png" alt="Usuario">
             </button>
             <div id="menuUsuario" class="menu-usuario">
-                <a href="#">Cerrar sesión</a>
+                <a href="#" onclick="cerrarSesion()">Cerrar sesión</a>
             </div>
         </div>
     </header>

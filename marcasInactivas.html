@@ -7,39 +7,42 @@
     <link rel="icon" href="imgs/favicon.png" type="image/png">
     <title>Marcas Inactivas</title>
     <link rel="stylesheet" href="css/marcaStyle.css">
+     <style>
+        body { visibility: hidden; } /* oculta el body si no se ha iniciado sesion */
+    </style>
+    <script src="js/sesion.js"></script> 
 </head>
 
 <body>
 
-    <!-- Encabezado -->
     <header>
         <button class="logo-btn" onclick="irInicio()">
             <img src="imgs/bicicleta.png" alt="Logo bicicleta">
         </button>
-        <h1>Marcas Inactivas</h1>
+        <h1>Taller de bicicletas Zelaya</h1>
         <div class="usuario">
-            <span class="nombre-usuario">Usuario</span>
+            <span id="nombreUsuario" class="nombre-usuario">Usuario</span>
             <button class="user-btn" onclick="toggleMenu()">
                 <img src="imgs/logo_user.png" alt="Usuario">
             </button>
             <div id="menuUsuario" class="menu-usuario">
-                <a href="#">Cerrar sesión</a>
+                <a href="#" onclick="cerrarSesion()">Cerrar sesión</a>
             </div>
         </div>
     </header>
 
     <main>
 
-        
+
 
         <!-- Tabla de marcas inactivas -->
         <section class="tabla">
             <!-- Botón para regresar -->
-        <section class="formulario">
-            <button id="btnVolver" class="btn-volver" onclick="window.location.href='marcas.html'">
-                Volver a Marcas
-            </button>
-        </section>
+            <section class="formulario">
+                <button id="btnVolver" class="btn-volver" onclick="window.location.href='marcas.html'">
+                    Volver a Marcas
+                </button>
+            </section>
 
             <div class="buscador">
                 <input type="text" id="inputBuscarInactivas" placeholder="Buscar...">
@@ -86,23 +89,22 @@
         </div>
 
         <!-- Modal de Confirmación Habilitar -->
-         <div id="modalConfirmarHabilitar" class="modal">
+        <div id="modalConfirmarHabilitar" class="modal">
             <div class="modal-content success">
                 <span class="close" onclick="cerrarModalConfirmarHabilitar()">&times;</span>
                 <p>¿Seguro que deseas habilitar este registro?</p>
                 <div class="modal-actions">
-                  <button id="btnConfirmarHabilitar" class="btn-confirmar">Sí, habilitar</button>
-                  <button onclick="cerrarModalConfirmarHabilitar()" class="btn-cancelar">Cancelar</button>
-                 </div> 
+                    <button id="btnConfirmarHabilitar" class="btn-confirmar">Sí, habilitar</button>
+                    <button onclick="cerrarModalConfirmarHabilitar()" class="btn-cancelar">Cancelar</button>
+                </div>
             </div>
-         </div>
+        </div>
 
 
     </main>
+    <!-- Conectar JS específico para marcas inactivas -->
+    <script src="js/jsMarcasInactivas.js?v=1.0.0"></script>
+   
 </body>
-
-
-<!-- Conectar JS específico para marcas inactivas -->
-<script src="js/jsMarcasInactivas.js?v=1.0.0"></script>
 
 </html>

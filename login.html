@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesión - Taller de Bicicletas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="image-section">
+            <h2>Bienvenido al Sistema</h2>
+            <p>Taller de Bicicletas Zelaya</p>
+        </div>
+
+        <div class="form-section">
+            <div class="logo">
+                <h1>Inicio de sesión</h1>
+                <p>Ingrese sus credenciales para continuar</p>
+            </div>
+
+            <form id="loginForm" action="php/login.php" method="POST">
+                <div class="form-group">
+                    <label for="correo">Correo Electrónico</label>
+                    <input type="email" id="correo" name="correo" placeholder="Ingresa tu correo electrónico" autocomplete="new-user" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="contrasena">Contraseña</label>
+                    <input type="password" id="contrasena" name="contrasena" placeholder="Ingresa tu contraseña" autocomplete="new-password" required>
+
+                    <div class="password-options">
+                        <a href="#" class="forgot-password">Olvidé la contraseña</a>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-button">Iniciar sesión</button>
+            </form>
+
+            <div id="mensajeError" class="mensaje-error" style="display: none; margin-top: 15px;"></div>
+
+            <div class="divider">
+                <span>o</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/login.js"></script>
+</body>
+
+</html>

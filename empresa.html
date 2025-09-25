@@ -7,23 +7,26 @@
     <link rel="icon" href="imgs/favicon.png" type="image/png">
     <title>Empresas</title>
     <link rel="stylesheet" href="css/empresaStyle.css">
+     <style>
+        body { visibility: hidden; } /* oculta el body si no se ha iniciado sesion */
+    </style>
+    <script src="js/sesion.js"></script> 
 </head>
 
 <body>
 
-    <!-- Encabezado -->
-    <header>
+  <header>
         <button class="logo-btn" onclick="irInicio()">
             <img src="imgs/bicicleta.png" alt="Logo bicicleta">
         </button>
-        <h1>Empresas</h1>
+        <h1>Taller de bicicletas Zelaya</h1>
         <div class="usuario">
-            <span class="nombre-usuario">Usuario</span>
+            <span id="nombreUsuario" class="nombre-usuario">Usuario</span>
             <button class="user-btn" onclick="toggleMenu()">
                 <img src="imgs/logo_user.png" alt="Usuario">
             </button>
             <div id="menuUsuario" class="menu-usuario">
-                <a href="#">Cerrar sesión</a>
+                <a href="#" onclick="cerrarSesion()">Cerrar sesión</a>
             </div>
         </div>
     </header>
@@ -133,8 +136,8 @@
             </div>
         </div>
     </main>
+    <script src="js/jsEmpresa.js"></script>
+    
 </body>
-
-<script src="js/jsEmpresa.js"></script>
 
 </html>
