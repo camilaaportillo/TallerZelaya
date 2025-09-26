@@ -15,13 +15,17 @@
 
 <body>
 
+     <!-- Encabezado -->
     <header>
         <button class="logo-btn" onclick="irInicio()">
             <img src="imgs/bicicleta.png" alt="Logo bicicleta">
         </button>
         <h1>Taller de bicicletas Zelaya</h1>
         <div class="usuario">
-            <span id="nombreUsuario" class="nombre-usuario">Usuario</span>
+            <div class="info-usuario">
+                <span id="nombreUsuario" class="nombre-usuario">Usuario</span>
+                <span id="rolUsuario" class="rol-usuario"></span>
+            </div>
             <button class="user-btn" onclick="toggleMenu()">
                 <img src="imgs/logo_user.png" alt="Usuario">
             </button>

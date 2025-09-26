@@ -63,16 +63,26 @@
             const nombreUsuarioElement = document.getElementById('nombreUsuario');
             const rolUsuarioElement = document.getElementById('rolUsuario');
 
-            if (nombreUsuarioElement && this.usuario && this.usuario.nombre) {
-                nombreUsuarioElement.textContent = this.usuario.nombre;
-
-                if (rolUsuarioElement) {
-                    rolUsuarioElement.textContent = this.getNombreRol();
+            if (nombreUsuarioElement && rolUsuarioElement) {
+                if (this.usuario && this.usuario.usuario) { 
+                    nombreUsuarioElement.textContent = this.usuario.usuario; // Mostrar el username
+                    rolUsuarioElement.textContent = `(${this.getNombreRol()})`;
+                } else if (this.usuario && this.usuario.nombre) {
+                    // Fallback: si no existe usuario, mostrar nombre
+                    nombreUsuarioElement.textContent = this.usuario.nombre;
+                    rolUsuarioElement.textContent = `(${this.getNombreRol()})`;
+                } else {
+                    nombreUsuarioElement.textContent = 'Invitado';
+                    rolUsuarioElement.textContent = '';
                 }
             } else if (nombreUsuarioElement) {
-                nombreUsuarioElement.textContent = 'Invitado';
-                if (rolUsuarioElement) {
-                    rolUsuarioElement.textContent = '';
+                // Fallback: si no existe el elemento rol
+                if (this.usuario && this.usuario.usuario) {
+                    nombreUsuarioElement.textContent = this.usuario.usuario;
+                } else if (this.usuario && this.usuario.nombre) {
+                    nombreUsuarioElement.textContent = this.usuario.nombre;
+                } else {
+                    nombreUsuarioElement.textContent = 'Invitado';
                 }
             }
         }

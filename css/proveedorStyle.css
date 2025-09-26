@@ -533,3 +533,26 @@ table tbody tr:hover {
 .btn-habilitar:active {
     transform: translateY(0);
 }
+/*css para usuario y rol del header*/
+.info-usuario {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    margin-right: 10px;
+}
+
+
+.rol-usuario {
+    font-size: 13px;
+    color: #000000;
+    font-style:normal;
+    margin-top: 3px;
+    line-height: 1;
+}
+
+.usuario {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}

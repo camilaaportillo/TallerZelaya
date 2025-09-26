@@ -3,17 +3,20 @@
 session_start();
 header('Content-Type: application/json');
 
-include 'conexion.php'; 
+include 'conexion.php';
 
-class LoginSystem {
+class LoginSystem
+{
     private $conn;
-    
-    public function __construct() {
+
+    public function __construct()
+    {
         global $conn;
         $this->conn = $conn;
     }
-    
-    public function verificarLogin($correo, $contrasena) {
+
+    public function verificarLogin($correo, $contrasena)
+    {
         try {
             // Buscar usuario por correo (incluyendo verificación de estado activo)
             $stmt = $this->conn->prepare("SELECT * FROM usuario WHERE correo = ? AND estado = 'activo'");
@@ -21,7 +24,7 @@ class LoginSystem {
             $stmt->execute();
             $result = $stmt->get_result();
             $usuario = $result->fetch_assoc();
-            
+
             if ($usuario) {
                 // Verificar la contraseña
                 if ($this->verificarContrasena($contrasena, $usuario['contrasena'])) {
@@ -29,17 +32,19 @@ class LoginSystem {
                     $_SESSION['usuario_id'] = $usuario['id_usuario'];
                     $_SESSION['usuario_correo'] = $usuario['correo'];
                     $_SESSION['usuario_nombre'] = $usuario['nombre'];
+                    $_SESSION['usuario_usuario'] = $usuario['usuario'];
                     $_SESSION['usuario_rol'] = $usuario['id_rol'];
                     $_SESSION['loggedin'] = true;
-                    
+
                     return [
                         'exitoso' => true,
                         'mensaje' => 'Login exitoso',
                         'usuario' => [
-                            'id' => $usuario['id_usuario'], 
+                            'id' => $usuario['id_usuario'],
                             'nombre' => $usuario['nombre'],
+                            'usuario' => $usuario['usuario'],
                             'correo' => $usuario['correo'],
-                            'rol' => $usuario['id_rol'] 
+                            'rol' => $usuario['id_rol']
                         ]
                     ];
                 } else {
@@ -54,7 +59,7 @@ class LoginSystem {
                 $stmt->bind_param("s", $correo);
                 $stmt->execute();
                 $result = $stmt->get_result();
-                
+
                 if ($result->num_rows > 0) {
                     return [
                         'exitoso' => false,
@@ -67,7 +72,6 @@ class LoginSystem {
                     ];
                 }
             }
-            
         } catch (Exception $e) {
             error_log("Error en login: " . $e->getMessage());
             return [
@@ -76,18 +80,19 @@ class LoginSystem {
             ];
         }
     }
-    
-    private function verificarContrasena($contrasenaPlana, $contrasenaHash) {
+
+    private function verificarContrasena($contrasenaPlana, $contrasenaHash)
+    {
         // Si la contraseña está en texto plano (para testing temporal)
         if ($contrasenaPlana === $contrasenaHash) {
             return true;
         }
-        
+
         // Verificar contraseña hasheada
         if (password_verify($contrasenaPlana, $contrasenaHash)) {
             return true;
         }
-        
+
         return false;
     }
 }
@@ -96,7 +101,7 @@ class LoginSystem {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $correo = trim($_POST['correo'] ?? '');
     $contrasena = $_POST['contrasena'] ?? '';
-    
+
     if (empty($correo) || empty($contrasena)) {
         echo json_encode([
             'exitoso' => false,
@@ -104,16 +109,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
         exit;
     }
-    
+
     $loginSystem = new LoginSystem();
     $resultado = $loginSystem->verificarLogin($correo, $contrasena);
-    
+
     echo json_encode($resultado);
-    
 } else {
     echo json_encode([
         'exitoso' => false,
         'mensaje' => 'Método no permitido'
     ]);
 }
-?>
