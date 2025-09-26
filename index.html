@@ -25,7 +25,8 @@
         <h1>Taller de bicicletas Zelaya</h1>
         <div class="usuario">
             <div class="info-usuario">
-                <span id="nombreUsuario" class="nombre-usuario">Usuario</span>
+                <span id="nombreUsuario" class="nombre-usuario" onclick="irPerfil()" style="cursor: pointer;">Usuario</span>
+
                 <span id="rolUsuario" class="rol-usuario"></span>
             </div>
             <button class="user-btn" onclick="toggleMenu()">
@@ -80,6 +81,12 @@
     </main>
 
     <script src="js/script.js"></script>
+
+      <script>
+        function irPerfil() {
+            window.location.href = "perfil.html";
+        }
+    </script>
 
 </body>
 
