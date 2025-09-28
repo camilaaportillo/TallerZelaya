@@ -423,6 +423,7 @@ if (btnConfirmarEliminar) {
         if (!id) return;
 
         productosCompra = productosCompra.filter(p => p.id !== id);
+        contadorId--;
         renderTabla();
 
         // si ya no hay productos, desbloquear proveedor y fecha
@@ -579,19 +580,7 @@ if (btnSubir) {
         if (modal) modal.style.display = "flex";
     });
 }
-/*
-// Cerrar modal
-cerrarModal.addEventListener("click", () => {
-    modal.style.display = "none";
-});
 
-// Click fuera del modal
-window.addEventListener("click", (e) => {
-    if (e.target === modal) {
-        modal.style.display = "none";
-    }
-});
-*/
 // Al hacer clic en el botón, abre el input
 const btnSeleccionarFactura = document.getElementById("btnSeleccionarFactura");
 if (btnSeleccionarFactura) {
