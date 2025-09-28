@@ -23,12 +23,43 @@ const inputFecha = document.getElementById("fecha");
 
 const totalCompra = document.getElementById("totalCompra");
 
+const cerrarMensaje = document.getElementById("cerrarMensaje");
+
 /* Errores (small tags en HTML) */
 const errorProducto = document.getElementById("errorProducto");
 const errorCantidad = document.getElementById("errorCantidad");
 const errorPrecio = document.getElementById("errorPrecio");
 const errorProveedor = document.getElementById("errorProveedor");
 const errorFecha = document.getElementById("errorFecha");
+
+// ========================= MODALES =========================
+function showModalMensaje(tipo, titulo, texto) {
+    // Resetear icono
+    modalIcono.className = "modal-mensaje-icono";
+
+    if (tipo === "error") {
+        modalIcono.classList.add("icono-error");
+        modalIcono.innerHTML = "✖";
+    } else if (tipo === "advertencia") {
+        modalIcono.classList.add("icono-advertencia");
+        modalIcono.innerHTML = "⚠";
+    } else if (tipo === "exito") {
+        modalIcono.classList.add("icono-exito");
+        modalIcono.innerHTML = "✔";
+    }
+
+    modalTitulo.innerText = titulo;
+    modalTexto.innerText = texto;
+
+    modalMensaje.style.display = "flex";
+
+    // Cerrar automático en 3 segundos
+    setTimeout(() => {
+        modalMensaje.style.display = "none";
+    }, 2000);
+}
+cerrarMensaje.addEventListener("click", () => modalMensaje.style.display = "none");
+//cerrarModal.addEventListener("click", () => modal.style.display = "none");
 
 // Si el botón listar_compras existe, navega
 const btnListar = document.getElementById("listar_compras");
@@ -160,12 +191,13 @@ function validarProducto() {
 function validarCantidad() {
     const v = inputCantidad ? inputCantidad.value.trim() : "";
     if (!/^[0-9]+$/.test(v) || parseInt(v) <= 0) {
-        if (errorCantidad) errorCantidad.textContent = "Ingrese una cantidad válida (número entero > 0).";
+        if (errorCantidad) errorCantidad.textContent = "Ingrese una cantidad válida (ej: 10).";
         return false;
     }
     if (errorCantidad) errorCantidad.textContent = "";
     return true;
 }
+
 function validarPrecio() {
     const v = inputPrecio ? inputPrecio.value.trim() : "";
     if (!/^\d+(\.\d{1,2})?$/.test(v) || parseFloat(v) <= 0) {
@@ -175,6 +207,9 @@ function validarPrecio() {
     if (errorPrecio) errorPrecio.textContent = "";
     return true;
 }
+
+
+
 function validarProveedor() {
     if (productosCompra.length === 0) {
         if (!selectProveedor || !selectProveedor.value || selectProveedor.value === "") {
@@ -185,18 +220,33 @@ function validarProveedor() {
     if (errorProveedor) errorProveedor.textContent = "";
     return true;
 }
+
 function validarFecha() {
-    if (productosCompra.length === 0) {
-        if (!inputFecha || !inputFecha.value || inputFecha.value === "") {
-            if (errorFecha) errorFecha.textContent = "Debe seleccionar una fecha.";
-            return false;
-        }
+    if (!inputFecha || !inputFecha.value) {
+        if (errorFecha) errorFecha.textContent = "Debe seleccionar una fecha.";
+        return false;
     }
+
+    const hoy = new Date();
+    const seleccionada = new Date(inputFecha.value);
+
+    // eliminar horas para comparación exacta
+    hoy.setHours(0,0,0,0);
+    seleccionada.setHours(0,0,0,0);
+
+    const hace7dias = new Date();
+    hace7dias.setDate(hoy.getDate() - 8);
+
+    if (seleccionada < hace7dias || seleccionada > hoy) {
+        if (errorFecha) errorFecha.textContent = "La fecha debe estar entre hoy y hace 7 días.";
+        return false;
+    }
+
     if (errorFecha) errorFecha.textContent = "";
     return true;
 }
 
-/* validar todo antes de agregar/actualizar */
+
 function validarCompra() {
     const v1 = validarProducto();
     const v2 = validarCantidad();
@@ -206,7 +256,14 @@ function validarCompra() {
 
     if (!(v1 && v2 && v3 && v4 && v5)) return false;
 
-    // devolver objeto con id_repuesto **claro**
+    // --- VALIDACIÓN: no permitir productos repetidos ---
+    const prodId = selectProducto.value;
+    if (productosCompra.some(p => p.id_repuesto == prodId && p.id !== filaSeleccionada)) {
+        showModalMensaje("advertencia", "Producto repetido", "Este producto ya fue agregado a la compra");
+        return false;
+    }
+
+    // devolver objeto con id_repuesto claro
     return {
         id_repuesto: selectProducto.value,
         nombreProducto: selectProducto.options[selectProducto.selectedIndex]?.text || "",
@@ -217,6 +274,7 @@ function validarCompra() {
         fecha: inputFecha ? inputFecha.value : null
     };
 }
+
 
 /* ========== Agregar producto ========== */
 btnRegistrar.addEventListener("click", (e) => {
@@ -416,19 +474,25 @@ function limpiarCampos() {
 
 // Cerrar modal (si existe)
 const cerrarModal = document.getElementById("cerrarModal");
-if (cerrarModal) {
+
     cerrarModal.addEventListener("click", () => {
         const modal = document.getElementById("modalFactura");
         if (modal) modal.style.display = "none";
     });
-}
+// Click fuera del modal
+window.addEventListener("click", (e) => {
+    const modal = document.getElementById("modalFactura");
+    if (e.target === modal) {
+        if (modal) modal.style.display = "none";
+    }
+});
 
 /* ========== ENVIAR COMPRA COMPLETA ========== */
 const btnEnviar = document.getElementById("btn-registro");
 if (btnEnviar) {
     btnEnviar.addEventListener("click", () => {
         if (productosCompra.length === 0) {
-            alert("Debe agregar al menos un producto antes de enviar la compra.");
+            showModalMensaje("advertencia", "Producto requerido", "Debe agregar al menos un producto antes de enviar la compra.");
             return;
         }
 
@@ -436,7 +500,7 @@ if (btnEnviar) {
         const fecha = inputFecha ? inputFecha.value : null;
 
         if (!proveedor || !fecha) {
-            alert("Proveedor o fecha inválidos.");
+            showModalMensaje("advertencia", "Datos invalidos", "Proveedor o fecha inválidos.");
             return;
         }
         // Preparar datos para enviar
@@ -481,7 +545,7 @@ if (btnEnviar) {
             })
             .then(data => {
                 if (data.status === "success") {
-                    alert("Compra registrada correctamente ✅");
+                    showModalMensaje("exito", "Éxito", "Compra registrada correctamente");
 
                     // Reset de estado
                     productosCompra = [];
@@ -496,12 +560,12 @@ if (btnEnviar) {
                     if (inputFecha) inputFecha.removeAttribute("readonly");
                     if (inputFecha) inputFecha.value = "";
                 } else {
-                    alert("Error al registrar la compra ❌ — " + (data.message || ""));
+                    showModalMensaje("error", "Error", "Error al registrar la compra");
                 }
             })
             .catch(err => {
                 console.error("Error en fetch:", err);
-                alert("Error de conexión con el servidor. Revisa la consola para más detalles.");
+                showModalMensaje("error", "Error", "Error de conexión con el servidor");
             });
     });
 }
@@ -515,15 +579,19 @@ if (btnSubir) {
         if (modal) modal.style.display = "flex";
     });
 }
-
-// Cerrar al hacer click fuera del modal
-window.addEventListener("click", (e) => {
-    if (e.target && e.target.id === "modalFactura") {
-        const modal = document.getElementById("modalFactura");
-        if (modal) modal.style.display = "none";
-    }
+/*
+// Cerrar modal
+cerrarModal.addEventListener("click", () => {
+    modal.style.display = "none";
 });
 
+// Click fuera del modal
+window.addEventListener("click", (e) => {
+    if (e.target === modal) {
+        modal.style.display = "none";
+    }
+});
+*/
 // Al hacer clic en el botón, abre el input
 const btnSeleccionarFactura = document.getElementById("btnSeleccionarFactura");
 if (btnSeleccionarFactura) {

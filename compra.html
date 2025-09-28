@@ -85,9 +85,9 @@
         <section class="tabla">
 
             <div class="buscador">
-                <button id="listar_compras">Historial de Compras</button>
+                <button id="listar_compras"><img src="imgs/listar_compra.png"></button>
                 <!-- Botón que abre el modal -->
-                <button id="subirFactura">Subir Factura</button>
+                <button id="subirFactura"><img src="imgs/subir_factura.png"></button>
 
                 <button></button>
                 <button id="btn-registro" class="btn-registro">Enviar</button>
@@ -158,12 +158,14 @@
         <!-- Modal para subir la imagen -->
         <div id="modalFactura" class="modal" style="display:none;">
             <div class="modal-contenido">
-                <span id="cerrarModal" style="cursor:pointer; float:right;">&times;</span>
                 <h2>Subir Factura</h2>
                 <form id="formFactura" enctype="multipart/form-data">
                     <input type="file" id="fileFactura" name="factura" accept="image/*" hidden>
                     <button type="button" id="btnSeleccionarFactura">Seleccionar Imagen</button>
+                    <br>
                     <div class="preview" id="previewFactura"></div>
+                    <br>
+                    <small class="error-msg">Click fuera para cerrar</small>
                 </form>
             </div>
         </div>

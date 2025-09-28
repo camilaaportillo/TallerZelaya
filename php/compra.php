@@ -1,7 +1,4 @@
 <?php
-file_put_contents("debug_compra.txt", print_r($_POST, true) . "\n", FILE_APPEND);
-file_put_contents("debug_compra.txt", file_get_contents("php://input") . "\n", FILE_APPEND);
-
 header("Content-Type: application/json; charset=UTF-8");
 include "conexion.php";
 
@@ -52,6 +49,7 @@ try {
         $p["subtotal"] = $cantidad * $precioUnitario; // se calcula aquí mismo
         $precioTotal += $p["subtotal"];
     }
+    
 
     // Insertar compra
     $stmt = $conn->prepare("INSERT INTO compra (precio, fecha, id_proveedor, id_usuario, facturaImagen) VALUES (?, ?, ?, ?, ?)");
