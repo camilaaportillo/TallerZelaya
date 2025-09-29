@@ -1,0 +1,137 @@
+/* Estilo limpio, tipo factura */
+body {
+    font-family: Inter, Arial, sans-serif;
+    margin: 20px;
+    color: #222;
+    background: #f6f8fa;
+}
+
+.paper {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 28px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 18px;
+}
+
+.brand {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.muted {
+    color: #666;
+    font-size: 13px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.box {
+    background: #fafafa;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #eee;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+}
+
+th,
+td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #e9eef2;
+    text-align: left;
+    font-size: 14px;
+}
+
+th {
+    background: #f3f6f9;
+    font-weight: 600;
+}
+
+tfoot td {
+    font-weight: 700;
+    font-size: 15px;
+    border-top: 2px solid #ddd;
+}
+
+.right {
+    text-align: right;
+}
+
+.actions {
+    margin: 12px 0;
+    display: flex;
+    gap: 8px;
+}
+
+button,
+.btn {
+    background: #1774ff;
+    color: #fff;
+    border: 0;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn.secondary {
+    background: #6c757d;
+}
+
+.image-wrap {
+    margin-top: 12px;
+    text-align: center;
+}
+
+img.factura-img {
+    max-width: 100%;
+    max-height: 480px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+.logo-placeholder {
+    width: 160px;
+    height: 60px;
+    background: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    color: #999;
+    font-weight: 600;
+}
+
+@media print {
+    body {
+        background: white;
+    }
+
+    .actions,
+    .no-print {
+        display: none;
+    }
+
+    .paper {
+        box-shadow: none;
+        margin: 0;
+        border-radius: 0;
+    }
+}

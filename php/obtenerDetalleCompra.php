@@ -1,45 +1,58 @@
 <?php
+header('Content-Type: application/json; charset=utf-8');
 include("conexion.php");
 
-header("Content-Type: application/json; charset=utf-8");
-
+// Verificar si se envió el id
 if (!isset($_GET["id"])) {
-    echo json_encode(["error" => "Falta parámetro id"], JSON_UNESCAPED_UNICODE);
+    echo json_encode(["error" => "No se proporcionó un id de compra"]);
     exit;
 }
 
-$idCompra = intval($_GET["id"]);
+$id_compra = $_GET["id"];
 
-$sql = "SELECT d.id_detalles_compra, d.cantidad, d.precioUnitario, d.subTotal,
-               r.nombre AS producto, m.medida_bicicleta AS medida, ma.nombre AS marca
-        FROM detallescompra d
-        INNER JOIN repuesto r ON d.id_repuesto = r.id_repuesto
-        INNER JOIN medida m ON r.id_medida = m.id_medida
-        INNER JOIN marca ma ON ma.id_marca = r.id_marca
-        WHERE d.id_compra = ?";
+// Consulta para obtener la compra, empresa, proveedor y usuario
+$sqlCompra = "SELECT c.id_compra, c.precio, c.fecha, c.facturaImagen,
+                     p.nombre AS proveedor, p.telefono AS proveedor_telefono, p.correo AS proveedor_correo,
+                     e.nombre AS empresa, e.correo AS empresa_correo, e.telefono AS empresa_telefono,
+                     u.nombre AS usuario
+              FROM compra c
+              INNER JOIN proveedor p ON c.id_proveedor = p.id_proveedor
+              INNER JOIN empresa e ON p.id_empresa = e.id_empresa
+              INNER JOIN usuario u ON c.id_usuario = u.id_usuario
+              WHERE c.id_compra = ?";
 
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $idCompra);
+$stmt = $conn->prepare($sqlCompra);
+$stmt->bind_param("i", $id_compra);
+$stmt->execute();
+$result = $stmt->get_result();
+$compra = $result->fetch_assoc();
+
+if (!$compra) {
+    echo json_encode(["error" => "Compra no encontrada"]);
+    exit;
+}
+
+// Consulta para los detalles
+$sqlDetalles = "SELECT d.cantidad, d.precioUnitario, d.subTotal,
+                       r.codigo, r.nombre AS repuesto
+                FROM detallescompra d
+                INNER JOIN repuesto r ON d.id_repuesto = r.id_repuesto
+                WHERE d.id_compra = ?";
+$stmt = $conn->prepare($sqlDetalles);
+$stmt->bind_param("i", $id_compra);
 $stmt->execute();
 $result = $stmt->get_result();
 
 $detalles = [];
 while ($row = $result->fetch_assoc()) {
-    $partes = [$row["producto"]];
-    if (!empty($row["medida"])) $partes[] = $row["medida"];
-    if (!empty($row["marca"])) $partes[] = $row["marca"];
-    $nombreCompleto = implode(" ", $partes);
-
-    $detalles[] = [
-        "id_detalle"     => (int)$row["id_detalles_compra"],
-        "producto"       => $nombreCompleto,
-        "cantidad"       => (int)$row["cantidad"],
-        "precio_unitario"=> (float)$row["precioUnitario"],
-        "subtotal"       => (float)$row["subTotal"]
-    ];
+    $detalles[] = $row;
 }
 
-echo json_encode($detalles, JSON_UNESCAPED_UNICODE);
+// Respuesta en JSON
+echo json_encode([
+    "compra" => $compra,
+    "detalles" => $detalles
+], JSON_UNESCAPED_UNICODE);
+
 $conn->close();
 ?>
-
