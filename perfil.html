@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario</title>
+    <link rel="stylesheet" href="css/perfilStyle.css">
+    <style>
+        body { visibility: hidden; } /* Ocultar body hasta validar sesión */
+    </style>
+   
+</head>
+
+<body>
+    <!-- Encabezado -->
+    <header>
+        <button class="logo-btn" onclick="irInicio()">
+            <img src="imgs/bicicleta.png" alt="Logo bicicleta">
+        </button>
+        <h1>Taller de bicicletas Zelaya</h1>
+       <div class="usuario">
+            <div class="info-usuario">
+                <span id="nombreUsuario" class="nombre-usuario">Usuario</span>
+                <span id="rolUsuario" class="rol-usuario"></span>
+            </div>
+            <button class="user-btn" onclick="toggleMenu()">
+                <img src="imgs/logo_user.png" alt="Usuario">
+            </button>
+            <div id="menuUsuario" class="menu-usuario">
+                <a href="#" onclick="cerrarSesion()">Cerrar sesión</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main>
+        <div class="perfil-contenedor">
+            <!-- Foto de perfil -->
+            <div class="perfil-foto">
+                <img src="imgs/logo_user.png" alt="Foto del usuario">
+            </div>
+
+            <!-- Datos del usuario -->
+            <div class="perfil-datos">
+                <h2 id="nombrePerfil">Juan Pérez</h2>
+                <p><strong>Correo:</strong> <span id="correoPerfil"></span></p>
+                <p><strong>Usuario:</strong> <span id="usuarioPerfil"></span></p>
+                
+                <p><strong>Estado:</strong> <span id="estadoPerfil"></span></p>
+
+                <!-- Acciones -->
+                <div class="perfil-acciones">
+                    <button onclick="editarPerfil()">Editar Perfil</button>
+                    <button onclick="cambiarContrasena()">Cambiar Contraseña</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById("menuUsuario").classList.toggle("mostrar");
+        }
+
+        function editarPerfil() {
+            alert("Aquí irá la opción para editar el perfil");
+        }
+
+        function cambiarContrasena() {
+            alert("Aquí irá la opción para cambiar la contraseña");
+        }
+    </script>
+
+ <script src="js/sesion.js"></script>
+<script src="js/jsPerfil.js"></script>
+
+
+</body>
+
+</html>

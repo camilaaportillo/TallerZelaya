@@ -1,0 +1,194 @@
+/* ===== Reset y base ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background: white;
+    color: black;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== Header ===== */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 2px solid black;
+}
+
+.logo-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.logo-btn img {
+    width: 70px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.usuario {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nombre-usuario {
+    font-weight: bold;
+    font-size: 16px;
+    color: #000000;
+}
+
+.user-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.user-btn img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+}
+
+.menu-usuario {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 65px;
+    background: white;
+    border: 2px solid #0026ff;
+    border-radius: 8px;
+    padding: 10px;
+    min-width: 150px;
+    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.menu-usuario a {
+    text-decoration: none;
+    color: #0026ff;
+    display: block;
+    padding: 5px 0;
+    font-weight: bold;
+}
+
+.menu-usuario.mostrar {
+    display: block;
+}
+
+/* ===== Perfil ===== */
+main {
+    display: flex;
+    flex: 1;
+    padding: 30px;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.perfil-contenedor {
+    display: flex;
+    gap: 40px;
+    background: white;
+    padding: 25px;
+    border: 2px solid #0026ff;
+    border-radius: 15px;
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.15);
+    max-width: 900px;
+    width: 100%;
+}
+
+/* Foto */
+.perfil-foto {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.perfil-foto img {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #0026ff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Datos */
+.perfil-datos {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.perfil-datos h2 {
+    color: #0026ff;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.perfil-datos p {
+    font-size: 16px;
+}
+
+.perfil-datos strong {
+    color: #333;
+}
+
+/* Acciones */
+.perfil-acciones {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+}
+
+.perfil-acciones button {
+    background: #0026ff;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 18px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.perfil-acciones button:hover {
+    background: #3b4fff;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .perfil-contenedor {
+        flex-direction: column;
+        align-items: center;
+    }
+    .perfil-datos {
+        text-align: center;
+    }
+}
+.info-usuario {
+    display: flex;
+    flex-direction: column; /* Coloca nombre arriba y rol abajo */
+    align-items: flex-start; /* Alinea a la izquierda */
+}
+
+.nombre-usuario {
+    font-weight: bold;
+}
+
+.rol-usuario {
+    font-size: 0.9em;
+    color: gray; /* opcional */
+}
