@@ -181,7 +181,7 @@ main {
 .info-usuario {
     display: flex;
     flex-direction: column; /* Coloca nombre arriba y rol abajo */
-    align-items: flex-start; /* Alinea a la izquierda */
+    align-items: flex-end; /* Alinea a la izquierda */
 }
 
 .nombre-usuario {
