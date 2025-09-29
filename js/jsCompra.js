@@ -1,4 +1,3 @@
-// js/jsCompra.js
 "use strict";
 
 /* ========== Estado ========== */
@@ -24,6 +23,8 @@ const inputFecha = document.getElementById("fecha");
 
 const totalCompra = document.getElementById("totalCompra");
 
+const cerrarMensaje = document.getElementById("cerrarMensaje");
+
 /* Errores (small tags en HTML) */
 const errorProducto = document.getElementById("errorProducto");
 const errorCantidad = document.getElementById("errorCantidad");
@@ -31,24 +32,64 @@ const errorPrecio = document.getElementById("errorPrecio");
 const errorProveedor = document.getElementById("errorProveedor");
 const errorFecha = document.getElementById("errorFecha");
 
+// ========================= MODALES =========================
+function showModalMensaje(tipo, titulo, texto) {
+    // Resetear icono
+    modalIcono.className = "modal-mensaje-icono";
+
+    if (tipo === "error") {
+        modalIcono.classList.add("icono-error");
+        modalIcono.innerHTML = "✖";
+    } else if (tipo === "advertencia") {
+        modalIcono.classList.add("icono-advertencia");
+        modalIcono.innerHTML = "⚠";
+    } else if (tipo === "exito") {
+        modalIcono.classList.add("icono-exito");
+        modalIcono.innerHTML = "✔";
+    }
+
+    modalTitulo.innerText = titulo;
+    modalTexto.innerText = texto;
+
+    modalMensaje.style.display = "flex";
+
+    // Cerrar automático en 3 segundos
+    setTimeout(() => {
+        modalMensaje.style.display = "none";
+    }, 2000);
+}
+cerrarMensaje.addEventListener("click", () => modalMensaje.style.display = "none");
+//cerrarModal.addEventListener("click", () => modal.style.display = "none");
+
+// Si el botón listar_compras existe, navega
+const btnListar = document.getElementById("listar_compras");
+if (btnListar) {
+    btnListar.addEventListener("click", () => {
+        window.location.href = "listar_compras.html";
+    });
+}
+
 /* ========== Inicialización ========== */
 document.addEventListener("DOMContentLoaded", () => {
-    // Inicializar Choices (buscador en los selects)
-    choicesProducto = new Choices(selectProducto, {
-        searchEnabled: true,
-        shouldSort: false,
-        placeholderValue: "Buscar producto...",
-        itemSelectText: "",
-        searchPlaceholderValue: "Escribe para buscar..."
-    });
-
-    choicesProveedor = new Choices(selectProveedor, {
-        searchEnabled: true,
-        shouldSort: false,
-        placeholderValue: "Buscar proveedor...",
-        itemSelectText: "",
-        searchPlaceholderValue: "Escribe para buscar..."
-    });
+    // Inicializar Choices (buscador en los selects) si existen
+    if (selectProducto) {
+        choicesProducto = new Choices(selectProducto, {
+            searchEnabled: true,
+            shouldSort: false,
+            placeholderValue: "Buscar producto...",
+            itemSelectText: "",
+            searchPlaceholderValue: "Escribe para buscar..."
+        });
+    }
+    if (selectProveedor) {
+        choicesProveedor = new Choices(selectProveedor, {
+            searchEnabled: true,
+            shouldSort: false,
+            placeholderValue: "Buscar proveedor...",
+            itemSelectText: "",
+            searchPlaceholderValue: "Escribe para buscar..."
+        });
+    }
 
     // Cargar los combos desde PHP
     cargarProductos();
@@ -56,6 +97,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Validaciones en tiempo real
     setupRealtimeValidation();
+
+    // Hacer focus en el primer input (mantengo tu comportamiento)
+    const formInputs = document.querySelectorAll("input, select, textarea");
+    if (formInputs.length > 0) formInputs[0].focus();
 });
 
 /* ========== Cargar datos para los combos ========== */
@@ -63,11 +108,9 @@ function cargarProductos() {
     fetch("http://localhost/TallerZelaya/php/obtenerRepuestos.php")
         .then(res => res.json())
         .then(data => {
-            // Construir arreglo para Choices: value + label (Nombre | Medida | Marca)
             const opciones = data.map(p => {
                 const medida = p.medida || p.medida_bicicleta || "";
                 const marca = p.marca || p.nombre_marca || "";
-                // etiqueta clara: nombre | medida | marca (si existen)
                 const partes = [p.nombre];
                 if (medida) partes.push(medida);
                 if (marca) partes.push(marca);
@@ -75,7 +118,6 @@ function cargarProductos() {
                 return {
                     value: String(p.id_repuesto),
                     label: label,
-                    // opcional: propiedades extras (ej: precio, stock) disponibles si las necesitas luego
                     customProperties: {
                         precio: p.precio ?? null,
                         stock: p.stock_minimo ?? null
@@ -83,12 +125,10 @@ function cargarProductos() {
                 };
             });
 
-            // Reemplazar choices (preserva el select subyacente)
             if (choicesProducto) {
                 choicesProducto.clearChoices();
                 choicesProducto.setChoices(opciones, "value", "label", true);
-            } else {
-                // fallback: si no existe choices (rarísimo), llenar directamente
+            } else if (selectProducto) {
                 selectProducto.innerHTML = '<option value="" disabled selected>Seleccionar Producto</option>';
                 opciones.forEach(o => {
                     const opt = document.createElement("option");
@@ -100,7 +140,6 @@ function cargarProductos() {
         })
         .catch(err => {
             console.error("Error al cargar productos:", err);
-            // mostrar mensaje no intrusivo
         });
 }
 
@@ -116,7 +155,7 @@ function cargarProveedores() {
             if (choicesProveedor) {
                 choicesProveedor.clearChoices();
                 choicesProveedor.setChoices(opciones, "value", "label", true);
-            } else {
+            } else if (selectProveedor) {
                 selectProveedor.innerHTML = '<option value="" disabled selected>Seleccionar Proveedor</option>';
                 opciones.forEach(o => {
                     const opt = document.createElement("option");
@@ -133,68 +172,81 @@ function cargarProveedores() {
 
 /* ========== Validaciones en tiempo real ========== */
 function setupRealtimeValidation() {
-    // selects (Choices emite 'change' en el select subyacente)
-    selectProducto.addEventListener("change", validarProducto);
-    selectProveedor.addEventListener("change", validarProveedor);
-    inputCantidad.addEventListener("input", validarCantidad);
-    inputPrecio.addEventListener("input", validarPrecio);
-    inputFecha.addEventListener("input", validarFecha);
+    if (selectProducto) selectProducto.addEventListener("change", validarProducto);
+    if (selectProveedor) selectProveedor.addEventListener("change", validarProveedor);
+    if (inputCantidad) inputCantidad.addEventListener("input", validarCantidad);
+    if (inputPrecio) inputPrecio.addEventListener("input", validarPrecio);
+    if (inputFecha) inputFecha.addEventListener("input", validarFecha);
 }
 
 /* validadores individuales (devuelven boolean) */
 function validarProducto() {
-    if (!selectProducto.value || selectProducto.value === "") {
-        errorProducto.textContent = "Debe seleccionar un producto.";
+    if (!selectProducto || !selectProducto.value || selectProducto.value === "") {
+        if (errorProducto) errorProducto.textContent = "Debe seleccionar un producto.";
         return false;
     }
-    errorProducto.textContent = "";
+    if (errorProducto) errorProducto.textContent = "";
     return true;
 }
 function validarCantidad() {
-    const v = inputCantidad.value.trim();
+    const v = inputCantidad ? inputCantidad.value.trim() : "";
     if (!/^[0-9]+$/.test(v) || parseInt(v) <= 0) {
-        errorCantidad.textContent = "Ingrese una cantidad válida (número entero > 0).";
+        if (errorCantidad) errorCantidad.textContent = "Ingrese una cantidad válida (ej: 10).";
         return false;
     }
-    errorCantidad.textContent = "";
-    return true;
-}
-function validarPrecio() {
-    const v = inputPrecio.value.trim();
-    if (!/^\d+(\.\d{1,2})?$/.test(v) || parseFloat(v) <= 0) {
-        errorPrecio.textContent = "Ingrese un precio válido (ej: 12.50).";
-        return false;
-    }
-    errorPrecio.textContent = "";
-    return true;
-}
-function validarProveedor() {
-    // validar proveedor solo si aún no hay productos (lo hacemos en validarCompra)
-    if (productosCompra.length === 0) {
-        if (!selectProveedor.value || selectProveedor.value === "") {
-            errorProveedor.textContent = "Debe seleccionar un proveedor.";
-            return false;
-        }
-        errorProveedor.textContent = "";
-    } else {
-        errorProveedor.textContent = "";
-    }
-    return true;
-}
-function validarFecha() {
-    if (productosCompra.length === 0) {
-        if (!inputFecha.value || inputFecha.value === "") {
-            errorFecha.textContent = "Debe seleccionar una fecha.";
-            return false;
-        }
-        errorFecha.textContent = "";
-    } else {
-        errorFecha.textContent = "";
-    }
+    if (errorCantidad) errorCantidad.textContent = "";
     return true;
 }
 
-/* validar todo antes de agregar/actualizar */
+function validarPrecio() {
+    const v = inputPrecio ? inputPrecio.value.trim() : "";
+    if (!/^\d+(\.\d{1,2})?$/.test(v) || parseFloat(v) <= 0) {
+        if (errorPrecio) errorPrecio.textContent = "Ingrese un precio válido (ej: 12.50).";
+        return false;
+    }
+    if (errorPrecio) errorPrecio.textContent = "";
+    return true;
+}
+
+
+
+function validarProveedor() {
+    if (productosCompra.length === 0) {
+        if (!selectProveedor || !selectProveedor.value || selectProveedor.value === "") {
+            if (errorProveedor) errorProveedor.textContent = "Debe seleccionar un proveedor.";
+            return false;
+        }
+    }
+    if (errorProveedor) errorProveedor.textContent = "";
+    return true;
+}
+
+function validarFecha() {
+    if (!inputFecha || !inputFecha.value) {
+        if (errorFecha) errorFecha.textContent = "Debe seleccionar una fecha.";
+        return false;
+    }
+
+    const hoy = new Date();
+    const seleccionada = new Date(inputFecha.value);
+
+    // eliminar horas para comparación exacta
+    hoy.setHours(0,0,0,0);
+    seleccionada.setHours(0,0,0,0);
+
+    const hace7dias = new Date();
+    hace7dias.setDate(hoy.getDate() - 8);
+
+    if (seleccionada < hace7dias || seleccionada > hoy) {
+        if (errorFecha) errorFecha.textContent = "La fecha debe estar entre hoy y hace 7 días.";
+        return false;
+    }
+
+    if (errorFecha) errorFecha.textContent = "";
+    return true;
+}
+
+
 function validarCompra() {
     const v1 = validarProducto();
     const v2 = validarCantidad();
@@ -204,17 +256,25 @@ function validarCompra() {
 
     if (!(v1 && v2 && v3 && v4 && v5)) return false;
 
-    // si todo OK devolver objeto con datos útiles
+    // --- VALIDACIÓN: no permitir productos repetidos ---
+    const prodId = selectProducto.value;
+    if (productosCompra.some(p => p.id_repuesto == prodId && p.id !== filaSeleccionada)) {
+        showModalMensaje("advertencia", "Producto repetido", "Este producto ya fue agregado a la compra");
+        return false;
+    }
+
+    // devolver objeto con id_repuesto claro
     return {
-        producto: selectProducto.value,
+        id_repuesto: selectProducto.value,
         nombreProducto: selectProducto.options[selectProducto.selectedIndex]?.text || "",
         cantidad: parseInt(inputCantidad.value.trim()),
         precio: parseFloat(inputPrecio.value.trim()),
         subtotal: parseInt(inputCantidad.value.trim()) * parseFloat(inputPrecio.value.trim()),
-        proveedor: selectProveedor.value,
-        fecha: inputFecha.value
+        proveedor: selectProveedor ? selectProveedor.value : null,
+        fecha: inputFecha ? inputFecha.value : null
     };
 }
+
 
 /* ========== Agregar producto ========== */
 btnRegistrar.addEventListener("click", (e) => {
@@ -226,15 +286,15 @@ btnRegistrar.addEventListener("click", (e) => {
     if (productosCompra.length === 0) {
         if (choicesProveedor && typeof choicesProveedor.disable === "function") {
             choicesProveedor.disable();
-        } else {
+        } else if (selectProveedor) {
             selectProveedor.setAttribute("disabled", "true");
         }
-        inputFecha.setAttribute("readonly", "true");
+        if (inputFecha) inputFecha.setAttribute("readonly", "true");
     }
 
     const nuevoProducto = {
-        id: contadorId++,
-        producto: datos.producto,
+        id: contadorId++, // id único para la fila en la tabla
+        id_repuesto: datos.id_repuesto, // id real del repuesto
         nombreProducto: datos.nombreProducto,
         cantidad: datos.cantidad,
         precio: datos.precio,
@@ -248,6 +308,7 @@ btnRegistrar.addEventListener("click", (e) => {
 
 /* ========== Render tabla ========== */
 function renderTabla() {
+    if (!tablaBody) return;
     tablaBody.innerHTML = "";
 
     productosCompra.forEach(prod => {
@@ -256,8 +317,8 @@ function renderTabla() {
             <td>${prod.id}</td>
             <td>${prod.nombreProducto}</td>
             <td>${prod.cantidad}</td>
-            <td>$${prod.precio.toFixed(2)}</td>
-            <td>$${prod.subtotal.toFixed(2)}</td>
+            <td>$${parseFloat(prod.precio).toFixed(2)}</td>
+            <td>$${parseFloat(prod.subtotal).toFixed(2)}</td>
             <td>
                 <button class="btn-editar" data-id="${prod.id}">✏</button>
                 <button class="btn-eliminar" data-id="${prod.id}">🗑</button>
@@ -265,12 +326,13 @@ function renderTabla() {
         `;
 
         // listeners
-        fila.querySelector(".btn-editar").addEventListener("click", (e) => {
+        const btnE = fila.querySelector(".btn-editar");
+        const btnX = fila.querySelector(".btn-eliminar");
+        if (btnE) btnE.addEventListener("click", (e) => {
             const id = parseInt(e.currentTarget.dataset.id, 10);
             editarProducto(id);
         });
-
-        fila.querySelector(".btn-eliminar").addEventListener("click", (e) => {
+        if (btnX) btnX.addEventListener("click", (e) => {
             const id = parseInt(e.currentTarget.dataset.id, 10);
             abrirModalEliminar(id);
         });
@@ -286,11 +348,11 @@ function editarProducto(id) {
     const prod = productosCompra.find(p => p.id === id);
     if (!prod) return;
 
-    // Seleccionar producto en Choices (intentar con el API; si no, fallback)
+    // Seleccionar producto en Choices por id_repuesto
     if (choicesProducto && typeof choicesProducto.setChoiceByValue === "function") {
-        choicesProducto.setChoiceByValue(String(prod.producto));
-    } else {
-        selectProducto.value = prod.producto;
+        choicesProducto.setChoiceByValue(String(prod.id_repuesto));
+    } else if (selectProducto) {
+        selectProducto.value = prod.id_repuesto;
         selectProducto.dispatchEvent(new Event("change"));
     }
 
@@ -299,210 +361,248 @@ function editarProducto(id) {
 
     // estado edición
     filaSeleccionada = id;
-    btnRegistrar.style.display = "none";
-    btnActualizar.style.display = "inline-block";
-    btnCancelarEdicion.style.display = "inline-block";
+    if (btnRegistrar) btnRegistrar.style.display = "none";
+    if (btnActualizar) btnActualizar.style.display = "inline-block";
+    if (btnCancelarEdicion) btnCancelarEdicion.style.display = "inline-block";
 }
 
 /* ========== Botón actualizar (confirmar edición) ========== */
-btnActualizar.addEventListener("click", (e) => {
-    e.preventDefault();
-    if (filaSeleccionada === null) return;
+if (btnActualizar) {
+    btnActualizar.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (filaSeleccionada === null) return;
 
-    const datos = validarCompra();
-    if (!datos) return;
+        const datos = validarCompra();
+        if (!datos) return;
 
-    const prod = productosCompra.find(p => p.id === filaSeleccionada);
-    if (prod) {
-        prod.producto = datos.producto;
-        prod.nombreProducto = datos.nombreProducto;
-        prod.cantidad = datos.cantidad;
-        prod.precio = datos.precio;
-        prod.subtotal = datos.subtotal;
-    }
+        const prod = productosCompra.find(p => p.id === filaSeleccionada);
+        if (prod) {
+            prod.id_repuesto = datos.id_repuesto;
+            prod.nombreProducto = datos.nombreProducto;
+            prod.cantidad = datos.cantidad;
+            prod.precio = datos.precio;
+            prod.subtotal = datos.subtotal;
+        }
 
-    renderTabla();
-    limpiarCampos();
+        renderTabla();
+        limpiarCampos();
 
-    // reset estado editar
-    filaSeleccionada = null;
-    btnRegistrar.style.display = "inline-block";
-    btnActualizar.style.display = "none";
-    btnCancelarEdicion.style.display = "none";
-});
+        // reset estado editar
+        filaSeleccionada = null;
+        if (btnRegistrar) btnRegistrar.style.display = "inline-block";
+        if (btnActualizar) btnActualizar.style.display = "none";
+        if (btnCancelarEdicion) btnCancelarEdicion.style.display = "none";
+    });
+}
 
 /* cancelar edición */
-btnCancelarEdicion.addEventListener("click", (e) => {
-    e.preventDefault();
-    limpiarCampos();
-    filaSeleccionada = null;
-    btnRegistrar.style.display = "inline-block";
-    btnActualizar.style.display = "none";
-    btnCancelarEdicion.style.display = "none";
-});
+if (btnCancelarEdicion) {
+    btnCancelarEdicion.addEventListener("click", (e) => {
+        e.preventDefault();
+        limpiarCampos();
+        filaSeleccionada = null;
+        if (btnRegistrar) btnRegistrar.style.display = "inline-block";
+        if (btnActualizar) btnActualizar.style.display = "none";
+        if (btnCancelarEdicion) btnCancelarEdicion.style.display = "none";
+    });
+}
 
 /* ========== Eliminar producto ========== */
 function abrirModalEliminar(id) {
-    // abrir modal de confirmación (tu modalConfirmar ya existe en HTML)
-    // guardamos el idSeleccionado temporalmente en una variable en ventana para usar al confirmar
     window._idAEliminar = id;
-    document.getElementById("modalConfirmar").style.display = "block";
+    const modalConfirm = document.getElementById("modalConfirmar");
+    if (modalConfirm) modalConfirm.style.display = "block";
 }
 
-document.getElementById("btnConfirmarEliminar").addEventListener("click", () => {
-    document.getElementById("modalConfirmar").style.display = "none";
-    const id = window._idAEliminar;
-    if (!id) return;
+const btnConfirmarEliminar = document.getElementById("btnConfirmarEliminar");
+if (btnConfirmarEliminar) {
+    btnConfirmarEliminar.addEventListener("click", () => {
+        const modalConfirm = document.getElementById("modalConfirmar");
+        if (modalConfirm) modalConfirm.style.display = "none";
+        const id = window._idAEliminar;
+        if (!id) return;
 
-    productosCompra = productosCompra.filter(p => p.id !== id);
-    renderTabla();
+        productosCompra = productosCompra.filter(p => p.id !== id);
+        contadorId--;
+        renderTabla();
 
-    // si ya no hay productos, desbloquear proveedor y fecha
-    if (productosCompra.length === 0) {
-        if (choicesProveedor && typeof choicesProveedor.enable === "function") {
-            choicesProveedor.enable();
-        } else {
-            selectProveedor.removeAttribute("disabled");
+        // si ya no hay productos, desbloquear proveedor y fecha
+        if (productosCompra.length === 0) {
+            if (choicesProveedor && typeof choicesProveedor.enable === "function") {
+                choicesProveedor.enable();
+            } else if (selectProveedor) {
+                selectProveedor.removeAttribute("disabled");
+            }
+            if (inputFecha) inputFecha.removeAttribute("readonly");
         }
-        inputFecha.removeAttribute("readonly");
-    }
 
-    // limpiar variable temporaria
-    window._idAEliminar = null;
-});
+        window._idAEliminar = null;
+    });
+}
 
-document.getElementById("btnCancelarEliminar").addEventListener("click", () => {
-    document.getElementById("modalConfirmar").style.display = "none";
-});
+const btnCancelarEliminar = document.getElementById("btnCancelarEliminar");
+if (btnCancelarEliminar) {
+    btnCancelarEliminar.addEventListener("click", () => {
+        const modalConfirm = document.getElementById("modalConfirmar");
+        if (modalConfirm) modalConfirm.style.display = "none";
+    });
+}
 
 /* ========== Calcular total ========== */
 function calcularTotal() {
-    const total = productosCompra.reduce((sum, p) => sum + p.subtotal, 0);
-    totalCompra.textContent = `$${total.toFixed(2)}`;
+    const total = productosCompra.reduce((sum, p) => sum + Number(p.subtotal || 0), 0);
+    if (totalCompra) totalCompra.textContent = `$${total.toFixed(2)}`;
 }
 
 /* ========== Utils ========== */
 function limpiarCampos() {
-    // limpiar selects/inputs
     if (choicesProducto && typeof choicesProducto.removeActiveItems === "function") {
-        choicesProducto.removeActiveItems(); // limpia la selección sin borrar las opciones
-    } else {
+        choicesProducto.removeActiveItems();
+    } else if (selectProducto) {
         selectProducto.selectedIndex = 0;
         selectProducto.dispatchEvent(new Event("change"));
     }
 
-    inputCantidad.value = "";
-    inputPrecio.value = "";
+    if (inputCantidad) inputCantidad.value = "";
+    if (inputPrecio) inputPrecio.value = "";
 
-    // limpiar errores
-    errorProducto.textContent = "";
-    errorCantidad.textContent = "";
-    errorPrecio.textContent = "";
+    if (errorProducto) errorProducto.textContent = "";
+    if (errorCantidad) errorCantidad.textContent = "";
+    if (errorPrecio) errorPrecio.textContent = "";
 
-    inputCantidad.focus();
+    if (inputCantidad) inputCantidad.focus();
 }
 
-// Cerrar modal
-cerrarModal.addEventListener("click", () => {
-    modal.style.display = "none";
-});
+// Cerrar modal (si existe)
+const cerrarModal = document.getElementById("cerrarModal");
 
-function irInicio() {
-    window.location.href = "index.html";
-}
-
-function toggleMenu() {
-    document.getElementById("menuUsuario").classList.toggle("mostrar");
-}
-
-window.onclick = function (e) {
-    if (!e.target.closest('.usuario')) {
-        document.getElementById("menuUsuario").classList.remove("mostrar");
-    }
-}
-
-const formInputs = document.querySelectorAll("input, select, textarea");
-
-// Hacer focus en el primer input al cargar la página
-document.addEventListener("DOMContentLoaded", () => {
-    if (formInputs.length > 0) {
-        formInputs[0].focus();
-    }
-});
-
-// Navegación con Enter
-formInputs.forEach((input, index) => {
-    input.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-            e.preventDefault(); // evitar submit accidental
-
-            // Si no es el último input → pasar al siguiente
-            if (index < formInputs.length - 1) {
-                formInputs[index + 1].focus();
-            } else {
-                // Si es el último input → enfocar botón correcto
-                if (btnRegistrar.style.display !== "none") {
-                    btnRegistrar.focus();
-                } else if (btnEditar.style.display !== "none") {
-                    btnEditar.focus();
-                }
-            }
-        }
+    cerrarModal.addEventListener("click", () => {
+        const modal = document.getElementById("modalFactura");
+        if (modal) modal.style.display = "none";
     });
+// Click fuera del modal
+window.addEventListener("click", (e) => {
+    const modal = document.getElementById("modalFactura");
+    if (e.target === modal) {
+        if (modal) modal.style.display = "none";
+    }
 });
-
 
 /* ========== ENVIAR COMPRA COMPLETA ========== */
 const btnEnviar = document.getElementById("btn-registro");
-
-btnEnviar.addEventListener("click", () => {
-    if (productosCompra.length === 0) {
-        alert("Debe agregar al menos un producto antes de enviar la compra.");
-        return;
-    }
-
-    const proveedor = selectProveedor.value;
-    const fecha = inputFecha.value;
-
-    // Armamos el payload
-    const payload = {
-        proveedor: proveedor,
-        fecha: fecha,
-        usuario: 1, // en producción lo obtienes de sesión PHP
-        productos: productosCompra.map(p => ({
-            id_repuesto: p.producto,
-            cantidad: p.cantidad,
-            precio: p.precio
-        }))
-    };
-    fetch("http://localhost/TallerZelaya/php/compra.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.status === "success") {
-            alert("Compra registrada correctamente ✅");
-
-            // Reset de estado
-            productosCompra = [];
-            renderTabla();
-            totalCompra.textContent = "$0.00";
-
-            if (choicesProveedor && typeof choicesProveedor.enable === "function") {
-                choicesProveedor.enable();
-            } else {
-                selectProveedor.removeAttribute("disabled");
-            }
-            inputFecha.removeAttribute("readonly");
-            inputFecha.value = "";
-        } else {
-            alert("Error al registrar la compra ❌");
+if (btnEnviar) {
+    btnEnviar.addEventListener("click", () => {
+        if (productosCompra.length === 0) {
+            showModalMensaje("advertencia", "Producto requerido", "Debe agregar al menos un producto antes de enviar la compra.");
+            return;
         }
-    })
-    .catch(err => {
-        console.error("Error en fetch:", err);
-        alert("Error de conexión con el servidor.");
+
+        const proveedor = selectProveedor ? selectProveedor.value : null;
+        const fecha = inputFecha ? inputFecha.value : null;
+
+        if (!proveedor || !fecha) {
+            showModalMensaje("advertencia", "Datos invalidos", "Proveedor o fecha inválidos.");
+            return;
+        }
+        // Preparar datos para enviar
+        const productosParaEnviar = productosCompra.map(p => ({
+            producto: Number(p.id_repuesto), 
+            cantidad: Number(p.cantidad),
+            precio: Number(p.precio)
+        }));
+
+
+        // Armamos el FormData
+        let formData = new FormData();
+        formData.append("proveedor", proveedor);
+        formData.append("fecha", fecha);
+        formData.append("usuario", 1); // ideal: obtener de sesión PHP
+        formData.append("productos", JSON.stringify(productosParaEnviar));
+
+        // agregar factura si se subió
+        let factura = document.getElementById("fileFactura")?.files[0];
+        if (factura) {
+            formData.append("factura", factura);
+        }
+
+        console.log("Productos que se enviarán:", productosCompra);
+        console.log("----------------------");
+        console.log("Datos del formulario:", { proveedor, fecha, usuario: 1, productos: productosParaEnviar, factura });
+
+        fetch("http://localhost/TallerZelaya/php/compra.php", {
+            method: "POST",
+            body: formData
+        })
+            .then(async res => {
+                const text = await res.text();
+                // intentar parsear JSON, si no es JSON mostrar crudo
+                try {
+                    const data = JSON.parse(text);
+                    return data;
+                } catch (err) {
+                    console.error("Respuesta cruda del servidor:", text);
+                    throw new Error("Respuesta inválida del servidor");
+                }
+            })
+            .then(data => {
+                if (data.status === "success") {
+                    showModalMensaje("exito", "Éxito", "Compra registrada correctamente");
+
+                    // Reset de estado
+                    productosCompra = [];
+                    renderTabla();
+                    if (totalCompra) totalCompra.textContent = "$0.00";
+
+                    if (choicesProveedor && typeof choicesProveedor.enable === "function") {
+                        choicesProveedor.enable();
+                    } else if (selectProveedor) {
+                        selectProveedor.removeAttribute("disabled");
+                    }
+                    if (inputFecha) inputFecha.removeAttribute("readonly");
+                    if (inputFecha) inputFecha.value = "";
+                } else {
+                    showModalMensaje("error", "Error", "Error al registrar la compra");
+                }
+            })
+            .catch(err => {
+                console.error("Error en fetch:", err);
+                showModalMensaje("error", "Error", "Error de conexión con el servidor");
+            });
     });
-});
+}
+
+/* ========== Modal factura (selección & preview) ========== */
+// Abrir modal
+const btnSubir = document.getElementById("subirFactura");
+if (btnSubir) {
+    btnSubir.addEventListener("click", () => {
+        const modal = document.getElementById("modalFactura");
+        if (modal) modal.style.display = "flex";
+    });
+}
+
+// Al hacer clic en el botón, abre el input
+const btnSeleccionarFactura = document.getElementById("btnSeleccionarFactura");
+if (btnSeleccionarFactura) {
+    btnSeleccionarFactura.addEventListener("click", () => {
+        const inputFile = document.getElementById("fileFactura");
+        if (inputFile) inputFile.click();
+    });
+}
+
+// Mostrar preview al seleccionar archivo
+const inputFileFactura = document.getElementById("fileFactura");
+if (inputFileFactura) {
+    inputFileFactura.addEventListener("change", function () {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = document.getElementById("previewFactura");
+                if (preview) preview.innerHTML =
+                    `<img src="${e.target.result}" alt="Factura" style="max-width:100%; border-radius:8px;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+}

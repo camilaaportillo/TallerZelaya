@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Historial de Compras</title>
+    <link rel="stylesheet" href="css/compraStyle.css">
+</head>
+
+<body>
+    <!-- Encabezado -->
+    <header>
+        <button class="logo-btn" onclick="irInicio()">
+            <img src="imgs/bicicleta.png" alt="Logo bicicleta">
+        </button>
+        <h1>Taller de bicicletas Zelaya</h1>
+        <div class="usuario">
+            <div class="info-usuario">
+                <span id="nombreUsuario" class="nombre-usuario">Usuario</span>
+                <span id="rolUsuario" class="rol-usuario"></span>
+            </div>
+            <button class="user-btn" onclick="toggleMenu()">
+                <img src="imgs/logo_user.png" alt="Usuario">
+            </button>
+            <div id="menuUsuario" class="menu-usuario">
+                <a href="#" onclick="cerrarSesion()">Cerrar sesión</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="tabla">
+
+        <div class="tabla-contenedor">
+            <table id="tablaCompras">
+                <thead>
+                    <tr>
+                        <th>Factura</th>
+                        <th>Empresa</th>
+                        <th>Proveedor</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <script src="js/jsListarCompras.js"></script>
+</body>
+
+</html>

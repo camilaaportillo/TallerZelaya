@@ -10,16 +10,20 @@
     <!-- Choices (CSS y JS) - CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-     <style>
-        body { visibility: hidden; } /* oculta el body si no se ha iniciado sesion */
+    <style>
+        body {
+            visibility: hidden;
+        }
+
+        /* oculta el body si no se ha iniciado sesion */
     </style>
-    <script src="js/sesion.js"></script> 
+    <script src="js/sesion.js"></script>
 
 </head>
 
 <body>
 
-     <!-- Encabezado -->
+    <!-- Encabezado -->
     <header>
         <button class="logo-btn" onclick="irInicio()">
             <img src="imgs/bicicleta.png" alt="Logo bicicleta">
@@ -81,6 +85,11 @@
         <section class="tabla">
 
             <div class="buscador">
+                <button id="listar_compras"><img src="imgs/listar_compra.png"></button>
+                <!-- Botón que abre el modal -->
+                <button id="subirFactura"><img src="imgs/subir_factura.png"></button>
+
+                <button></button>
                 <button id="btn-registro" class="btn-registro">Enviar</button>
             </div>
             <div class="tabla-contenedor">
@@ -145,8 +154,24 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal para subir la imagen -->
+        <div id="modalFactura" class="modal" style="display:none;">
+            <div class="modal-contenido">
+                <h2>Subir Factura</h2>
+                <form id="formFactura" enctype="multipart/form-data">
+                    <input type="file" id="fileFactura" name="factura" accept="image/*" hidden>
+                    <button type="button" id="btnSeleccionarFactura">Seleccionar Imagen</button>
+                    <br>
+                    <div class="preview" id="previewFactura"></div>
+                    <br>
+                    <small class="error-msg">Click fuera para cerrar</small>
+                </form>
+            </div>
+        </div>
+
     </main>
-    
+
     <script src="js/jsCompra.js"></script>
 </body>
 

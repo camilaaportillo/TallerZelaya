@@ -514,10 +514,13 @@ table tbody tr:hover {
 }
 
 .btn-registro {
-    padding: 6px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     border: none;
+    padding: 10px 20px;
     border-radius: 4px;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -597,4 +600,45 @@ input[type=number]::-webkit-outer-spin-button {
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+
+.modal {
+  display: none; /* Oculto por defecto */
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-contenido {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  width: 400px;
+  position: relative;
+}
+
+.cerrar {
+  position: absolute;
+  right: 10px; top: 10px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.listar_compras {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #007bff; /* azul */
+    color: white;
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
 }

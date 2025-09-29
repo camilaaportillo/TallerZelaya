@@ -64,7 +64,6 @@ function mostrarTabla(datos) {
 
         fila.innerHTML = `
             <td>${cliente.nombre}</td>
-           
             <td>${cliente.correo ?? ""}</td>
             <td>${cliente.telefono?? ""}</td>
             
