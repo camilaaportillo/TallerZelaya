@@ -1,5 +1,4 @@
 <?php
-file_put_contents("debug.log", date("Y-m-d H:i:s") . " => " . $_SERVER["REQUEST_METHOD"] . PHP_EOL, FILE_APPEND);
 header("Content-Type: application/json; charset=UTF-8");
 include "conexion.php";
 
