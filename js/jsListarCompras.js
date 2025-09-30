@@ -4,6 +4,11 @@ document.addEventListener("DOMContentLoaded", () => {
     cargarCompras();
 });
 
+// Función irInicio
+window.irInicio = function () {
+    window.location.href = "index.html";
+};
+
 function cargarCompras() {
     fetch("http://localhost/TallerZelaya/php/obtenerCompras.php")
         .then(res => res.json())
@@ -29,4 +34,31 @@ function cargarCompras() {
             });
         })
         .catch(err => console.error("Error al cargar compras:", err));
+}
+
+// ========================= MODALES =========================
+function showModalMensaje(tipo, titulo, texto) {
+    // Resetear icono
+    modalIcono.className = "modal-mensaje-icono";
+
+    if (tipo === "error") {
+        modalIcono.classList.add("icono-error");
+        modalIcono.innerHTML = "✖";
+    } else if (tipo === "advertencia") {
+        modalIcono.classList.add("icono-advertencia");
+        modalIcono.innerHTML = "⚠";
+    } else if (tipo === "exito") {
+        modalIcono.classList.add("icono-exito");
+        modalIcono.innerHTML = "✔";
+    }
+
+    modalTitulo.innerText = titulo;
+    modalTexto.innerText = texto;
+
+    modalMensaje.style.display = "flex";
+
+    // Cerrar automático en 3 segundos
+    setTimeout(() => {
+        modalMensaje.style.display = "none";
+    }, 2000);
 }

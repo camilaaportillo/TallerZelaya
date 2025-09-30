@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Historial de Compras</title>
+    <link rel="icon" href="imgs/favicon.png" type="image/png">
     <link rel="stylesheet" href="css/compraStyle.css">
 </head>
 
@@ -29,30 +30,44 @@
     </header>
 
     <br>
-    <h2 style="margin-left: 1%;">Historial de Compras</h2>
-    
-    <section class="tabla">
+    <h2 style=" margin-left: 1%;">Historial de Compras</h2>
+        <small style="margin-right: 1%; color: red; text-align: right;">Seleccione una compra para ver su
+            detalle</small>
 
-        <div class="tabla-contenedor">
-            <table id="tablaCompras">
-                <thead>
-                    <tr>
-                        <th>Factura</th>
-                        <th>Empresa</th>
-                        <th>Proveedor</th>
-                        <th>Fecha</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody>
+        <section class="tabla">
 
-                </tbody>
-            </table>
+            <div class="tabla-contenedor">
+                <table id="tablaCompras">
+                    <thead>
+                        <tr>
+                            <th>Factura</th>
+                            <th>Empresa</th>
+                            <th>Proveedor</th>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+        <!-- Modal de mensajes -->
+        <div id="modalMensaje" class="modal">
+            <div class="modal-mensaje-contenido">
+                <div class="modal-mensaje-icono" id="modalIcono"></div>
+                <div class="modal-mensaje-texto">
+                    <h2 id="modalTitulo"></h2>
+                    <p id="modalTexto"></p>
+                </div>
+                <button id="cerrarMensaje" class="btn-cerrar">X</button>
+            </div>
         </div>
 
-    </section>
-
-    <script src="js/jsListarCompras.js"></script>
+        <script src="js/jsListarCompras.js"></script>
 </body>
 
 </html>
