@@ -503,3 +503,29 @@ body.modal-open .login-container {
     margin: 10px 0 15px 0;
     /* Espacio consistente */
 }
+
+/* Estilos para el modal de código */
+.info-text {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* Input de código con estilo especial */
+#codigoVerificacion {
+    font-size: 18px !important;
+    letter-spacing: 5px !important;
+    text-align: center !important;
+    font-weight: bold !important;
+}
+
+/* Botón de reenviar */
+.reenviar-codigo {
+    color: #667eea !important;
+    text-decoration: none !important;
+    font-weight: 500;
+}
+
+.reenviar-codigo:hover {
+    text-decoration: underline !important;
+}

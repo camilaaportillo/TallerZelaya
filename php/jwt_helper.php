@@ -11,7 +11,7 @@ class JWTHelper {
         ]));
 
         $payload['iat'] = time(); // Fecha de emisión
-        $payload['exp'] = time() + (5 * 60); // Expira en 15 minutos
+        $payload['exp'] = time() + (5 * 60); // Expira en 5 minutos
         $payload['jti'] = bin2hex(random_bytes(16)); // ID único del token
         
         $payload_encoded = self::base64UrlEncode(json_encode($payload));

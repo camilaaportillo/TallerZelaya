@@ -1,53 +1,33 @@
-// js/sesion.js - VERSIÓN COMPLETA CON MOSTRAR ROL
 (function () {
     'use strict';
 
-    // 🔥 BLOQUEAR RENDERIZADO INMEDIATAMENTE
-    if (document.body) {
-        document.body.style.visibility = 'hidden';
-    } else {
-        document.addEventListener('DOMContentLoaded', function () {
-            document.body.style.visibility = 'hidden';
-        });
-    }
-
-    // VERIFICACIÓN ULTRA-RÁPIDA
-    const loggedin = sessionStorage.getItem('loggedin');
-    const paginasProtegidas = [
-        'index.html', 'usuario.html', 'clientes.html', 'compra.html',
-        'marcas.html', 'clientesInactivos.html', 'empresa.html',
-        'marcasInactivas.html', 'medidas.html', 'proveedor.html', 'repuestos.html'
-    ];
-    const paginaActual = window.location.pathname.split('/').pop();
-
-    if (loggedin !== 'true' && paginasProtegidas.includes(paginaActual)) {
-        window.location.replace('login.html');
-        return;
-    }
-
-    // SI PASA LA VERIFICACIÓN, MOSTRAR CONTENIDO
-    if (loggedin === 'true') {
-        const revelar = function () {
-            document.body.style.visibility = 'visible';
-        };
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', revelar);
-        } else {
-            revelar();
-        }
-    }
-
     class SistemaSesion {
-        constructor() {
+        constructor(quitarLoaderCallback) {
             this.usuario = null;
+            this.quitarLoader = quitarLoaderCallback;
             this.inicializar();
         }
 
         inicializar() {
+            // ✅ MOSTRAR EL BODY INMEDIATAMENTE (por si hay CSS inline ocultándolo)
+            this.mostrarBody();
+            
             this.cargarUsuario();
             this.actualizarHeader();
-            this.protegerRutas();
+            
+            if (this.protegerRutas()) {
+                if (this.quitarLoader) {
+                    this.quitarLoader();
+                }
+            }
+        }
+
+        mostrarBody() {
+            // ✅ FORZAR QUE EL BODY SEA VISIBLE
+            if (document.body) {
+                document.body.style.visibility = 'visible';
+                document.body.style.opacity = '1';
+            }
         }
 
         cargarUsuario() {
@@ -65,10 +45,9 @@
 
             if (nombreUsuarioElement && rolUsuarioElement) {
                 if (this.usuario && this.usuario.usuario) { 
-                    nombreUsuarioElement.textContent = this.usuario.usuario; // Mostrar el username
+                    nombreUsuarioElement.textContent = this.usuario.usuario;
                     rolUsuarioElement.textContent = `(${this.getNombreRol()})`;
                 } else if (this.usuario && this.usuario.nombre) {
-                    // Fallback: si no existe usuario, mostrar nombre
                     nombreUsuarioElement.textContent = this.usuario.nombre;
                     rolUsuarioElement.textContent = `(${this.getNombreRol()})`;
                 } else {
@@ -76,7 +55,6 @@
                     rolUsuarioElement.textContent = '';
                 }
             } else if (nombreUsuarioElement) {
-                // Fallback: si no existe el elemento rol
                 if (this.usuario && this.usuario.usuario) {
                     nombreUsuarioElement.textContent = this.usuario.usuario;
                 } else if (this.usuario && this.usuario.nombre) {
@@ -87,7 +65,6 @@
             }
         }
 
-        // FUNCIONES PARA ROLES
         obtenerRol() {
             return this.usuario ? this.usuario.rol : null;
         }
@@ -102,7 +79,7 @@
 
         tienePermiso(rolRequerido) {
             const rolActual = this.obtenerRol();
-            if (rolActual === 1) return true; // Admin tiene acceso a todo
+            if (rolActual === 1) return true;
             return rolActual === rolRequerido;
         }
 
@@ -153,7 +130,84 @@
         }
     }
 
-    //  FUNCIONES GLOBALES
+    // LÓGICA PRINCIPAL
+    const loggedin = sessionStorage.getItem('loggedin');
+    const paginasProtegidas = [
+        'index.html', 'usuario.html', 'clientes.html', 'compra.html',
+        'marcas.html', 'clientesInactivos.html', 'empresa.html',
+        'marcasInactivas.html', 'medidas.html', 'proveedor.html', 'repuestos.html'
+    ];
+    const paginaActual = window.location.pathname.split('/').pop();
+
+    // REDIRIGIR INMEDIATAMENTE SI NO ESTÁ LOGUEADO
+    if (loggedin !== 'true' && paginasProtegidas.includes(paginaActual)) {
+        window.location.replace('login.html');
+        return;
+    }
+
+    // ✅ INICIALIZACIÓN MEJORADA
+    if (loggedin === 'true') {
+        document.addEventListener('DOMContentLoaded', function () {
+            // ✅ CREAR LOADER SOLO SI ES NECESARIO (no en index.html)
+            let loader = null;
+            let quitarLoader = function() {};
+            
+            if (paginaActual !== 'index.html') {
+                const crearLoader = function () {
+                    const loader = document.createElement('div');
+                    loader.id = 'seguridad-loader';
+                    loader.innerHTML = `
+                        <div style="
+                            position: fixed;
+                            top: 0; left: 0;
+                            width: 100%; height: 100%;
+                            background: white;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            z-index: 9999;
+                            font-family: Arial, sans-serif;
+                        ">
+                            <div style="text-align: center;">
+                                <div style="
+                                    width: 40px; height: 40px;
+                                    border: 4px solid #f3f3f3;
+                                    border-top: 4px solid #667eea;
+                                    border-radius: 50%;
+                                    animation: spin 1s linear infinite;
+                                    margin: 0 auto 20px;
+                                "></div>
+                                <p>Verificando permisos...</p>
+                            </div>
+                        </div>
+                        <style>
+                            @keyframes spin {
+                                0% { transform: rotate(0deg); }
+                                100% { transform: rotate(360deg); }
+                            }
+                        </style>
+                    `;
+                    document.body.appendChild(loader);
+                    return loader;
+                };
+
+                loader = crearLoader();
+                
+                quitarLoader = function () {
+                    if (loader && loader.parentNode) {
+                        loader.parentNode.removeChild(loader);
+                    }
+                };
+
+                setTimeout(quitarLoader, 3000);
+            }
+
+            // ✅ INICIALIZAR SISTEMA
+            const sistema = new SistemaSesion(quitarLoader);
+        });
+    }
+
+    // FUNCIONES GLOBALES
     window.verificarSesion = function () {
         const sistema = new SistemaSesion();
         return sistema.verificarSesion();
@@ -171,41 +225,51 @@
         }
     };
 
+    window.irInicio = function () {
+        window.location.href = 'index.html';
+    };
     window.obtenerUsuarioLogueado = function () {
-        const sistema = new SistemaSesion();
-        return sistema.obtenerUsuario();
+        // Crear instancia temporal para obtener usuario
+        const tempSistema = new SistemaSesion();
+        tempSistema.cargarUsuario();
+        return tempSistema.obtenerUsuario();
     };
 
     window.esAdministrador = function () {
-        const sistema = new SistemaSesion();
-        return sistema.esAdministrador();
+        const tempSistema = new SistemaSesion();
+        tempSistema.cargarUsuario();
+        return tempSistema.esAdministrador();
     };
 
     window.esEmpleado = function () {
-        const sistema = new SistemaSesion();
-        return sistema.esEmpleado();
+        const tempSistema = new SistemaSesion();
+        tempSistema.cargarUsuario();
+        return tempSistema.esEmpleado();
     };
 
     window.tienePermiso = function (rolRequerido) {
-        const sistema = new SistemaSesion();
-        return sistema.tienePermiso(rolRequerido);
+        const tempSistema = new SistemaSesion();
+        tempSistema.cargarUsuario();
+        return tempSistema.tienePermiso(rolRequerido);
     };
 
     window.getNombreRol = function () {
-        const sistema = new SistemaSesion();
-        return sistema.getNombreRol();
+        const tempSistema = new SistemaSesion();
+        tempSistema.cargarUsuario();
+        return tempSistema.getNombreRol();
     };
 
     window.restringirAccesoPorRol = function (rolRequerido) {
-        const sistema = new SistemaSesion();
-        if (!sistema.tienePermiso(rolRequerido)) {
+        const tempSistema = new SistemaSesion();
+        tempSistema.cargarUsuario();
+        if (!tempSistema.tienePermiso(rolRequerido)) {
             alert('No tienes permisos para realizar esta acción');
             return false;
         }
         return true;
     };
 
-    // Event listeners
+    // Event listener para cerrar menú
     if (loggedin === 'true') {
         document.addEventListener('click', function (e) {
             const menu = document.getElementById('menuUsuario');
@@ -214,10 +278,6 @@
             if (menu && userBtn && !menu.contains(e.target) && !userBtn.contains(e.target)) {
                 menu.style.display = 'none';
             }
-        });
-
-        document.addEventListener('DOMContentLoaded', function () {
-            new SistemaSesion();
         });
     }
 })();

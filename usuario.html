@@ -34,14 +34,13 @@
         body {
             visibility: hidden;
         }
-
     </style>
     <script src="js/sesion.js"></script> <!-- 🔥 PRIMER SCRIPT -->
 </head>
 
 <body>
 
- <!-- Encabezado -->
+    <!-- Encabezado -->
     <header>
         <button class="logo-btn" onclick="irInicio()">
             <img src="imgs/bicicleta.png" alt="Logo bicicleta">
@@ -226,7 +225,10 @@
 
             // Mostrar información del usuario
             const userData = JSON.parse(usuario);
-            document.getElementById('userName').textContent = userData.nombre || userData.correo;
+            const userNameElement = document.getElementById('userName');
+            if (userNameElement && userData) {
+                userNameElement.textContent = userData.nombre || userData.correo;
+            }
         }
 
         function cerrarSesion() {
@@ -246,7 +248,7 @@
             // Opcional: puedes agregar lógica adicional aquí
         });
     </script>
-    
+
 
 </body>
 
