@@ -5,9 +5,9 @@ include "conexion.php";
 try {
     // ====== Validaciones iniciales ======
     if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-        throw new Exception("Método no permitido, use POST.");
+        throw new Exception("Método no permitido. Use POST.");
     }
-
+    
     if (!isset($_POST["proveedor"], $_POST["fecha"], $_POST["usuario"], $_POST["productos"])) {
         throw new Exception("Datos incompletos.");
     }
@@ -86,6 +86,7 @@ try {
         "precio_total" => $precioTotal
     ]);
 
+    
 } catch (Exception $e) {
     if ($conn && $conn->connect_errno === 0) {
         $conn->rollback();

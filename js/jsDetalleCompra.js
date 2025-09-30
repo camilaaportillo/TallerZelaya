@@ -1,36 +1,78 @@
-"use strict";
-const tablaBody = document.querySelector(".tabla tbody");
+(async function() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
+  if (!id) {
+    alert("No se proporcionó un ID de compra.");
+    return;
+  }
 
-document.addEventListener("DOMContentLoaded", () => {
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
-    if (id) {
-        cargarDetalle(id);
+  try {
+    const res = await fetch(`http://localhost/TallerZelaya/php/obtenerDetalleCompra.php?id=${id}`);
+    const data = await res.json();
+    if (data.error) {
+      alert(data.error);
+      return;
     }
-});
 
-function cargarDetalle(idCompra) {
-    fetch(`http://localhost/TallerZelaya/php/obtenerDetalleCompra.php?id=${idCompra}`)
-        .then(res => res.json())
-        .then(data => {
-            mostrarTabla(data);
-        })
-        .catch(err => console.error("Error al cargar detalle:", err));
-}
+    const compra = data.compra;
+    const items = data.detalles;
+    console.log(compra);
+    console.log(items);
 
-function mostrarTabla(datos) {
-    // Limpia solo el tbody, no la tabla completa
-    tablaBody.innerHTML = "";
+    // Empresa
+    document.getElementById("empresaNombre").textContent = compra.empresa_nombre;
+    document.getElementById("empresaContacto").textContent = `${compra.empresa_correo} • ${compra.empresa_telefono}`;
 
-    datos.forEach(item => {
-        const fila = document.createElement("tr");
-        fila.innerHTML = `
-            <td>${item.producto}</td>
-            <td>${item.cantidad}</td>
-            <td>$${item.precio_unitario.toFixed(2)}</td>
-            <td>$${(item.cantidad * item.precio_unitario).toFixed(2)}</td>
-        `;
-        tablaBody.appendChild(fila);
+    // Proveedor
+    document.getElementById("proveedorNombre").textContent = compra.proveedor_nombre;
+    document.getElementById("proveedorContacto").textContent = `${compra.proveedor_correo} • ${compra.proveedor_telefono}`;
+
+    // Usuario
+    document.getElementById("usuarioNombre").textContent = compra.usuario_nombre;
+    document.getElementById("usuarioLogin").textContent = compra.usuario_login;
+
+    // Factura
+    document.getElementById("facturaId").textContent = "#" + compra.id_compra;
+    document.getElementById("facturaFecha").textContent = compra.fecha;
+
+    // Productos
+    const tbody = document.querySelector("#tablaProductos tbody");
+    tbody.innerHTML = "";
+    let total = 0;
+    items.forEach((it, i) => {
+      const tr = document.createElement("tr");
+      const sub = parseFloat(it.subTotal);
+      total += sub;
+      tr.innerHTML = `
+        <td>${i+1}</td>
+        <td>${it.repuesto} (${it.codigo})</td>
+        <td>${it.cantidad}</td>
+        <td>${parseFloat(it.precioUnitario).toFixed(2)}</td>
+        <td>${sub.toFixed(2)}</td>
+      `;
+      tbody.appendChild(tr);
     });
-}
+    document.getElementById("totalFactura").textContent = total.toFixed(2);
 
+    // Imagen
+    const btnVer = document.getElementById("verImagen");
+    const contImg = document.getElementById("contenedorImagen");
+    const img = document.getElementById("facturaImg");
+    const linkDesc = document.getElementById("descargarImagen");
+
+    if (compra.facturaImagen) {
+      btnVer.addEventListener("click", () => {
+        contImg.style.display = "block";
+        img.src = "facturas/" + compra.facturaImagen;
+        linkDesc.style.display = "inline-block";
+        linkDesc.href = "php/descargarFactura.php?id=" + id;
+      });
+    } else {
+      btnVer.style.display = "none";
+    }
+
+  } catch (e) {
+    console.error(e);
+    alert("Error cargando detalle de la compra");
+  }
+})();

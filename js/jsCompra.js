@@ -8,11 +8,16 @@ let contadorId = 1;
 let choicesProducto = null;
 let choicesProveedor = null;
 
+// Recuperar usuario de sessionStorage
+const usuarioData = JSON.parse(sessionStorage.getItem("usuario") || "{}");
+const ID_USUARIO = usuarioData.id || null;
+
 /* ========== Referencias DOM ========== */
 const tablaBody = document.querySelector(".tabla tbody");
 const btnRegistrar = document.querySelector(".btn-registrar");
 const btnActualizar = document.querySelector(".btn-actualizar");
 const btnCancelarEdicion = document.getElementById("btnCancelarEdicion");
+
 
 const selectProducto = document.getElementById("selectProducto");
 const inputCantidad = document.getElementById("inputCantidad");
@@ -231,8 +236,8 @@ function validarFecha() {
     const seleccionada = new Date(inputFecha.value);
 
     // eliminar horas para comparación exacta
-    hoy.setHours(0,0,0,0);
-    seleccionada.setHours(0,0,0,0);
+    hoy.setHours(0, 0, 0, 0);
+    seleccionada.setHours(0, 0, 0, 0);
 
     const hace7dias = new Date();
     hace7dias.setDate(hoy.getDate() - 8);
@@ -476,10 +481,10 @@ function limpiarCampos() {
 // Cerrar modal (si existe)
 const cerrarModal = document.getElementById("cerrarModal");
 
-    cerrarModal.addEventListener("click", () => {
-        const modal = document.getElementById("modalFactura");
-        if (modal) modal.style.display = "none";
-    });
+cerrarModal.addEventListener("click", () => {
+    const modal = document.getElementById("modalFactura");
+    if (modal) modal.style.display = "none";
+});
 // Click fuera del modal
 window.addEventListener("click", (e) => {
     const modal = document.getElementById("modalFactura");
@@ -491,7 +496,8 @@ window.addEventListener("click", (e) => {
 /* ========== ENVIAR COMPRA COMPLETA ========== */
 const btnEnviar = document.getElementById("btn-registro");
 if (btnEnviar) {
-    btnEnviar.addEventListener("click", () => {
+    btnEnviar.addEventListener("click", (e) => {
+        e.preventDefault();
         if (productosCompra.length === 0) {
             showModalMensaje("advertencia", "Producto requerido", "Debe agregar al menos un producto antes de enviar la compra.");
             return;
@@ -506,7 +512,7 @@ if (btnEnviar) {
         }
         // Preparar datos para enviar
         const productosParaEnviar = productosCompra.map(p => ({
-            producto: Number(p.id_repuesto), 
+            producto: Number(p.id_repuesto),
             cantidad: Number(p.cantidad),
             precio: Number(p.precio)
         }));
@@ -516,7 +522,7 @@ if (btnEnviar) {
         let formData = new FormData();
         formData.append("proveedor", proveedor);
         formData.append("fecha", fecha);
-        formData.append("usuario", 1); // ideal: obtener de sesión PHP
+        formData.append("usuario", ID_USUARIO);
         formData.append("productos", JSON.stringify(productosParaEnviar));
 
         // agregar factura si se subió
@@ -525,16 +531,13 @@ if (btnEnviar) {
             formData.append("factura", factura);
         }
 
-        console.log("Productos que se enviarán:", productosCompra);
-        console.log("----------------------");
-        console.log("Datos del formulario:", { proveedor, fecha, usuario: 1, productos: productosParaEnviar, factura });
-
-        fetch("http://localhost/TallerZelaya/php/compra.php", {
+        fetch("php/compra.php", {
             method: "POST",
             body: formData
         })
             .then(async res => {
                 const text = await res.text();
+                console.log("Respuesta cruda del servidor:", text);
                 // intentar parsear JSON, si no es JSON mostrar crudo
                 try {
                     const data = JSON.parse(text);

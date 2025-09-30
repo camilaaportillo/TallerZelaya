@@ -1,55 +1,64 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-
 <head>
-  <meta charset="UTF-8">
-  <title>Detalle de Compra</title>
-  <link rel="stylesheet" href="css/compraStyle.css">
+  <meta charset="utf-8">
+  <title>Detalle de Factura</title>
+  <link rel="stylesheet" href="css/detalle_compra.css">
 </head>
-
 <body>
-
-  <!-- Encabezado -->
-  <header>
-    <button class="logo-btn" onclick="irInicio()">
-      <img src="imgs/bicicleta.png" alt="Logo bicicleta">
-    </button>
-    <h1>Taller de bicicletas Zelaya</h1>
-    <div class="usuario">
-      <div class="info-usuario">
-        <span id="nombreUsuario" class="nombre-usuario">Usuario</span>
-        <span id="rolUsuario" class="rol-usuario"></span>
+  <div class="factura" id="factura">
+    <header>
+      <h1 id="empresaNombre">Empresa</h1>
+      <small id="empresaContacto">correo • teléfono</small>
+      <div class="info">
+        <strong>Factura</strong> <span id="facturaId">#--</span><br>
+        <small id="facturaFecha">--</small>
       </div>
-      <button class="user-btn" onclick="toggleMenu()">
-        <img src="imgs/logo_user.png" alt="Usuario">
-      </button>
-      <div id="menuUsuario" class="menu-usuario">
-        <a href="#" onclick="cerrarSesion()">Cerrar sesión</a>
+    </header>
+
+    <section>
+      <div>
+        <h3>Proveedor</h3>
+        <p id="proveedorNombre"></p>
+        <small id="proveedorContacto"></small>
       </div>
+      <div>
+        <h3>Usuario</h3>
+        <p id="usuarioNombre"></p>
+        <small id="usuarioLogin"></small>
+      </div>
+    </section>
+
+    <table id="tablaProductos">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Precio unitario</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4" style="text-align:right"><strong>Total</strong></td>
+          <td id="totalFactura">0.00</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div class="acciones">
+      <button id="verImagen">Ver Factura</button>
+      <a id="descargarImagen" style="display:none;" class="btn">Descargar Factura</a>
+      <button onclick="window.print()">Imprimir Factura</button>
     </div>
-  </header>
 
-  <section class="tabla">
-
-    <div class="tabla-contenedor">
-      <table id="tablaCompras">
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Precio Unitario</th>
-            <th>Subtotal</th>
-          </tr>
-        </thead>
-        <tbody>
-
-        </tbody>
-      </table>
+    <div id="contenedorImagen" style="display:none; text-align:center; margin-top:20px;">
+      <img id="facturaImg" style="max-width:100%; border:1px solid #ddd;">
     </div>
-
-  </section>
+  </div>
 
   <script src="js/jsDetalleCompra.js"></script>
 </body>
-
 </html>

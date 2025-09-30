@@ -1,4 +1,8 @@
+// js/script.js - Seguro para cualquier página
 document.addEventListener("DOMContentLoaded", () => {
+    let filaSeleccionada = null;
+
+    // Elementos del modal
     const modal = document.getElementById("modalAcciones");
     const cerrarModal = document.getElementById("cerrarModal");
     const btnEditarModal = document.getElementById("btnEditarModal");
@@ -6,82 +10,72 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnRegistrar = document.querySelector(".btn-registrar");
     const inputs = document.querySelectorAll(".formulario input, .formulario select");
 
-    // ✅ VERIFICAR SI ESTAMOS EN UNA PÁGINA QUE TIENE EL MODAL
-    if (!modal || !cerrarModal) {
-        console.log("No estamos en una página con modal de acciones");
-        return; // Salir si no estamos en la página correcta
+    // Abrir modal al dar click en botones editar
+    const botonesEditar = document.querySelectorAll(".btn-editar");
+    if (modal && botonesEditar.length > 0) {
+        botonesEditar.forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+                filaSeleccionada = e.target.closest("tr");
+                modal.style.display = "flex";
+            });
+        });
     }
 
-    // Abrir modal al dar click en editar
-    document.querySelectorAll(".btn-editar").forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-            filaSeleccionada = e.target.closest("tr");
-            modal.style.display = "flex";
-        });
-    });
-
-    // ✅ VERIFICAR QUE cerrarModal EXISTE ANTES DE AGREGAR EVENTO
-    if (cerrarModal) {
+    // Cerrar modal
+    if (modal && cerrarModal) {
         cerrarModal.addEventListener("click", () => {
             modal.style.display = "none";
         });
     }
 
     // Click fuera del modal
-    window.addEventListener("click", (e) => {
-        if (e.target === modal) {
-            modal.style.display = "none";
-        }
-    });
+    if (modal) {
+        window.addEventListener("click", (e) => {
+            if (e.target === modal) {
+                modal.style.display = "none";
+            }
+        });
+    }
 
-    // ✅ VERIFICAR QUE LOS ELEMENTOS EXISTEN ANTES DE USARLOS
-    if (btnEditarModal) {
+    // Acción Editar modal
+    if (btnEditarModal && filaSeleccionada && inputs.length >= 3 && btnRegistrar) {
         btnEditarModal.addEventListener("click", () => {
-            if (filaSeleccionada) {
-                const celdas = filaSeleccionada.querySelectorAll("td");
-
-                inputs[0].value = celdas[1].innerText; // Nombre repuesto
+            const celdas = filaSeleccionada.querySelectorAll("td");
+            if (celdas.length >= 4) {
+                inputs[0].value = celdas[1].innerText; // Nombre
                 inputs[1].value = celdas[2].innerText; // Descripción
                 inputs[2].value = celdas[3].innerText; // Stock mínimo
 
-                // Cambiar texto del botón
-                if (btnRegistrar) {
-                    btnRegistrar.textContent = "Editar repuesto";
-                }
-
+                btnRegistrar.textContent = "Editar repuesto";
                 modal.style.display = "none";
             }
         });
     }
 
-    if (btnEliminarModal) {
+    // Acción Eliminar modal
+    if (btnEliminarModal && filaSeleccionada && modal) {
         btnEliminarModal.addEventListener("click", () => {
-            if (filaSeleccionada) {
-                filaSeleccionada.remove();
-                modal.style.display = "none";
-            }
+            filaSeleccionada.remove();
+            modal.style.display = "none";
         });
     }
-});
 
-let filaSeleccionada = null;
+    // Función irInicio
+    window.irInicio = function () {
+        window.location.href = "index.html";
+    };
 
-function irInicio() {
-    window.location.href = "index.html";
-}
+    // Función toggleMenu
+    window.toggleMenu = function () {
+        const menu = document.getElementById("menuUsuario");
+        if (menu) menu.classList.toggle("mostrar");
+    };
 
-function toggleMenu() {
-    const menuUsuario = document.getElementById("menuUsuario");
-    if (menuUsuario) {
-        menuUsuario.classList.toggle("mostrar");
-    }
-}
-
-window.onclick = function (e) {
-    if (!e.target.closest('.usuario')) {
-        const menuUsuario = document.getElementById("menuUsuario");
-        if (menuUsuario) {
-            menuUsuario.classList.remove("mostrar");
+    // Click fuera del menú usuario
+    window.addEventListener("click", (e) => {
+        const menu = document.getElementById("menuUsuario");
+        if (menu && !e.target.closest('.usuario')) {
+            menu.classList.remove("mostrar");
         }
-    }
-}
+    });
+});
