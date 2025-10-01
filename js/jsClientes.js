@@ -31,8 +31,7 @@ const cerrarMensaje = document.getElementById("cerrarMensaje");
 
 function validarCliente() {
     const nombre = inputNombre.value.trim();
-    
-    const telefono = inputTelefono.value.trim();
+    let telefono = inputTelefono.value.trim().replace(/\D/g, ""); // solo números
     const correo = inputCorreo.value.trim();
 
     if (!nombre) {
@@ -41,8 +40,40 @@ function validarCliente() {
         return false;
     }
 
+    if (telefono && telefono.length !== 8) {
+        showModalMensaje("advertencia", "Teléfono inválido", "El teléfono debe tener 8 dígitos.");
+        inputTelefono.focus();
+        return false;
+    }
+
+    // Formatear antes de guardar (1234-5678)
+    if (telefono.length === 8) {
+        telefono = telefono.replace(/(\d{4})(\d{4})/, "$1-$2");
+    }
+
     return { nombre, telefono, correo };
 }
+
+
+// Validar y formatear teléfono
+inputTelefono.addEventListener("input", () => {
+    // Permitir solo números
+    inputTelefono.value = inputTelefono.value.replace(/\D/g, "");
+
+    // Limitar a 8 dígitos
+    if (inputTelefono.value.length > 8) {
+        inputTelefono.value = inputTelefono.value.slice(0, 8);
+    }
+});
+
+// Formatear al salir del input
+inputTelefono.addEventListener("blur", () => {
+    let tel = inputTelefono.value.replace(/\D/g, "");
+    if (tel.length === 8) {
+        inputTelefono.value = tel.replace(/(\d{4})(\d{4})/, "$1-$2");
+    }
+});
+
 
 // Cargar datos
 document.addEventListener("DOMContentLoaded", cargarClientes);
