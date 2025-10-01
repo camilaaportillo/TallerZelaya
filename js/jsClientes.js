@@ -95,8 +95,8 @@ function mostrarTabla(datos) {
 
         fila.innerHTML = `
             <td>${cliente.nombre}</td>
-            <td>${cliente.correo ?? ""}</td>
-            <td>${cliente.telefono?? ""}</td>
+            <td>${cliente.correo ?? "-"}</td>
+            <td>${cliente.telefono?? "-"}</td>
             
             <td>
                 <button class="btn-editar" data-id="${cliente.id_cliente}">
