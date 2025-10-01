@@ -3,7 +3,49 @@ const modalIcono = document.getElementById("modalIcono");
 const modalTitulo = document.getElementById("modalTitulo");
 const modalTexto = document.getElementById("modalTexto");
 const cerrarMensaje = document.getElementById("cerrarMensaje");
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&._-])[A-Za-z\d!@#$%^&._-]{8,}$/;
 
+// Función para validar inputs
+function validarInput(inputElement, regex, mensajeError) {
+    const valor = inputElement.value;
+    const mensajeElement = inputElement.nextElementSibling; // Asumiendo que el mensaje está después del input
+    
+    // Verificar si existe un elemento para mostrar mensajes
+    let mensajeErrorElement = inputElement.parentNode.querySelector('.error-message');
+    
+    // Si no existe, crear uno
+    if (!mensajeErrorElement) {
+        mensajeErrorElement = document.createElement('div');
+        mensajeErrorElement.className = 'error-message';
+        mensajeErrorElement.style.color = 'red';
+        mensajeErrorElement.style.fontSize = '12px';
+        mensajeErrorElement.style.marginTop = '5px';
+        inputElement.parentNode.appendChild(mensajeErrorElement);
+    }
+    
+    if (valor === '') {
+        inputElement.style.borderColor = '';
+        mensajeErrorElement.textContent = '';
+    } else if (!regex.test(valor)) {
+        inputElement.style.borderColor = 'red';
+        mensajeErrorElement.textContent = mensajeError;
+    } else {
+        inputElement.style.borderColor = 'green';
+        mensajeErrorElement.textContent = '';
+    }
+}
+
+configurarEventListeners();
+
+function configurarEventListeners() {
+    document.getElementById("nuevaContrasena").addEventListener("input", () => {
+        validarInput(document.getElementById("nuevaContrasena"), passwordRegex, "Mínimo 8 caracteres, 1 mayúscula, 1 minúscula, 1 número y 1 carácter especial");
+    });
+
+    document.getElementById("confirmarContrasena").addEventListener("input", () => {
+        validarInput(document.getElementById("confirmarContrasena"), passwordRegex, "Mínimo 8 caracteres, 1 mayúscula, 1 minúscula, 1 número y 1 carácter especial");
+    });
+}
 // Permitir cerrar el modal manualmente
 cerrarMensaje.addEventListener("click", () => {
   modalMensaje.style.display = "none";
@@ -14,9 +56,9 @@ cerrarMensaje.addEventListener("click", () => {
 document.addEventListener("DOMContentLoaded", () => {
     // Recuperar el usuario logueado desde sesion.js
     const usuario = window.obtenerUsuarioLogueado();
-
+  
     if (!usuario) {
-        showModalMensaje("error", "Error de Sesión", "⚠️ No se encontró la sesión del usuario.");
+        showModalMensaje("error", "Error de Sesión", " No se encontró la sesión del usuario.");
         setTimeout(() => window.location.href = "login.html", 2000);
         return;
     }
@@ -62,13 +104,13 @@ document.addEventListener("DOMContentLoaded", () => {
     btnGuardarUsuario.addEventListener("click", async () => {
         const nuevoAlias = inputNuevoUsuario.value.trim();
         if (!nuevoAlias) {
-            showModalMensaje("error", "Error de Validación", "⚠️ El alias no puede estar vacío.");
+            showModalMensaje("error", "Error de Validación", " El alias no puede estar vacío.");
             return;
         }
 
         const usuario = window.obtenerUsuarioLogueado();
         if (!usuario || !usuario.usuario) {
-            showModalMensaje("error", "Error de Sesión", "❌ No se encontró el usuario.");
+            showModalMensaje("error", "Error de Sesión", " No se encontró el usuario.");
             return;
         }
 
@@ -89,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // Cerrar sesión tras un alias cambiado
                 setTimeout(() => {
-                    showModalMensaje("advertencia", "Advertencia", "⚠️ Se actualizará el alias. El sistema se cerrará automáticamente.");
+                    showModalMensaje("advertencia", "Advertencia", " Se actualizará el alias. El sistema se cerrará automáticamente.");
                 }, 1500);
 
                 setTimeout(() => {
@@ -103,7 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
             console.error(error);
-            showModalMensaje("error", "Error Interno", "❌ Error al actualizar el usuario.");
+            showModalMensaje("error", "Error Interno", " Error al actualizar el usuario.");
         }
     });
 
@@ -116,29 +158,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Guardar nueva contraseña
    // En tu jsPerfil.js - versión normal
-btnGuardarContrasena.addEventListener("click", async () => {
+    btnGuardarContrasena.addEventListener("click", async () => {
+
     const actualContrasena = document.getElementById("actualContrasena").value.trim();
     const nuevaContrasena = document.getElementById("nuevaContrasena").value.trim();
     const confirmarContrasena = document.getElementById("confirmarContrasena").value.trim();
+   
+
+   
 
     // Validaciones básicas
     if (!actualContrasena || !nuevaContrasena || !confirmarContrasena) {
-        showModalMensaje("error", "Error de Validación", "⚠️ Todos los campos son obligatorios.");
+        showModalMensaje("error", "Error de Validación", " Todos los campos son obligatorios.");
         return;
     }
 
     if (nuevaContrasena !== confirmarContrasena) {
-        showModalMensaje("error", "Error de Validación", "⚠️ Las nuevas contraseñas no coinciden.");
+        showModalMensaje("error", "Error de Validación", " Las nuevas contraseñas no coinciden.");
         return;
     }
 
     if (actualContrasena === nuevaContrasena) {
-        showModalMensaje("error", "Error de Validación", "⚠️ La nueva contraseña debe ser diferente a la actual.");
+        showModalMensaje("error", "Error de Validación", " La nueva contraseña debe ser diferente a la actual.");
         return;
     }
 
     if (nuevaContrasena.length < 6) {
-        showModalMensaje("error", "Error de Validación", "⚠️ La nueva contraseña debe tener al menos 6 caracteres.");
+        showModalMensaje("error", "Error de Validación", " La nueva contraseña debe tener al menos 6 caracteres.");
         return;
     }
 
@@ -161,8 +207,12 @@ btnGuardarContrasena.addEventListener("click", async () => {
             
             // Mostrar mensaje de seguridad
             setTimeout(() => {
-                showModalMensaje("advertencia", "Seguridad", "🔒 Por seguridad, se recomienda cerrar sesión después de cambiar la contraseña.");
+                showModalMensaje("advertencia", "Seguridad", " Por seguridad, se recomienda cerrar sesión después de cambiar la contraseña.");
             }, 2000);
+
+            setTimeout(() => {
+                    window.cerrarSesion();
+                }, 2000);
             
         } else {
             showModalMensaje("error", "Error", data.mensaje);
@@ -170,7 +220,7 @@ btnGuardarContrasena.addEventListener("click", async () => {
 
     } catch (error) {
         console.error("Error cambiando contraseña:", error);
-        showModalMensaje("error", "Error Interno", "❌ Error al cambiar la contraseña.");
+        showModalMensaje("error", "Error Interno", " Error al cambiar la contraseña.");
     }
 });
 });
