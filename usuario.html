@@ -35,7 +35,33 @@
             visibility: hidden;
         }
     </style>
-    <script src="js/sesion.js"></script> <!-- 🔥 PRIMER SCRIPT -->
+    
+    <!-- ✅ SCRIPTS EN ORDEN CORRECTO -->
+   <script src="js/sesion.js"></script>
+    
+    <!-- DEBUG TEMPORAL -->
+    <script>
+        console.log('🐛 DEBUG usuario.html - INICIO');
+        console.log('📍 URL:', window.location.href);
+        console.log('📦 sessionStorage al cargar usuario.html:');
+        console.log('  loggedin:', sessionStorage.getItem('loggedin'));
+        console.log('  usuario:', sessionStorage.getItem('usuario'));
+        console.log('  usuario_rol:', sessionStorage.getItem('usuario_rol'));
+        
+        // Verificación inmediata
+        if (sessionStorage.getItem('loggedin') !== 'true') {
+            console.error('❌ PROBLEMA: No hay sesión en usuario.html');
+            window.location.href = 'login.html';
+        } else {
+            console.log('✅ Sesión activa encontrada en usuario.html');
+            const usuario = JSON.parse(sessionStorage.getItem('usuario') || '{}');
+            console.log('👤 Usuario:', usuario);
+            console.log('🎭 Rol del usuario:', usuario.rol);
+        }
+    </script>
+    
+    <script src="js/permisos.js"></script>
+   
 </head>
 
 <body>
@@ -212,42 +238,7 @@
             }
         });
     </script>
-    <script>
-        // Verificación de sesión al cargar la página
-        function verificarSesion() {
-            const loggedin = sessionStorage.getItem('loggedin');
-            const usuario = sessionStorage.getItem('usuario');
-
-            if (loggedin !== 'true' || !usuario) {
-                window.location.href = 'login.html';
-                return;
-            }
-
-            // Mostrar información del usuario
-            const userData = JSON.parse(usuario);
-            const userNameElement = document.getElementById('userName');
-            if (userNameElement && userData) {
-                userNameElement.textContent = userData.nombre || userData.correo;
-            }
-        }
-
-        function cerrarSesion() {
-            // Limpiar sessionStorage
-            sessionStorage.removeItem('loggedin');
-            sessionStorage.removeItem('usuario');
-
-            // Redirigir al login
-            window.location.href = 'login.html';
-        }
-
-        // Verificar sesión cuando la página carga
-        document.addEventListener('DOMContentLoaded', verificarSesion);
-
-        // También verificar si se recarga la página
-        window.addEventListener('beforeunload', () => {
-            // Opcional: puedes agregar lógica adicional aquí
-        });
-    </script>
+   
 
 
 </body>

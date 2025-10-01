@@ -4,38 +4,165 @@
     class SistemaSesion {
         constructor(quitarLoaderCallback) {
             this.usuario = null;
+            this.rol = '';
             this.quitarLoader = quitarLoaderCallback;
             this.inicializar();
         }
 
         inicializar() {
-            // ✅ MOSTRAR EL BODY INMEDIATAMENTE (por si hay CSS inline ocultándolo)
-            this.mostrarBody();
+            console.log('🔍 Inicializando sistema de sesión...');
+            
+            // Verificación básica de sesión
+            if (!this.verificarSesionBasica()) {
+                return;
+            }
             
             this.cargarUsuario();
-            this.actualizarHeader();
             
-            if (this.protegerRutas()) {
-                if (this.quitarLoader) {
-                    this.quitarLoader();
-                }
+            // ✅ SI NO ES ADMINISTRADOR Y ESTÁ EN PÁGINA ADMIN, REDIRIGIR AL INDEX
+            if (this.esPaginaAdmin() && !this.esAdministrador()) {
+                console.log('🚫 No es administrador - Redirigiendo al index...');
+                this.redirigirAlIndex();
+                return;
+            }
+            
+            this.configurarMenu();
+            this.mostrarContenido();
+            
+            if (this.quitarLoader) {
+                this.quitarLoader();
             }
         }
 
-        mostrarBody() {
-            // ✅ FORZAR QUE EL BODY SEA VISIBLE
+        verificarSesionBasica() {
+            const loggedin = sessionStorage.getItem('loggedin');
+            const usuarioStorage = sessionStorage.getItem('usuario');
+            
+            console.log('📊 Estado sesión:');
+            console.log('- loggedin:', loggedin);
+            console.log('- usuarioStorage:', usuarioStorage ? 'EXISTE' : 'NO EXISTE');
+            
+            if (loggedin !== 'true' || !usuarioStorage) {
+                console.warn('⚠️ No hay sesión activa - Redirigiendo al login');
+                this.redirigirALogin();
+                return false;
+            }
+            
+            return true;
+        }
+
+        cargarUsuario() {
+            try {
+                this.usuario = JSON.parse(sessionStorage.getItem('usuario'));
+                this.rol = this.obtenerRolUsuario();
+                console.log('👤 Usuario cargado:', this.usuario.nombre);
+                console.log('🎭 Rol determinado:', this.rol);
+                
+                this.actualizarHeader();
+            } catch (error) {
+                console.error('❌ Error cargando usuario:', error);
+                this.redirigirALogin();
+            }
+        }
+
+        obtenerRolUsuario() {
+            // Fuentes del rol en orden de prioridad (igual que permisos.js)
+            const fuentes = [
+                sessionStorage.getItem('usuario_rol'),
+                this.usuario?.rol,
+                this.usuario?.id_rol?.toString()
+            ];
+
+            console.log('🔍 Buscando rol en fuentes:', fuentes);
+
+            for (let fuente of fuentes) {
+                if (fuente) {
+                    return this.normalizarRol(fuente);
+                }
+            }
+
+            return 'Sin rol';
+        }
+
+        normalizarRol(rol) {
+            const rolString = String(rol).trim();
+            console.log('🛠️ Normalizando rol:', rolString);
+            
+            const mapeoRoles = {
+                '1': 'Administrador',
+                '2': 'Empleado',
+                'administrador': 'Administrador',
+                'empleado': 'Empleado',
+                'admin': 'Administrador'
+            };
+
+            const rolLower = rolString.toLowerCase();
+            const rolNormalizado = mapeoRoles[rolLower] || mapeoRoles[rolString] || rolString;
+            console.log('🎯 Rol normalizado:', rolNormalizado);
+            
+            return rolNormalizado;
+        }
+
+        esPaginaAdmin() {
+            const paginaActual = window.location.pathname.split('/').pop();
+            const paginasAdmin = [
+                'usuario.html',
+                'empresa.html', 
+                'marcas.html',
+                'proveedor.html',
+                'compra.html'
+            ];
+            
+            const esAdmin = paginasAdmin.includes(paginaActual);
+            console.log('📄 Verificando página:', paginaActual, 'Es admin?:', esAdmin);
+            return esAdmin;
+        }
+
+        esAdministrador() {
+            const esAdmin = this.rol === 'Administrador';
+            console.log('👑 Verificando si es administrador:', this.rol, '=== Administrador →', esAdmin);
+            return esAdmin;
+        }
+
+        esEmpleado() {
+            return this.rol === 'Empleado';
+        }
+
+        redirigirAlIndex() {
+            console.log('🏠 Redirigiendo al index...');
+            window.location.href = 'index.html';
+        }
+
+        redirigirALogin() {
+            console.log('🔒 Redirigiendo al login...');
+            window.location.href = 'login.html';
+        }
+
+        mostrarContenido() {
+            // ✅ MOSTRAR EL BODY (igual que permisos.js)
             if (document.body) {
                 document.body.style.visibility = 'visible';
                 document.body.style.opacity = '1';
             }
+            console.log('👀 Contenido hecho visible');
         }
 
-        cargarUsuario() {
-            if (sessionStorage.getItem('loggedin') === 'true') {
-                const usuarioData = sessionStorage.getItem('usuario');
-                if (usuarioData) {
-                    this.usuario = JSON.parse(usuarioData);
-                }
+        configurarMenu() {
+            console.log('🔧 Configurando interfaz para rol:', this.rol);
+            const elementosAdmin = document.querySelectorAll('.admin-only');
+            
+            if (this.esEmpleado()) {
+                console.log('👷 Ocultando elementos admin - MODO EMPLEADO');
+                elementosAdmin.forEach(el => {
+                    el.style.display = 'none';
+                });
+                document.body.classList.add('modo-empleado');
+            } else {
+                console.log('👨‍💼 Mostrando todos los elementos - MODO ADMINISTRADOR');
+                elementosAdmin.forEach(el => {
+                    el.style.display = '';
+                });
+                document.body.classList.remove('modo-empleado');
             }
         }
 
@@ -43,75 +170,36 @@
             const nombreUsuarioElement = document.getElementById('nombreUsuario');
             const rolUsuarioElement = document.getElementById('rolUsuario');
 
-            if (nombreUsuarioElement && rolUsuarioElement) {
-                if (this.usuario && this.usuario.usuario) { 
-                    nombreUsuarioElement.textContent = this.usuario.usuario;
-                    rolUsuarioElement.textContent = `(${this.getNombreRol()})`;
-                } else if (this.usuario && this.usuario.nombre) {
-                    nombreUsuarioElement.textContent = this.usuario.nombre;
-                    rolUsuarioElement.textContent = `(${this.getNombreRol()})`;
-                } else {
-                    nombreUsuarioElement.textContent = 'Invitado';
-                    rolUsuarioElement.textContent = '';
-                }
-            } else if (nombreUsuarioElement) {
-                if (this.usuario && this.usuario.usuario) {
-                    nombreUsuarioElement.textContent = this.usuario.usuario;
-                } else if (this.usuario && this.usuario.nombre) {
-                    nombreUsuarioElement.textContent = this.usuario.nombre;
-                } else {
-                    nombreUsuarioElement.textContent = 'Invitado';
-                }
+            if (nombreUsuarioElement && this.usuario) {
+                const nombre = this.usuario.nombre || this.usuario.usuario || 'Usuario';
+                nombreUsuarioElement.textContent = nombre;
+                console.log('👤 Nombre actualizado:', nombre);
+            }
+
+            if (rolUsuarioElement) {
+                rolUsuarioElement.textContent = this.rol;
+                const rolClase = this.rol.toLowerCase();
+                rolUsuarioElement.className = `rol-usuario rol-${rolClase}`;
+                console.log('🎭 Rol actualizado:', this.rol, 'Clase CSS:', `rol-${rolClase}`);
             }
         }
 
+        // ✅ MÉTODOS ADICIONALES PARA COMPATIBILIDAD
         obtenerRol() {
-            return this.usuario ? this.usuario.rol : null;
-        }
-
-        esAdministrador() {
-            return this.obtenerRol() === 1;
-        }
-
-        esEmpleado() {
-            return this.obtenerRol() === 2;
+            return this.rol;
         }
 
         tienePermiso(rolRequerido) {
-            const rolActual = this.obtenerRol();
-            if (rolActual === 1) return true;
-            return rolActual === rolRequerido;
+            if (this.esAdministrador()) return true;
+            return this.rol === rolRequerido;
         }
 
         getNombreRol() {
-            const rol = this.obtenerRol();
-            switch (rol) {
-                case 1: return 'Administrador';
-                case 2: return 'Empleado';
-                default: return 'Invitado';
-            }
-        }
-
-        protegerRutas() {
-            const paginaActual = window.location.pathname.split('/').pop();
-            const rutasSoloAdministrador = ['usuario.html', 'empresa.html'];
-
-            if (rutasSoloAdministrador.includes(paginaActual) && !this.esAdministrador()) {
-                alert('❌ Acceso restringido. Solo administradores pueden acceder a esta página.');
-                window.location.href = 'index.html';
-                return false;
-            }
-
-            return true;
+            return this.rol;
         }
 
         verificarSesion() {
-            const loggedin = sessionStorage.getItem('loggedin');
-            if (loggedin !== 'true') {
-                window.location.href = 'login.html';
-                return false;
-            }
-            return true;
+            return this.verificarSesionBasica();
         }
 
         cerrarSesion() {
@@ -130,17 +218,17 @@
         }
     }
 
-    // LÓGICA PRINCIPAL
+    // LÓGICA PRINCIPAL (SIMPLIFICADA)
     const loggedin = sessionStorage.getItem('loggedin');
     const paginasProtegidas = [
         'index.html', 'usuario.html', 'clientes.html', 'compra.html',
         'marcas.html', 'clientesInactivos.html', 'empresa.html',
-        'marcasInactivas.html', 'medidas.html', 'proveedor.html', 'repuestos.html'
-    ];
+        'marcasInactivas.html', 'medidas.html', 'proveedor.html', 'repuestos.html'];
     const paginaActual = window.location.pathname.split('/').pop();
 
     // REDIRIGIR INMEDIATAMENTE SI NO ESTÁ LOGUEADO
     if (loggedin !== 'true' && paginasProtegidas.includes(paginaActual)) {
+        console.log('🚫 No logueado - Redirigiendo a login');
         window.location.replace('login.html');
         return;
     }
@@ -148,7 +236,9 @@
     // ✅ INICIALIZACIÓN MEJORADA
     if (loggedin === 'true') {
         document.addEventListener('DOMContentLoaded', function () {
-            // ✅ CREAR LOADER SOLO SI ES NECESARIO (no en index.html)
+            console.log('🚀 DOM cargado - Iniciando sistema de sesión...');
+            
+            // ✅ CREAR LOADER SOLO SI ES NECESARIO
             let loader = null;
             let quitarLoader = function() {};
             
@@ -199,15 +289,21 @@
                     }
                 };
 
+                // Quitar loader después de 3 segundos máximo
                 setTimeout(quitarLoader, 3000);
             }
 
             // ✅ INICIALIZAR SISTEMA
-            const sistema = new SistemaSesion(quitarLoader);
+            try {
+                const sistema = new SistemaSesion(quitarLoader);
+            } catch (error) {
+                console.error('💥 Error inicializando sistema:', error);
+                quitarLoader();
+            }
         });
     }
 
-    // FUNCIONES GLOBALES
+    // FUNCIONES GLOBALES (MANTENIDAS PARA COMPATIBILIDAD)
     window.verificarSesion = function () {
         const sistema = new SistemaSesion();
         return sistema.verificarSesion();
@@ -228,40 +324,34 @@
     window.irInicio = function () {
         window.location.href = 'index.html';
     };
+
     window.obtenerUsuarioLogueado = function () {
-        // Crear instancia temporal para obtener usuario
         const tempSistema = new SistemaSesion();
-        tempSistema.cargarUsuario();
         return tempSistema.obtenerUsuario();
     };
 
     window.esAdministrador = function () {
         const tempSistema = new SistemaSesion();
-        tempSistema.cargarUsuario();
         return tempSistema.esAdministrador();
     };
 
     window.esEmpleado = function () {
         const tempSistema = new SistemaSesion();
-        tempSistema.cargarUsuario();
         return tempSistema.esEmpleado();
     };
 
     window.tienePermiso = function (rolRequerido) {
         const tempSistema = new SistemaSesion();
-        tempSistema.cargarUsuario();
         return tempSistema.tienePermiso(rolRequerido);
     };
 
     window.getNombreRol = function () {
         const tempSistema = new SistemaSesion();
-        tempSistema.cargarUsuario();
         return tempSistema.getNombreRol();
     };
 
     window.restringirAccesoPorRol = function (rolRequerido) {
         const tempSistema = new SistemaSesion();
-        tempSistema.cargarUsuario();
         if (!tempSistema.tienePermiso(rolRequerido)) {
             alert('No tienes permisos para realizar esta acción');
             return false;

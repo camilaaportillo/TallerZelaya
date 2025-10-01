@@ -1,10 +1,51 @@
 <?php
 include "conexion.php";
+include "login.php";
 if (isset($_GET['accion']) && $_GET['accion'] === 'validar') {
     validarCampo();
     exit;
 }
+
+// ✅ NUEVA ACCIÓN: Reactivar usuario y resetear intentos
+if (isset($_GET['accion']) && $_GET['accion'] === 'reactivar') {
+    reactivarUsuario();
+    exit;
+}
+
 header('Content-Type: application/json; charset=utf-8');
+function reactivarUsuario() {
+    global $conn;
+    
+    $id_usuario = isset($_GET['id_usuario']) ? (int)$_GET['id_usuario'] : 0;
+    $correo = isset($_GET['correo']) ? trim($_GET['correo']) : '';
+
+    if ($id_usuario <= 0 || empty($correo)) {
+        echo json_encode(["status" => "error", "mensaje" => "Parámetros incompletos"]);
+        return;
+    }
+
+    try {
+        // 1. Reactivar el usuario en la base de datos
+        $stmt = $conn->prepare("UPDATE usuario SET estado = 'Activo' WHERE id_usuario = ?");
+        $stmt->bind_param("i", $id_usuario);
+        $stmt->execute();
+        
+        // 2. Resetear los intentos fallidos
+        $loginSystem = new LoginSystem();
+        $loginSystem->resetearIntentosPorCorreo($correo);
+        
+        echo json_encode([
+            "status" => "success", 
+            "mensaje" => "Usuario reactivado correctamente e intentos reseteados"
+        ]);
+        
+    } catch (Exception $e) {
+        echo json_encode([
+            "status" => "error", 
+            "mensaje" => "Error al reactivar usuario: " . $e->getMessage()
+        ]);
+    }
+}
 
 function validarCampo() {
     global $conn;

@@ -7,6 +7,9 @@ class SistemaLogin {
         this.correoInput = document.getElementById('correo');
         this.contrasenaInput = document.getElementById('contrasena');
         this.mensajeError = document.getElementById('mensajeError');
+        this.intentosFallidos = 0;
+        this.tiempoBloqueo = 0;
+        this.esTemporizadorActivo = false;
 
         // 👁️ CHECKBOX SIMPLE PARA LOGIN
         this.togglePasswordCheckbox = document.getElementById('togglePasswordLogin');
@@ -16,27 +19,40 @@ class SistemaLogin {
         this.correoRecuperarInput = document.getElementById('correoRecuperar');
         this.mensajeRecuperar = document.getElementById('mensajeRecuperar');
 
-
-        this.inicializarEventos();
-    }
-
-    inicializarEventos() {
+        // Agrega este evento en el constructor o inicializarEventos():
+        this.correoInput.addEventListener('input', () => {
+            // Si los campos están deshabilitados por cuenta desactivada, habilitarlos al cambiar correo
+            if (this.correoInput.disabled || this.contrasenaInput.disabled) {
+                this.correoInput.disabled = false;
+                this.contrasenaInput.disabled = false;
+                const botonLogin = this.loginForm.querySelector('.login-button');
+                botonLogin.disabled = false;
+                botonLogin.innerHTML = 'Iniciar sesión';
+                botonLogin.style.opacity = '1';
+                botonLogin.style.cursor = 'pointer';
+            }
+        });
         this.loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
             this.validarLogin();
         });
+        this.inicializarEventos();
+        this.verificarBloqueoTemporal();
+    }
+    inicializarEventos() {
+        
 
         // Evento para "Olvidé la contraseña"
         document.querySelector('.forgot-password').addEventListener('click', (e) => {
             e.preventDefault();
             this.mostrarModalRecuperar();
         });
+
         // Evento del formulario de recuperación
         this.formRecuperar.addEventListener('submit', (e) => {
             e.preventDefault();
             this.solicitarRecuperacion();
         });
-
 
         // 👁️ Evento para mostrar/ocultar contraseña en login (checkbox simple)
         if (this.togglePasswordCheckbox) {
@@ -54,6 +70,21 @@ class SistemaLogin {
 
         // Cerrar modal al hacer clic en X o fuera
         this.inicializarEventosModal();
+    }
+
+    verificarBloqueoTemporal() {
+        const bloqueoGuardado = localStorage.getItem('bloqueo_login');
+        if (bloqueoGuardado) {
+            const { timestamp, duracion } = JSON.parse(bloqueoGuardado);
+            const tiempoTranscurrido = Date.now() - timestamp;
+            const tiempoRestante = duracion - tiempoTranscurrido;
+
+            if (tiempoRestante > 0) {
+                this.iniciarBloqueoTemporal(tiempoRestante);
+            } else {
+                localStorage.removeItem('bloqueo_login');
+            }
+        }
     }
 
     // 👁️ Función para mostrar/ocultar contraseña (versión simple)
@@ -115,54 +146,159 @@ class SistemaLogin {
     }
 
     async validarLogin() {
-        const correo = this.correoInput.value.trim();
-        const contrasena = this.contrasenaInput.value.trim();
+    // Verificar si el formulario está bloqueado temporalmente
+    if (this.esTemporizadorActivo) {
+        this.mostrarError(`El formulario está bloqueado. Espera ${Math.ceil(this.tiempoBloqueo / 1000)} segundos.`);
+        return;
+    }
 
-        // Validaciones básicas
-        if (!this.validarCampos(correo, contrasena)) {
-            return;
+    const correo = this.correoInput.value.trim();
+    const contrasena = this.contrasenaInput.value.trim();
+
+    // Validaciones básicas
+    if (!this.validarCampos(correo, contrasena)) {
+        return;
+    }
+
+    // Mostrar loading en el botón
+    const botonLogin = this.loginForm.querySelector('.login-button');
+    const textoOriginal = botonLogin.innerHTML;
+    botonLogin.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Validando...';
+    botonLogin.disabled = true;
+
+    // ✅ DECLARAR resultado aquí para que esté disponible en el finally
+    let resultado = null;
+
+    try {
+        const formData = new FormData();
+        formData.append('correo', correo);
+        formData.append('contrasena', contrasena);
+
+        const response = await fetch('php/login.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        // Verificar si la respuesta es JSON válido
+        const responseText = await response.text();
+        
+        try {
+            resultado = JSON.parse(responseText);
+        } catch (e) {
+            console.error('Respuesta del servidor:', responseText);
+            throw new Error('El servidor devolvió una respuesta inválida');
         }
 
-        // Mostrar loading en el botón
-        const botonLogin = this.loginForm.querySelector('.login-button');
-        const textoOriginal = botonLogin.innerHTML;
-        botonLogin.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Validando...';
-        botonLogin.disabled = true;
-
-        try {
-            const formData = new FormData();
-            formData.append('correo', correo);
-            formData.append('contrasena', contrasena);
-
-            const response = await fetch('php/login.php', {
-                method: 'POST',
-                body: formData
-            });
-
-            // Verificar si la respuesta es JSON válido
-            const responseText = await response.text();
-            let resultado;
-
-            try {
-                resultado = JSON.parse(responseText);
-            } catch (e) {
-                console.error('Respuesta del servidor:', responseText);
-                throw new Error('El servidor devolvió una respuesta inválida');
-            }
-
-            if (resultado.exitoso) {
-                this.loginExitoso(resultado);
+        if (resultado.exitoso) {
+            this.intentosFallidos = 0;
+            localStorage.removeItem('bloqueo_login');
+            this.loginExitoso(resultado);
+        } else {
+            // ✅ Manejar diferentes tipos de errores
+            if (resultado.bloqueado) {
+                // Bloqueo temporal (30 segundos)
+                this.iniciarBloqueoTemporal(30000);
+                this.mostrarError(resultado.mensaje);
+            } else if (resultado.cuenta_desactivada) {
+                // ✅ Cuenta desactivada permanentemente - NO bloquear formulario
+                this.mostrarError(resultado.mensaje);
+                // Opcional: deshabilitar solo los campos de este usuario
+                this.correoInput.disabled = true;
+                this.contrasenaInput.disabled = true;
+                botonLogin.disabled = true;
+                botonLogin.innerHTML = 'Cuenta Desactivada';
+                botonLogin.style.opacity = '0.6';
+                botonLogin.style.cursor = 'not-allowed';
             } else {
+                // Error normal (contraseña incorrecta, etc.)
                 this.mostrarError(resultado.mensaje);
             }
-        } catch (error) {
-            this.mostrarError('Error de conexión. Intente nuevamente.');
-            console.error('Error en login:', error);
-        } finally {
-            // Restaurar botón
+        }
+    } catch (error) {
+        this.mostrarError('Error de conexión. Intente nuevamente.');
+        console.error('Error en login:', error);
+    } finally {
+        // ✅ CORRECIÓN: Verificar si resultado existe antes de usarlo
+        const cuentaDesactivada = resultado ? resultado.cuenta_desactivada : false;
+        
+        // Restaurar botón solo si no está en estado de cuenta desactivada y no está bloqueado
+        if (!this.esTemporizadorActivo && !cuentaDesactivada) {
             botonLogin.innerHTML = textoOriginal;
             botonLogin.disabled = false;
         }
+    }
+}
+    iniciarBloqueoTemporal(duracion) {
+        this.esTemporizadorActivo = true;
+        this.tiempoBloqueo = duracion;
+
+        // Guardar en localStorage para persistir entre recargas
+        localStorage.setItem('bloqueo_login', JSON.stringify({
+            timestamp: Date.now(),
+            duracion: duracion
+        }));
+
+        // Deshabilitar formulario
+        this.deshabilitarFormulario();
+
+        // Iniciar cuenta regresiva
+        const intervalo = setInterval(() => {
+            this.tiempoBloqueo -= 1000;
+
+            if (this.tiempoBloqueo <= 0) {
+                clearInterval(intervalo);
+                this.esTemporizadorActivo = false;
+                this.habilitarFormulario();
+                localStorage.removeItem('bloqueo_login');
+                this.ocultarMensajeError();
+
+                // ✅ RESETEAR intentosFallidos cuando termina el bloqueo
+                this.intentosFallidos = 0;
+            } else {
+                this.actualizarMensajeBloqueo();
+            }
+        }, 1000);
+    }
+
+    deshabilitarFormulario() {
+        const inputs = this.loginForm.querySelectorAll('input');
+        const boton = this.loginForm.querySelector('button');
+
+        inputs.forEach(input => {
+            input.disabled = true;
+            input.style.opacity = '0.6';
+            input.style.cursor = 'not-allowed';
+        });
+
+        boton.disabled = true;
+        boton.innerHTML = `<i class="fas fa-clock"></i> Bloqueado (${Math.ceil(this.tiempoBloqueo / 1000)}s)`;
+        boton.style.opacity = '0.6';
+        boton.style.cursor = 'not-allowed';
+    }
+
+    habilitarFormulario() {
+        const inputs = this.loginForm.querySelectorAll('input');
+        const boton = this.loginForm.querySelector('button');
+
+        inputs.forEach(input => {
+            input.disabled = false;
+            input.style.opacity = '1';
+            input.style.cursor = 'text';
+        });
+
+        boton.disabled = false;
+        boton.innerHTML = 'Iniciar sesión';
+        boton.style.opacity = '1';
+        boton.style.cursor = 'pointer';
+    }
+
+    actualizarMensajeBloqueo() {
+        const segundosRestantes = Math.ceil(this.tiempoBloqueo / 1000);
+        this.mostrarError(`El formulario está bloqueado. Espera ${segundosRestantes} segundos.`);
+
+        // Actualizar texto del botón
+        const boton = this.loginForm.querySelector('button');
+        boton.innerHTML = `<i class="fas fa-clock"></i> Bloqueado (${segundosRestantes}s)`;
     }
 
     validarCampos(correo, contrasena) {
@@ -187,14 +323,19 @@ class SistemaLogin {
     loginExitoso(resultado) {
         this.mostrarMensajeExito('¡Login exitoso! Redirigiendo...', 'exito');
 
-        // Guardar información del usuario en sessionStorage
+        // Guardar información del usuario
         if (resultado.usuario) {
             sessionStorage.setItem('usuario', JSON.stringify(resultado.usuario));
             sessionStorage.setItem('loggedin', 'true');
-            sessionStorage.setItem('usuario_rol', resultado.usuario.rol);
+
+            // Guardar el rol exactamente como viene del servidor
+            const rol = resultado.usuario.rol;
+            sessionStorage.setItem('usuario_rol', rol);
+
+            console.log('💾 Rol guardado:', rol, 'Tipo:', typeof rol);
         }
 
-        // Redirigir al dashboard después de 1.5 segundos
+        // Redirigir al dashboard
         setTimeout(() => {
             window.location.href = 'index.html';
         }, 1500);
@@ -420,68 +561,68 @@ class SistemaLogin {
         }
     }
 
-// ✅ MÉTODO MEJORADO: Reenviar código
-async reenviarCodigo(e) {
-    e.preventDefault();
-    const mensajeDiv = document.getElementById('mensajeCodigo');
-    const reenviarBtn = document.querySelector('.reenviar-codigo');
+    // ✅ MÉTODO MEJORADO: Reenviar código
+    async reenviarCodigo(e) {
+        e.preventDefault();
+        const mensajeDiv = document.getElementById('mensajeCodigo');
+        const reenviarBtn = document.querySelector('.reenviar-codigo');
 
-    // Mostrar loading
-    const textoOriginal = reenviarBtn.innerHTML;
-    reenviarBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Reenviando...';
-    reenviarBtn.style.pointerEvents = 'none';
+        // Mostrar loading
+        const textoOriginal = reenviarBtn.innerHTML;
+        reenviarBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Reenviando...';
+        reenviarBtn.style.pointerEvents = 'none';
 
-    try {
-        const formData = new FormData();
-        formData.append('accion', 'reenviar_codigo');
-        formData.append('correo', this.correoRecuperacionActual);
-
-        const response = await fetch('php/recuperar_password.php', {
-            method: 'POST',
-            body: formData
-        });
-
-        // ✅ OBTENER TEXTO DE RESPUESTA
-        const responseText = await response.text();
-        console.log('🔧 Respuesta cruda:', responseText);
-
-        let resultado;
-        
         try {
-            resultado = JSON.parse(responseText);
-        } catch (parseError) {
-            console.error('❌ Error parseando JSON:', parseError);
-            throw new Error('El servidor devolvió una respuesta inválida: ' + responseText.substring(0, 100));
+            const formData = new FormData();
+            formData.append('accion', 'reenviar_codigo');
+            formData.append('correo', this.correoRecuperacionActual);
+
+            const response = await fetch('php/recuperar_password.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            // ✅ OBTENER TEXTO DE RESPUESTA
+            const responseText = await response.text();
+            console.log('🔧 Respuesta cruda:', responseText);
+
+            let resultado;
+
+            try {
+                resultado = JSON.parse(responseText);
+            } catch (parseError) {
+                console.error('❌ Error parseando JSON:', parseError);
+                throw new Error('El servidor devolvió una respuesta inválida: ' + responseText.substring(0, 100));
+            }
+
+            // ✅ VERIFICAR QUE RESULTADO NO SEA NULL
+            if (!resultado) {
+                throw new Error('El servidor devolvió una respuesta vacía');
+            }
+
+            console.log('✅ Respuesta parseada:', resultado);
+
+            if (resultado.exitoso) {
+                this.mostrarMensajeCodigo(mensajeDiv, resultado.mensaje, 'exito');
+
+                // Ocultar mensaje después de 5 segundos
+                setTimeout(() => {
+                    if (mensajeDiv.style.display !== 'none') {
+                        mensajeDiv.style.display = 'none';
+                    }
+                }, 5000);
+            } else {
+                this.mostrarMensajeCodigo(mensajeDiv, resultado.mensaje, 'error');
+            }
+
+        } catch (error) {
+            console.error('💥 Error reenviando código:', error);
+            this.mostrarMensajeCodigo(mensajeDiv, '❌ Error: ' + error.message, 'error');
+        } finally {
+            reenviarBtn.innerHTML = textoOriginal;
+            reenviarBtn.style.pointerEvents = 'auto';
         }
-
-        // ✅ VERIFICAR QUE RESULTADO NO SEA NULL
-        if (!resultado) {
-            throw new Error('El servidor devolvió una respuesta vacía');
-        }
-
-        console.log('✅ Respuesta parseada:', resultado);
-
-        if (resultado.exitoso) {
-            this.mostrarMensajeCodigo(mensajeDiv, resultado.mensaje, 'exito');
-            
-            // Ocultar mensaje después de 5 segundos
-            setTimeout(() => {
-                if (mensajeDiv.style.display !== 'none') {
-                    mensajeDiv.style.display = 'none';
-                }
-            }, 5000);
-        } else {
-            this.mostrarMensajeCodigo(mensajeDiv, resultado.mensaje, 'error');
-        }
-
-    } catch (error) {
-        console.error('💥 Error reenviando código:', error);
-        this.mostrarMensajeCodigo(mensajeDiv, '❌ Error: ' + error.message, 'error');
-    } finally {
-        reenviarBtn.innerHTML = textoOriginal;
-        reenviarBtn.style.pointerEvents = 'auto';
     }
-}
 
     // ✅ NUEVO MÉTODO: Mostrar mensaje en modal de código
     mostrarMensajeCodigo(mensajeDiv, mensaje, tipo) {
