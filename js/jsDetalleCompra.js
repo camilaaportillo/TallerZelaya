@@ -1,8 +1,16 @@
-(async function() {
+(async function () {
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
+
+  // Función irInicio
+  window.irInicio = function () {
+    window.location.href = "index.html";
+  };
+
+  modalMensaje.style.display = "none";
+
   if (!id) {
-    alert("No se proporcionó un ID de compra.");
+    showModalMensaje("advertencia", "Falta Compra", "No se proporcionó un ID de compra");
     return;
   }
 
@@ -10,7 +18,7 @@
     const res = await fetch(`http://localhost/TallerZelaya/php/obtenerDetalleCompra.php?id=${id}`);
     const data = await res.json();
     if (data.error) {
-      alert(data.error);
+      showModalMensaje("error", "Error en petición", data.error);
       return;
     }
 
@@ -24,11 +32,11 @@
     document.getElementById("empresaContacto").textContent = `${compra.empresa_correo} • ${compra.empresa_telefono}`;
 
     // Proveedor
-    document.getElementById("proveedorNombre").textContent = compra.proveedor_nombre;
+    document.getElementById("proveedorNombre").textContent = compra.proveedor;
     document.getElementById("proveedorContacto").textContent = `${compra.proveedor_correo} • ${compra.proveedor_telefono}`;
 
     // Usuario
-    document.getElementById("usuarioNombre").textContent = compra.usuario_nombre;
+    document.getElementById("usuarioNombre").textContent = compra.usuario;
     document.getElementById("usuarioLogin").textContent = compra.usuario_login;
 
     // Factura
@@ -44,7 +52,7 @@
       const sub = parseFloat(it.subTotal);
       total += sub;
       tr.innerHTML = `
-        <td>${i+1}</td>
+        <td>${i + 1}</td>
         <td>${it.repuesto} (${it.codigo})</td>
         <td>${it.cantidad}</td>
         <td>${parseFloat(it.precioUnitario).toFixed(2)}</td>
@@ -73,6 +81,34 @@
 
   } catch (e) {
     console.error(e);
-    alert("Error cargando detalle de la compra");
+    showModalMensaje("error", "Error al cargar", "Error cargando detalle de la compra");
   }
 })();
+
+
+// ========================= MODALES =========================
+function showModalMensaje(tipo, titulo, texto) {
+    // Resetear icono
+    modalIcono.className = "modal-mensaje-icono";
+
+    if (tipo === "error") {
+        modalIcono.classList.add("icono-error");
+        modalIcono.innerHTML = "✖";
+    } else if (tipo === "advertencia") {
+        modalIcono.classList.add("icono-advertencia");
+        modalIcono.innerHTML = "⚠";
+    } else if (tipo === "exito") {
+        modalIcono.classList.add("icono-exito");
+        modalIcono.innerHTML = "✔";
+    }
+
+    modalTitulo.innerText = titulo;
+    modalTexto.innerText = texto;
+
+    modalMensaje.style.display = "flex";
+
+    // Cerrar automático en 3 segundos
+    setTimeout(() => {
+        modalMensaje.style.display = "none";
+    }, 2000);
+}

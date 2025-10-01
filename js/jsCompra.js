@@ -64,7 +64,6 @@ function showModalMensaje(tipo, titulo, texto) {
     }, 2000);
 }
 cerrarMensaje.addEventListener("click", () => modalMensaje.style.display = "none");
-//cerrarModal.addEventListener("click", () => modal.style.display = "none");
 
 // Si el botón listar_compras existe, navega
 const btnListar = document.getElementById("listar_compras");
