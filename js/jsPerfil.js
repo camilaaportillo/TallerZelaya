@@ -106,7 +106,86 @@ document.addEventListener("DOMContentLoaded", () => {
             showModalMensaje("error", "Error Interno", "❌ Error al actualizar el usuario.");
         }
     });
+
+   // ---------------------------
+    // MODAL CAMBIAR CONTRASEÑA
+    // ---------------------------
+    const modalContrasena = document.getElementById("modalContrasena");
+    const btnGuardarContrasena = document.getElementById("btnGuardarContrasena");
+    const formContrasena = document.getElementById("formContrasena");
+
+    // Guardar nueva contraseña
+   // En tu jsPerfil.js - versión normal
+btnGuardarContrasena.addEventListener("click", async () => {
+    const actualContrasena = document.getElementById("actualContrasena").value.trim();
+    const nuevaContrasena = document.getElementById("nuevaContrasena").value.trim();
+    const confirmarContrasena = document.getElementById("confirmarContrasena").value.trim();
+
+    // Validaciones básicas
+    if (!actualContrasena || !nuevaContrasena || !confirmarContrasena) {
+        showModalMensaje("error", "Error de Validación", "⚠️ Todos los campos son obligatorios.");
+        return;
+    }
+
+    if (nuevaContrasena !== confirmarContrasena) {
+        showModalMensaje("error", "Error de Validación", "⚠️ Las nuevas contraseñas no coinciden.");
+        return;
+    }
+
+    if (actualContrasena === nuevaContrasena) {
+        showModalMensaje("error", "Error de Validación", "⚠️ La nueva contraseña debe ser diferente a la actual.");
+        return;
+    }
+
+    if (nuevaContrasena.length < 6) {
+        showModalMensaje("error", "Error de Validación", "⚠️ La nueva contraseña debe tener al menos 6 caracteres.");
+        return;
+    }
+
+    try {
+        const formData = new FormData();
+        formData.append("actualContrasena", actualContrasena);
+        formData.append("nuevaContrasena", nuevaContrasena);
+        formData.append("confirmarContrasena", confirmarContrasena);
+
+        const resp = await fetch("php/cambiarPassword.php", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await resp.json();
+
+        if (data.status === "success") {
+            showModalMensaje("exito", "Contraseña Actualizada", data.mensaje);
+            cerrarModalContrasena();
+            
+            // Mostrar mensaje de seguridad
+            setTimeout(() => {
+                showModalMensaje("advertencia", "Seguridad", "🔒 Por seguridad, se recomienda cerrar sesión después de cambiar la contraseña.");
+            }, 2000);
+            
+        } else {
+            showModalMensaje("error", "Error", data.mensaje);
+        }
+
+    } catch (error) {
+        console.error("Error cambiando contraseña:", error);
+        showModalMensaje("error", "Error Interno", "❌ Error al cambiar la contraseña.");
+    }
 });
+});
+
+// Asegúrate de que estas funciones estén definidas
+function cambiarContrasena() {
+    document.getElementById("modalContrasena").style.display = "flex";
+}
+
+function cerrarModalContrasena() {
+    document.getElementById("modalContrasena").style.display = "none";
+    // Limpiar campos al cerrar
+    document.getElementById("formContrasena").reset();
+}
+ 
 
 // ---------------------------
 // FUNCIONES DE UTILIDAD
