@@ -18,7 +18,7 @@ body {
 .login-container {
     display: flex;
     width: 900px;
-    height: 500px;
+    height: 550px;
     background-color: white;
     border-radius: 12px;
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
@@ -100,10 +100,12 @@ input[type="text"] {
     letter-spacing: normal;
     box-sizing: border-box;
 }
+
 input.password-visible {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
     letter-spacing: normal !important;
 }
+
 input[type="email"]:focus,
 input[type="password"]:focus,
 input[type="text"]:focus {
@@ -300,13 +302,15 @@ input[type="text"]:focus {
 
 .modal-body .form-group input {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     border: 2px solid #e0e0e0;
     border-radius: 5px;
-    font-size: 14px;
+    font-size: 15px;
     box-sizing: border-box;
     transition: border-color 0.3s;
 }
+
+
 
 .modal-body .form-group input:focus {
     outline: none;
@@ -363,64 +367,91 @@ input[type="text"]:focus {
     font-weight: 500;
 }
 
+#mensajeError {
+    min-height: 75px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
 /* ESTILOS PARA MENSAJES DE ERROR Y ÉXITO */
-.mensaje-error, .mensaje-exito {
-    padding: 20px 20px;
+.mensaje-error,
+.mensaje-exito {
+    display: flex;
+    align-items: center;
+    /* centra verticalmente el icono y el texto */
+    justify-content: center;
+    /* centra horizontalmente */
+    gap: 10px;
+    /* espacio entre icono y texto */
+    padding: 12px 18px;
+    /* menos alto, más compacto */
     border-radius: 10px;
-    margin: 20px 0;
-    font-size: 14px;
+    margin: 15px 0;
+    font-size: 15px;
     font-weight: 500;
     text-align: center;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     border: none;
     animation: slideInUp 0.4s ease-out;
+    width: 100%;
 }
+
 
 /* Mensaje de Error Elegante */
 .mensaje-error {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-    color: white;
-    border-left: 4px solid #ff4757;
+    /*background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);*/
+    color: rgb(255, 0, 0);
+
 }
 
 /* Mensaje de Éxito Elegante */
 .mensaje-exito {
-    background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
-    color: white;
-    border-left: 4px solid #2f9e44;
+
+    color: #2f9e44;
+    border-top-left-radius: 2px solid #2f9e44;
 }
 
 /* Iconos en los mensajes */
-.mensaje-error::before, .mensaje-exito::before {
-    font-family: 'Font Awesome 6 Free';
+.mensaje-error::before,
+.mensaje-exito::before {
+    font-family: "Font Awesome 6 Free";
     font-weight: 900;
-    margin-right: 10px;
-    font-size: 16px;
+    font-size: 18px;
+    line-height: 1;
+    /* quita espacio extra arriba/abajo */
 }
 
+
 .mensaje-error::before {
-    content: "\f06a"; /* Icono exclamation-triangle */
+    content: "\f06a";
+    /* Icono exclamation-triangle */
 }
 
 .mensaje-exito::before {
-    content: "\f058"; /* Icono check-circle */
+    content: "\f058";
+    /* Icono check-circle */
 }
 
 /* Efecto de brillo sutil */
-.mensaje-error::after, .mensaje-exito::after {
+.mensaje-error::after,
+.mensaje-exito::after {
     content: '';
     position: absolute;
     top: 0;
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
     transition: left 0.5s;
 }
 
-.mensaje-error:hover::after, .mensaje-exito:hover::after {
+.mensaje-error:hover::after,
+.mensaje-exito:hover::after {
     left: 100%;
 }
 
@@ -430,6 +461,7 @@ input[type="text"]:focus {
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -445,9 +477,11 @@ input[type="text"]:focus {
     0% {
         box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4);
     }
+
     70% {
         box-shadow: 0 0 0 10px rgba(255, 107, 107, 0);
     }
+
     100% {
         box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
     }
@@ -511,16 +545,16 @@ body.modal-open .login-container {
 }
 
 .simple-checkbox-toggle .checkmark {
-    width: 16px;
+    width: 18px;
     /* Más pequeño */
-    height: 16px;
+    height: 18px;
     /* Más pequeño */
     background: white;
     border: 2px solid #000000;
     /* Color principal */
-    border-radius: 3px;
+    border-radius: 4px;
     /* Bordes menos redondeados */
-    margin-right: 8px;
+    margin-right: 10px;
     position: relative;
     transition: all 0.2s ease;
     flex-shrink: 0;
@@ -551,7 +585,7 @@ body.modal-open .login-container {
 }
 
 .toggle-label {
-    font-size: 12px;
+    font-size: 14px;
     /* Texto más pequeño */
     color: #000000;
     /* Color principal */

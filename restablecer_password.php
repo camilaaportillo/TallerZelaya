@@ -55,7 +55,7 @@
                     <div class="form-group">
                         <label for="nuevaContrasena">Nueva Contraseña</label>
                         <input type="password" id="nuevaContrasena" name="nuevaContrasena" 
-                               placeholder="Ingresa tu nueva contraseña" required>
+                               placeholder="Ingresa tu nueva contraseña" autocomplete="new-password" required>
                         <div class="password-strength" id="passwordStrength"></div>
                         <small>Mínimo 8 caracteres, con mayúsculas, minúsculas y números</small>
                     </div>
@@ -63,7 +63,7 @@
                     <div class="form-group">
                         <label for="confirmarContrasena">Confirmar Contraseña</label>
                         <input type="password" id="confirmarContrasena" name="confirmarContrasena" 
-                               placeholder="Confirma tu nueva contraseña" required>
+                               placeholder="Confirma tu nueva contraseña" autocomplete="new-password" required>
                     </div>
                     <!-- 👁️ UN SOLO CHECKBOX PARA AMBAS CONTRASEÑAS -->
             <!-- 👁️ CHECKBOX SIMPLE SIN ICONOS -->
