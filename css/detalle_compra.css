@@ -203,3 +203,10 @@ modal {
 .icono-exito {
     background: green;
 }
+
+@media print {
+  
+  .no-imprimir {
+    display: none !important;
+  }
+}

@@ -28,7 +28,7 @@
     console.log(items);
 
     // Empresa
-    document.getElementById("empresaNombre").textContent = compra.empresa_nombre;
+    document.getElementById("empresaNombre").textContent = compra.empresa;
     document.getElementById("empresaContacto").textContent = `${compra.empresa_correo} • ${compra.empresa_telefono}`;
 
     // Proveedor

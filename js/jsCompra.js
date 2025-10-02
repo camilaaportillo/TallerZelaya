@@ -153,7 +153,7 @@ function cargarProveedores() {
         .then(data => {
             const opciones = data.map(p => ({
                 value: String(p.id_proveedor),
-                label: p.empresa
+                label: p.nombre + (p.empresa ? ` (${p.empresa})` : "")
             }));
 
             if (choicesProveedor) {
