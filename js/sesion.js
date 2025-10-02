@@ -171,7 +171,7 @@
             const rolUsuarioElement = document.getElementById('rolUsuario');
 
             if (nombreUsuarioElement && this.usuario) {
-                const nombre = this.usuario.nombre || this.usuario.usuario || 'Usuario';
+                const nombre = this.usuario.usuario || this.usuario.nombre || 'Usuario';
                 nombreUsuarioElement.textContent = nombre;
                 console.log('👤 Nombre actualizado:', nombre);
             }

@@ -336,9 +336,15 @@ class SistemaLogin {
         }
 
         // Redirigir al dashboard
-        setTimeout(() => {
-            window.location.href = 'index.html';
-        }, 1500);
+       setTimeout(() => {
+    // ✅ VERIFICAR que los datos se guardaron antes de redirigir
+    console.log('🔍 Verificando sessionStorage antes de redirigir:');
+    console.log('usuario:', sessionStorage.getItem('usuario'));
+    console.log('loggedin:', sessionStorage.getItem('loggedin'));
+    console.log('usuario_rol:', sessionStorage.getItem('usuario_rol'));
+    
+    window.location.href = 'index.html';
+}, 500); // ⚡ Reducir a 500ms
     }
     mostrarError(mensaje) {
         this.mensajeError.textContent = mensaje;

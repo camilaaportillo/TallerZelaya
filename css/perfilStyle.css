@@ -14,25 +14,13 @@ body {
     flex-direction: column;
 }
 
-/* ===== Header ===== */
+/* Header */
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 15px;
     border-bottom: 2px solid black;
-}
-
-.logo-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
-.logo-btn img {
-    width: 70px;
-    height: 40px;
-    object-fit: contain;
 }
 
 .usuario {
@@ -42,10 +30,55 @@ header {
     gap: 10px;
 }
 
+.info-usuario {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    margin-right: 10px;
+}
+
 .nombre-usuario {
     font-weight: bold;
     font-size: 16px;
+    color: black;
+    cursor: pointer;
+}
+
+.rol-usuario {
+    font-size: 13px;
     color: #000000;
+    font-style: normal;
+    margin-top: 3px;
+    line-height: 1;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: bold;
+}
+
+.rol-administrador {
+    background-color: #667eea;
+    color: white;
+}
+
+.rol-empleado {
+    background-color: #48bb78;
+    color: white;
+}
+
+.logo-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    
+}
+.logo-btn img {
+    width: 70px;
+    height: 40px;
+    object-fit: contain;
 }
 
 .user-btn {
@@ -178,20 +211,12 @@ main {
         text-align: center;
     }
 }
-.info-usuario {
-    display: flex;
-    flex-direction: column; /* Coloca nombre arriba y rol abajo */
-    align-items: flex-end; /* Alinea a la izquierda */
-}
+
 
 .nombre-usuario {
     font-weight: bold;
 }
 
-.rol-usuario {
-    font-size: 0.9em;
-    color: gray; /* opcional */
-}
 /* ===== Modal Editar Usuario ===== */
 .modal {
     display: none; /* oculto por defecto */
@@ -522,4 +547,21 @@ main {
 
 .modal-contenido input:valid {
     border-color: #27ae60;
+}
+
+.hover-text {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 13px;
+    color: #494949;
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: nowrap;
+    
+}
+
+.logo-btn:hover .hover-text {
+    opacity: 1;
 }
