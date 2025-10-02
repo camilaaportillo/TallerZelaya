@@ -68,9 +68,13 @@ header {
 
 
 .logo-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
     background: none;
     border: none;
     cursor: pointer;
+    
 }
 
 .logo-btn img {
@@ -577,4 +581,21 @@ table tbody tr:hover {
 
 .btn-habilitar:active {
     transform: translateY(0);
+}
+
+.hover-text {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 13px;
+    color: #494949;
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: nowrap;
+    
+}
+
+.logo-btn:hover .hover-text {
+    opacity: 1;
 }

@@ -298,7 +298,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $loginSystem = new LoginSystem();
     $resultado = $loginSystem->verificarLogin($correo, $contrasena);
-
+    // ✅ AGREGAR: Si el login es exitoso, incluir datos para sessionStorage
+    if ($resultado['exitoso']) {
+        $resultado['session_data'] = [
+            'usuario' => $resultado['usuario'],
+            'loggedin' => 'true',
+            'usuario_rol' => $resultado['usuario']['rol']
+        ];
+    }
     echo json_encode($resultado);
 } else {
     echo json_encode([
