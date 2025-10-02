@@ -335,3 +335,191 @@ main {
 .btn-cerrar:hover {
   background: darkred;
 }
+
+/* ===== Estilos para mostrar/ocultar contraseña ===== */
+.password-container {
+    position: relative;
+    margin-bottom: 5px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #0026ff;
+    padding: 5px;
+    z-index: 10;
+    font-size: 16px;
+}
+
+.password-toggle:hover {
+    color: #3b4fff;
+}
+
+.simple-checkbox-toggle {
+    display: flex;
+    align-items: center;
+    margin: 10px 0 15px 0;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 5px 0;
+}
+
+.simple-checkbox-toggle input[type="checkbox"] {
+    margin-right: 8px;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+.toggle-label {
+    color: #0026ff;
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.error-message {
+    color: #e74c3c;
+    font-size: 12px;
+    margin-top: 5px;
+    min-height: 18px;
+    font-weight: bold;
+}
+
+.success-message {
+    color: #27ae60;
+    font-size: 12px;
+    margin-top: 5px;
+    min-height: 18px;
+    font-weight: bold;
+}
+
+/* Ajuste para inputs de contraseña con botón toggle */
+.modal-contenido input[type="password"],
+.modal-contenido input[type="text"] {
+    padding-right: 40px;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 5px;
+    border: 2px solid #0026ff;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+/* ===== Estilos para el perfil ===== */
+.perfil-contenedor {
+    display: flex;
+    gap: 40px;
+    background: white;
+    padding: 25px;
+    border: 2px solid #0026ff;
+    border-radius: 15px;
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.15);
+    max-width: 900px;
+    width: 100%;
+    margin: 20px auto;
+}
+
+/* Foto */
+.perfil-foto {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.perfil-foto img {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #0026ff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Datos */
+.perfil-datos {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.perfil-datos h2 {
+    color: #0026ff;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.perfil-datos p {
+    font-size: 16px;
+}
+
+.perfil-datos strong {
+    color: #333;
+}
+
+/* Acciones */
+.perfil-acciones {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+}
+
+.perfil-acciones button {
+    background: #0026ff;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 18px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.perfil-acciones button:hover {
+    background: #3b4fff;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .perfil-contenedor {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .password-toggle {
+        right: 8px;
+        padding: 4px;
+    }
+    
+    .modal-contenido input[type="password"],
+    .modal-contenido input[type="text"] {
+        padding-right: 35px;
+    }
+    
+    .perfil-acciones {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .perfil-acciones button {
+        width: 100%;
+        max-width: 200px;
+    }
+}
+
+/* Estados de validación visual */
+.modal-contenido input:invalid {
+    border-color: #e74c3c;
+}
+
+.modal-contenido input:valid {
+    border-color: #27ae60;
+}

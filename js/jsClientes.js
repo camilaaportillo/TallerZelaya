@@ -21,6 +21,7 @@ const inputBuscar = document.getElementById("inputBuscar");
 const btnLimpiar = document.getElementById("btnLimpiar");
 
 let clientesData = [];
+let datosOriginales = {}; // Para almacenar los datos originales al editar
 
 // Modal de mensajes
 const modalMensaje = document.getElementById("modalMensaje");
@@ -29,31 +30,74 @@ const modalTitulo = document.getElementById("modalTitulo");
 const modalTexto = document.getElementById("modalTexto");
 const cerrarMensaje = document.getElementById("cerrarMensaje");
 
+// Validar que solo contenga letras, espacios y acentos
+function validarSoloLetras(texto) {
+    return /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(texto);
+}
+
+// Validar formato de correo electrónico
+function validarCorreo(correo) {
+    if (!correo) return true; // Si está vacío, es válido (opcional)
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(correo);
+}
+
+// Función para verificar si hay cambios
+function hayCambios() {
+    const nombreActual = inputNombre.value.trim();
+    const telefonoActual = inputTelefono.value.trim();
+    const correoActual = inputCorreo.value.trim();
+
+    return nombreActual !== datosOriginales.nombre ||
+           telefonoActual !== datosOriginales.telefono ||
+           correoActual !== datosOriginales.correo;
+}
+
 function validarCliente() {
     const nombre = inputNombre.value.trim();
     let telefono = inputTelefono.value.trim().replace(/\D/g, ""); // solo números
     const correo = inputCorreo.value.trim();
 
+    // Validar nombre (solo letras)
     if (!nombre) {
         showModalMensaje("advertencia", "Falta nombre", "El nombre no puede estar vacío.");
         inputNombre.focus();
         return false;
     }
 
+    if (!validarSoloLetras(nombre)) {
+        showModalMensaje("advertencia", "Nombre inválido", "El nombre solo puede contener letras y espacios.");
+        inputNombre.focus();
+        return false;
+    }
+
+    // Validar teléfono
     if (telefono && telefono.length !== 8) {
         showModalMensaje("advertencia", "Teléfono inválido", "El teléfono debe tener 8 dígitos.");
         inputTelefono.focus();
         return false;
     }
 
-    // Formatear antes de guardar (1234-5678)
+    // Validar correo
+    if (correo && !validarCorreo(correo)) {
+        showModalMensaje("advertencia", "Correo inválido", "El correo debe tener un formato válido (ejemplo@dominio.com).");
+        inputCorreo.focus();
+        return false;
+    }
+
+    // Verificar si hay cambios (solo en modo edición)
+    if (idSeleccionado && !hayCambios()) {
+        showModalMensaje("advertencia", "Sin cambios", "No se realizaron cambios en los datos del cliente.");
+        return false;
+    }
+
+    // Formatear teléfono antes de guardar (1234-5678)
     if (telefono.length === 8) {
         telefono = telefono.replace(/(\d{4})(\d{4})/, "$1-$2");
     }
 
     return { nombre, telefono, correo };
 }
-
 
 // Validar y formatear teléfono
 inputTelefono.addEventListener("input", () => {
@@ -66,14 +110,19 @@ inputTelefono.addEventListener("input", () => {
     }
 });
 
-// Formatear al salir del input
+// Validar que el nombre solo contenga letras
+inputNombre.addEventListener("input", () => {
+    // Remover caracteres que no sean letras, espacios o acentos
+    inputNombre.value = inputNombre.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, "");
+});
+
+// Formatear teléfono al salir del input
 inputTelefono.addEventListener("blur", () => {
     let tel = inputTelefono.value.replace(/\D/g, "");
     if (tel.length === 8) {
         inputTelefono.value = tel.replace(/(\d{4})(\d{4})/, "$1-$2");
     }
 });
-
 
 // Cargar datos
 document.addEventListener("DOMContentLoaded", cargarClientes);
@@ -88,16 +137,26 @@ function cargarClientes() {
         .catch(err => console.error("Error cargando clientes:", err));
 }
 
+// Función para mostrar guión si el campo está vacío o nulo
+function mostrarCampo(valor) {
+    return (valor === null || valor === "" || valor === undefined) ? "-" : valor;
+}
+
+// Función para obtener el valor real (sin guión) para editar
+function obtenerValorReal(valor) {
+    return (valor === "-") ? "" : valor;
+}
+
 function mostrarTabla(datos) {
     tablaBody.innerHTML = "";
     datos.forEach(cliente => {
         const fila = document.createElement("tr");
 
+        // Usar mostrarCampo para mostrar guiones en campos vacíos
         fila.innerHTML = `
             <td>${cliente.nombre}</td>
-            <td>${cliente.correo ?? "-"}</td>
-            <td>${cliente.telefono?? "-"}</td>
-            
+            <td>${mostrarCampo(cliente.correo)}</td>
+            <td>${mostrarCampo(cliente.telefono)}</td>
             <td>
                 <button class="btn-editar" data-id="${cliente.id_cliente}">
                     <img src="imgs/editar.png" alt="Editar">
@@ -156,7 +215,6 @@ btnActualizar.addEventListener("click", () => {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `id_cliente=${idSeleccionado}&nombre=${encodeURIComponent(datos.nombre)}&telefono=${encodeURIComponent(datos.telefono)}&correo=${encodeURIComponent(datos.correo)}`
-
     })
     .then(res => res.json())
     .then(data => {
@@ -166,10 +224,10 @@ btnActualizar.addEventListener("click", () => {
 
             // Resetear formulario
             inputNombre.value = "";
-            
             inputTelefono.value = "";
             inputCorreo.value = "";
             idSeleccionado = null;
+            datosOriginales = {};
 
             btnRegistrar.style.display = "inline-block";
             btnActualizar.style.display = "none";
@@ -205,6 +263,7 @@ btnEliminarModal.addEventListener("click", () => {
                 cargarClientes();
                 modal.style.display = "none";
                 idSeleccionado = null;
+                datosOriginales = {};
             } else {
                 showModalMensaje("error", "Error", data.mensaje);
             }
@@ -221,9 +280,23 @@ cerrarModal.addEventListener("click", () => modal.style.display = "none");
 btnEditarModal.addEventListener("click", () => {
     if (filaSeleccionada && idSeleccionado) {
         const celdas = filaSeleccionada.querySelectorAll("td");
-        inputNombre.value = celdas[0].innerText;
-        inputCorreo.value = celdas[1].innerText;
-        inputTelefono.value = celdas[2].innerText;
+        
+        // Usar obtenerValorReal para quitar el guión al editar
+        const nombre = obtenerValorReal(celdas[0].innerText);
+        const correo = obtenerValorReal(celdas[1].innerText);
+        const telefono = obtenerValorReal(celdas[2].innerText);
+        
+        // Llenar los campos del formulario
+        inputNombre.value = nombre;
+        inputCorreo.value = correo;
+        inputTelefono.value = telefono;
+        
+        // Guardar los datos originales para comparar cambios
+        datosOriginales = {
+            nombre: nombre,
+            correo: correo,
+            telefono: telefono
+        };
         
         btnRegistrar.style.display = "none";
         btnActualizar.style.display = "inline-block";
@@ -236,10 +309,10 @@ btnEditarModal.addEventListener("click", () => {
 
 btnCancelarEdicion.addEventListener("click", () => {
     inputNombre.value = ""; 
-  
     inputTelefono.value = ""; 
     inputCorreo.value = ""; 
     idSeleccionado = null;  
+    datosOriginales = {};
 
     btnRegistrar.style.display = "inline-block";
     btnActualizar.style.display = "none";
@@ -253,7 +326,9 @@ inputBuscar.addEventListener("input", () => {
     if (texto.trim() !== "") {
         btnLimpiar.style.display = "inline";
         const filtrados = clientesData.filter(c =>
-            c.nombre.toLowerCase().includes(texto)
+            c.nombre.toLowerCase().includes(texto) ||
+            (c.correo && c.correo.toLowerCase().includes(texto)) ||
+            (c.telefono && c.telefono.toLowerCase().includes(texto))
         );
         mostrarTabla(filtrados);
     } else {
@@ -281,10 +356,15 @@ function showModalMensaje(tipo, titulo, texto) {
     } else if (tipo === "exito") {
         modalIcono.classList.add("icono-exito");
         modalIcono.innerHTML = "✔";
+    } else if (tipo === "info") {
+        modalIcono.classList.add("icono-advertencia");
+        modalIcono.innerHTML = "ℹ";
     }
     modalTitulo.innerText = titulo;
     modalTexto.innerText = texto;
     modalMensaje.style.display = "flex";
+    
+    // Auto cerrar después de 3 segundos para todos los tipos
     setTimeout(() => { modalMensaje.style.display = "none"; }, 3000);
 }
 
