@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil de Usuario</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/perfilStyle.css">
     <style>
         body { visibility: hidden; } /* Ocultar body hasta validar sesión */
@@ -47,8 +48,6 @@
                 <p><strong>Correo:</strong> <span id="correoPerfil"></span></p>
                 <p><strong>Usuario:</strong> <span id="usuarioPerfil"></span></p>
               
-                
-
                 <!-- Acciones -->
                 <div class="perfil-acciones">
                     <button onclick="editarPerfil()">Editar Usuario</button>
@@ -58,94 +57,91 @@
         </div>
     </main>
 
-        <!-- Modal Cambiar Contraseña -->
-<!-- Modal Cambiar Contraseña -->
-
-<!-- Modal Cambiar Contraseña -->
-<div id="modalContrasena" class="modal" style="display:none;">
+    <!-- Modal Cambiar Contraseña -->
+    <div id="modalContrasena" class="modal" style="display:none;">
     <div class="modal-contenido">
         <h2>Cambiar Contraseña</h2>
         <form id="formContrasena">
-            <label for="actualContrasena">Contraseña Actual:</label>
-            <input type="password" id="actualContrasena" name="actualContrasena" placeholder="Ingresa tu contraseña actual" required>
+                <div class="form-group">
+                    <label for="actualContrasena">Contraseña Actual:</label>
+                    <div class="password-container">
+                        <input type="password" id="actualContrasena" name="actualContrasena" 
+                               placeholder="Ingresa tu contraseña actual" required>
+                        <button type="button" class="password-toggle" id="toggleActualContrasena">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="errorActualContrasena"></div>
+                </div>
 
-            <label for="nuevaContrasena">Nueva Contraseña:</label>
-            <input type="password" id="nuevaContrasena" name="nuevaContrasena"
-             placeholder="Ingresa tu nueva contraseña" required>
+                <div class="form-group">
+                    <label for="nuevaContrasena">Nueva Contraseña:</label>
+                    <div class="password-container">
+                        <input type="password" id="nuevaContrasena" name="nuevaContrasena"
+                               placeholder="Ingresa tu nueva contraseña" required>
+                        <button type="button" class="password-toggle" id="toggleNuevaContrasena">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="errorNuevaContrasena"></div>
+                </div>
 
-            <label for="confirmarContrasena">Confirmar Nueva Contraseña:</label>
-            <input type="password" id="confirmarContrasena" name="confirmarContrasena" placeholder="Repite tu nueva contraseña" required>
+                <div class="form-group">
+                    <label for="confirmarContrasena">Confirmar Nueva Contraseña:</label>
+                    <div class="password-container">
+                        <input type="password" id="confirmarContrasena" name="confirmarContrasena" 
+                               placeholder="Repite tu nueva contraseña" required>
+                        <button type="button" class="password-toggle" id="toggleConfirmarContrasena">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="errorConfirmarContrasena"></div>
+                </div>
 
-            <div class="modal-botones">
-                <button type="button" id="btnGuardarContrasena">Guardar</button>
-                <button type="button" onclick="cerrarModalContrasena()">Cancelar</button>
-            </div>
-        </form>
+                <div class="simple-checkbox-toggle">
+                    <input type="checkbox" id="toggleAllPasswords">
+                    <span class="toggle-label">Mostrar todas las contraseñas</span>
+                </div>
+
+                <div class="modal-botones">
+                    <button type="button" id="btnGuardarContrasena">Guardar</button>
+                    <button type="button" onclick="cerrarModalContrasena()">Cancelar</button>
+                </div>
+            </form>
         <button class="btn-cerrar" onclick="cerrarModalContrasena()">X</button>
     </div>
 </div>
+
 <!-- Modal Editar Usuario -->
 <div id="modalEditarUsuario" class="modal" style="display:none;">
     <div class="modal-contenido">
         <h2>Editar Usuario</h2>
         <form id="formEditarUsuario">
-            <label for="nuevoUsuario">Nuevo Usuario:</label>
-            <input type="text" id="nuevoUsuario" name="nuevoUsuario" autocomplete="off" placeholder="Escribe el nuevo usuario" required>
-           <p style="font-size: 0.9em; color: #c00;">
-    ⚠️ Si cambias tu alias, el sistema cerrará la sesión automáticamente.
-</p>
+                <label for="nuevoUsuario">Nuevo Usuario:</label>
+                <input type="text" id="nuevoUsuario" name="nuevoUsuario" autocomplete="off" 
+                       placeholder="Escribe el nuevo usuario" required>
+                <p style="font-size: 0.9em; color: #c00;">
+                     Si cambias tu alias, el sistema cerrará la sesión automáticamente.
+                </p>
 
-            <div class="modal-botones">
-                <button type="button" id="btnGuardarUsuario">Guardar</button>
-                <button type="button" id="btnCancelarUsuario">Cancelar</button>
-            </div>
-        </form>
+                <div class="modal-botones">
+                    <button type="button" id="btnGuardarUsuario">Guardar</button>
+                    <button type="button" id="btnCancelarUsuario">Cancelar</button>
+                </div>
+            </form>
         <button id="cerrarModal" class="btn-cerrar">X</button>
     </div>
 </div>
 
- <!-- ===========================
-     Modal de Mensajes Global
-=========================== -->
+   <!-- Modal de Mensajes Global -->
 <div id="modalMensaje" class="modal-mensaje">
   <div class="modal-mensaje-contenido">
     <span id="modalIcono" class="modal-mensaje-icono"></span>
     <h3 id="modalTitulo"></h3>
     <p id="modalTexto"></p>
-    <button id="cerrarMensaje" class="btn-cerrar">Cerrar</button>
+    <button id="cerrarMensaje" class="btn-cerrar">X</button>
   </div>
 </div>
-
-
-<script>
-    // Mostrar/Ocultar menú de usuario
-    function toggleMenu() {
-        document.getElementById("menuUsuario").classList.toggle("mostrar");
-    }
-
-  
-    function editarPerfil() {
-        document.getElementById("modalEditarUsuario").style.display = "flex";
-        // Rellenar campo con el usuario actual
-        document.getElementById("nuevoUsuario").value = document.getElementById("usuarioPerfil").textContent;
-        
-    }
-
-    function cerrarModalEditar() {
-        document.getElementById("modalEditarUsuario").style.display = "none";
-    }
-
-    function cambiarContrasena() {
-        document.getElementById("modalContrasena").style.display = "flex";
-    }
-
-    function cerrarModalContrasena() {
-        document.getElementById("modalContrasena").style.display = "none";
-        // Opcional: limpiar campos al cerrar
-        document.getElementById("formContrasena").reset();
-    }
-</script>
-
 
     <script src="js/sesion.js"></script>
     <script src="js/jsPerfil.js"></script>

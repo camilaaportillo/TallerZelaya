@@ -37,20 +37,20 @@ try {
     $conn->begin_transaction();
 
     // Primero calculamos el total en base a los productos
+    
     $precioTotal = 0;
-
-    foreach ($productos as &$p) {
+    foreach ($productos as $i => $p) {
         if (!isset($p["producto"], $p["cantidad"], $p["precio"])) {
             throw new Exception("Formato de producto inválido.");
         }
 
         $cantidad = intval($p["cantidad"]);
         $precioUnitario = floatval($p["precio"]);
-        $p["subtotal"] = $cantidad * $precioUnitario; // se calcula aquí mismo
-        $precioTotal += $p["subtotal"];
+        $productos[$i]["subtotal"] = $cantidad * $precioUnitario;
+        $precioTotal += $productos[$i]["subtotal"];
     }
-    
 
+    
     // Insertar compra
     $stmt = $conn->prepare("INSERT INTO compra (precio, fecha, id_proveedor, id_usuario, facturaImagen) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("dsiis", $precioTotal, $fecha, $proveedor, $usuario, $facturaNombreFinal);
@@ -60,21 +60,21 @@ try {
 
     // Insertar detalles
     $stmtDetalle = $conn->prepare(
-        "INSERT INTO detallescompra (cantidad, id_compra, id_repuesto, precioUnitario, subTotal)
-         VALUES (?, ?, ?, ?, ?)"
+    "INSERT INTO detallescompra (cantidad, id_compra, id_repuesto, precioUnitario, subTotal)
+     VALUES (?, ?, ?, ?, ?)"
     );
 
+    $stmtDetalle->bind_param("iiidd", $cantidad, $idCompra, $idRepuesto, $precioUnitario, $subTotal);
+
     foreach ($productos as $p) {
-        $idRepuesto = intval($p["producto"]);
         $cantidad = intval($p["cantidad"]);
+        $idRepuesto = intval($p["producto"]);
         $precioUnitario = floatval($p["precio"]);
         $subTotal = $p["subtotal"];
-
-        $stmtDetalle->bind_param("iiidd", $cantidad, $idCompra, $idRepuesto, $precioUnitario, $subTotal);
         $stmtDetalle->execute();
+
     }
 
-    $stmtDetalle->close();
 
     // Confirmar
     $conn->commit();

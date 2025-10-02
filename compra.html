@@ -53,7 +53,7 @@
 
             <label>Producto</label>
             <select id="selectProducto">
-                <option value="" disabled selected>Seleccionar Marca</option>
+                <option value="" disabled selected>Seleccionar Producto</option>
             </select>
             <small id="errorProducto" class="error-msg"></small>
 
@@ -76,9 +76,6 @@
             <label>Fecha de compra</label>
             <input type="date" id="fecha" placeholder="Escriba aquí" autocomplete="off">
             <small id="errorFecha" class="error-msg"></small>
-
-            <p style="font-size: 15px; color: rgb(0, 0, 0); margin-top: -10px; margin-bottom: 10px;">Presione "Enter"
-                para cambiar de campo</p>
         </section>
 
         <!-- Tabla -->
@@ -162,6 +159,7 @@
                 <form id="formFactura" enctype="multipart/form-data">
                     <input type="file" id="fileFactura" name="factura" accept="image/*" hidden>
                     <button type="button" id="btnSeleccionarFactura">Seleccionar Imagen</button>
+                    <br>
                     <br>
                     <div class="preview" id="previewFactura"></div>
                     <br>
