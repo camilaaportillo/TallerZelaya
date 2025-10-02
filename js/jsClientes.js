@@ -174,12 +174,23 @@ function mostrarTabla(datos) {
     });
 }
 
-// Registrar cliente
+// Registrar cliente - CORREGIDO
 btnRegistrar.addEventListener("click", (e) => {
     e.preventDefault();
 
     const datos = validarCliente();
     if (!datos) return;
+
+    // Verificar si ya existe un cliente con el mismo nombre (solo nombre)
+    const clienteExistente = clientesData.find(cliente => 
+        cliente.nombre.toLowerCase() === datos.nombre.toLowerCase()
+    );
+
+    if (clienteExistente) {
+        showModalMensaje("advertencia", "Cliente duplicado", "Ya existe un cliente con ese nombre.");
+        inputNombre.focus();
+        return;
+    }
 
     fetch("http://localhost/TallerZelaya/php/ingresarClientes.php", {
         method: "POST",
@@ -206,10 +217,22 @@ btnRegistrar.addEventListener("click", (e) => {
     });
 });
 
-// Actualizar cliente
+// Actualizar cliente - CORREGIDO
 btnActualizar.addEventListener("click", () => {
     const datos = validarCliente();
     if (!datos) return;
+
+    // Verificar si ya existe otro cliente con el mismo nombre (excluyendo el actual)
+    const clienteExistente = clientesData.find(cliente => 
+        cliente.id_cliente != idSeleccionado && 
+        cliente.nombre.toLowerCase() === datos.nombre.toLowerCase()
+    );
+
+    if (clienteExistente) {
+        showModalMensaje("advertencia", "Cliente duplicado", "Ya existe otro cliente con ese nombre.");
+        inputNombre.focus();
+        return;
+    }
 
     fetch("http://localhost/TallerZelaya/php/editarClientes.php", {
         method: "POST",
@@ -256,21 +279,21 @@ btnEliminarModal.addEventListener("click", () => {
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: `id_cliente=${idSeleccionado}`
         })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === "exito") {
-                showModalMensaje("exito", "Éxito", data.mensaje);
-                cargarClientes();
-                modal.style.display = "none";
-                idSeleccionado = null;
-                datosOriginales = {};
-            } else {
-                showModalMensaje("error", "Error", data.mensaje);
-            }
-        })
-        .catch(() => {
-            showModalMensaje("error", "Error", "No se pudo dar de baja el cliente.");
-        });
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "exito") {
+            showModalMensaje("exito", "Éxito", data.mensaje);
+            cargarClientes();
+            modal.style.display = "none";
+            idSeleccionado = null;
+            datosOriginales = {};
+        } else {
+            showModalMensaje("error", "Error", data.mensaje);
+        }
+    })
+    .catch(() => {
+        showModalMensaje("error", "Error", "No se pudo dar de baja el cliente.");
+    });
     });
 });
 

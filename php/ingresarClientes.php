@@ -1,26 +1,31 @@
 <?php
 include "conexion.php";
 
-$nombre = $_POST['nombre'];
-$telefono = !empty($_POST['telefono']) ? $_POST['telefono'] : null;
-$correo = !empty($_POST['correo']) ? $_POST['correo'] : null;
+$nombre = mysqli_real_escape_string($conn, $_POST['nombre']);
+$telefono = isset($_POST['telefono']) && $_POST['telefono'] !== "" ? mysqli_real_escape_string($conn, $_POST['telefono']) : null;
+$correo = isset($_POST['correo']) && $_POST['correo'] !== "" ? mysqli_real_escape_string($conn, $_POST['correo']) : null;
 
-// Validar duplicado por nombre o correo si existe
-$checkSql = "SELECT * FROM cliente WHERE nombre = '$nombre' OR (correo IS NOT NULL AND correo = '$correo')";
+// Validar duplicado SOLO por nombre
+$checkSql = "SELECT * FROM cliente WHERE nombre = '$nombre'";
 $checkResult = mysqli_query($conn, $checkSql);
 
 if(mysqli_num_rows($checkResult) > 0) {
-    echo json_encode(["status" => "error", "mensaje" => "No se puede registrar, el cliente ya existe."]);
+    echo json_encode(["status" => "duplicado", "mensaje" => "Ya existe un cliente con ese nombre."]);
     exit;
 }
 
-// Insertar cliente
-$sql = "INSERT INTO cliente (nombre, telefono, correo, estado) VALUES ('$nombre', '$telefono', '$correo', 1)";
+// Insertar cliente (manejar NULL correctamente)
+$sql = "INSERT INTO cliente (nombre, telefono, correo, estado) VALUES ('$nombre', ";
+$sql .= $telefono !== null ? "'$telefono'" : "NULL";
+$sql .= ", ";
+$sql .= $correo !== null ? "'$correo'" : "NULL";
+$sql .= ", 1)";
+
 $result = mysqli_query($conn, $sql);
 
 if($result){
     echo json_encode(["status" => "exito", "mensaje" => "Cliente registrado correctamente."]);
 } else {
-    echo json_encode(["status" => "error", "mensaje" => "Error al registrar: " . $conn->error]);
+    echo json_encode(["status" => "error", "mensaje" => "Error al registrar: " . mysqli_error($conn)]);
 }
 ?>

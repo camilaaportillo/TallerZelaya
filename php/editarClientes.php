@@ -17,21 +17,35 @@ $sql_check = "SELECT id_cliente FROM cliente WHERE nombre = '$nombre' AND id_cli
 $result_check = mysqli_query($conn, $sql_check);
 
 if (mysqli_num_rows($result_check) > 0) {
-    echo json_encode(["status" => "error", "mensaje" => "Ya existe un cliente con ese nombre"]);
+    echo json_encode(["status" => "duplicado", "mensaje" => "Ya existe un cliente con ese nombre"]);
     exit;
 }
 
-// Actualizar cliente
-$sql = "UPDATE cliente 
-        SET nombre = '$nombre', 
-            telefono = " . ($telefono ? "'$telefono'" : "NULL") . ", 
-            correo = " . ($correo ? "'$correo'" : "NULL") . " 
-        WHERE id_cliente = $id";
+// Construir la consulta UPDATE correctamente para valores NULL
+$sql = "UPDATE cliente SET nombre = '$nombre'";
 
+// Agregar teléfono (manejar NULL correctamente)
+if ($telefono !== null) {
+    $sql .= ", telefono = '$telefono'";
+} else {
+    $sql .= ", telefono = NULL";
+}
+
+// Agregar correo (manejar NULL correctamente)
+if ($correo !== null) {
+    $sql .= ", correo = '$correo'";
+} else {
+    $sql .= ", correo = NULL";
+}
+
+$sql .= " WHERE id_cliente = $id";
+
+// Ejecutar la consulta
 if (mysqli_query($conn, $sql)) {
     echo json_encode(["status" => "exito", "mensaje" => "Cliente actualizado correctamente"]);
 } else {
-    echo json_encode(["status" => "error", "mensaje" => "No se pudo actualizar el cliente"]);
+    // Para debugging - mostrar el error real
+    echo json_encode(["status" => "error", "mensaje" => "Error en la base de datos: " . mysqli_error($conn)]);
 }
 
 exit;
