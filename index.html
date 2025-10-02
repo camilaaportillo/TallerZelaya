@@ -7,7 +7,7 @@
     <link rel="icon" href="imgs/favicon.png" type="image/png">
     <title>Sistema del Taller Zelaya</title>
     <link rel="stylesheet" href="css/styles.css">
-    
+
     <script src="js/sesion.js"></script>
 </head>
 
@@ -21,7 +21,8 @@
         <h1>Taller de bicicletas Zelaya</h1>
         <div class="usuario">
             <div class="info-usuario">
-                <span id="nombreUsuario" class="nombre-usuario" onclick="irPerfil()" style="cursor: pointer;">Usuario</span>
+                <span id="nombreUsuario" class="nombre-usuario" onclick="irPerfil()"
+                    style="cursor: pointer;">Usuario</span>
 
                 <span id="rolUsuario" class="rol-usuario"></span>
             </div>
@@ -37,15 +38,15 @@
     <!-- Contenido principal -->
     <main>
         <div class="grid-menu">
-            <a class="item" href="usuario.html">
+            <a class="item admin-only" href="usuario.html">
                 <img src="imgs/usuarios.png" alt="Usuarios">
                 <p>Usuarios</p>
             </a>
-            <a class="item" href="empresa.html">
+            <a class="item admin-only" href="empresa.html">
                 <img src="imgs/empresas.png" alt="Empresas">
                 <p>Empresas</p>
             </a>
-            <a class="item" href="marcas.html">
+            <a class="item admin-only" href="marcas.html">
                 <img src="imgs/marcas.png" alt="Marcas">
                 <p>Marcas</p>
             </a>
@@ -61,7 +62,7 @@
                 <img src="imgs/inventario.png" alt="Inventario">
                 <p>Inventario</p>
             </a>
-            <a class="item" href="proveedor.html">
+            <a class="item admin-only" href="proveedor.html">
                 <img src="imgs/proveedores.png" alt="Proveedores">
                 <p>Proveedores</p>
             </a>
@@ -69,16 +70,21 @@
                 <img src="imgs/repuestos.png" alt="Repuestos">
                 <p>Repuestos</p>
             </a>
-            <a class="item" href="compra.html">
+            <a class="item admin-only" href="compra.html">
                 <img src="imgs/Compra.png" alt="Compras">
                 <p>Compras</p>
             </a>
+            <a class="item" href="compra.html">
+                <img src="imgs/Compra.png" alt="Ventas">
+                <p>Ventas</p>
+            </a>
+            
         </div>
     </main>
 
     <script src="js/script.js"></script>
-
-      <script>
+    
+    <script>
         function irPerfil() {
             window.location.href = "perfil.html";
         }

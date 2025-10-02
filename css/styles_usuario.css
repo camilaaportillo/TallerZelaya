@@ -908,4 +908,10 @@ input[type="text"]:not(:placeholder-shown)~.toggle-password {
     gap: 10px;
 }
 
+.nombre-usuario {
+    font-weight: bold;
+    font-size: 16px;
+    color: #0026ff; /* 🔵 texto azul */
+    cursor: pointer;
+}
 
