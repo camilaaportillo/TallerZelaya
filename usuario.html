@@ -38,6 +38,35 @@
     
     <!-- ✅ SCRIPTS EN ORDEN CORRECTO -->
    <script src="js/sesion.js"></script>
+   <script>
+    // ✅ DEBUG TEMPORAL - Agrega esto en usuario.html
+function debugValidacionCorreo() {
+    const correo = document.getElementById('correo').value;
+    console.log('🔍 Debug validación correo:', correo);
+    
+    const params = new URLSearchParams({
+        accion: 'validar',
+        tipo: 'correo', 
+        valor: correo
+    });
+    
+    console.log('📡 URL de validación:', `usuarios.php?${params}`);
+    
+    fetch(`usuarios.php?${params}`)
+        .then(response => {
+            console.log('📊 Status response:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('📨 Respuesta servidor:', data);
+        })
+        .catch(error => {
+            console.error('💥 Error fetch:', error);
+        });
+}
+
+// Ejecuta en consola: debugValidacionCorreo()
+   </script>
     
     <!-- DEBUG TEMPORAL -->
     <script>
@@ -60,7 +89,7 @@
         }
     </script>
     
-    <script src="js/permisos.js"></script>
+
    
 </head>
 

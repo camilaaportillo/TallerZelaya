@@ -262,6 +262,25 @@ private function desactivarCuenta($usuarioId)
 
         return false;
     }
+
+    // Después de la línea ~95 (después de resetearIntentosFallidos), agrega:
+
+public function resetearIntentosPorCorreo($correo)
+{
+    try {
+        // Buscar y eliminar todas las sesiones de intentos para este correo
+        foreach ($_SESSION as $clave => $valor) {
+            if (strpos($clave, 'intentos_') === 0 && strpos($clave, $correo) !== false) {
+                unset($_SESSION[$clave]);
+                error_log("🔄 Intentos reseteados por correo: " . $correo . " (sesión eliminada: " . $clave . ")");
+            }
+        }
+        return true;
+    } catch (Exception $e) {
+        error_log("Error en resetearIntentosPorCorreo: " . $e->getMessage());
+        return false;
+    }
+}
 }
 
 // Manejar la solicitud
