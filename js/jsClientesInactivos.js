@@ -1,9 +1,9 @@
-// jsClientesInactivos.js
+// jsClientesInactivos.js - VERSIÓN CORREGIDA
 document.addEventListener("DOMContentLoaded", () => {
 
   const tbody = document.getElementById("tbodyClientesInactivos");
   const inputBuscar = document.getElementById("inputBuscarInactivos");
-  const btnLimpiar = document.getElementById("btnLimpiarInactivas");
+  const btnLimpiar = document.getElementById("btnLimpiarInactivos"); // CORREGIDO: "btnLimpiarInactivos"
 
   // Modales / mensajes
   const modalMensaje = document.getElementById("modalMensaje");
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Cargar datos desde PHP
   function cargar() {
     fetch("http://localhost/TallerZelaya/php/obtenerClientesInactivos.php")
-      .then(res => res.text()) // leer texto para debug si viene HTML
+      .then(res => res.text())
       .then(text => {
         try {
           const data = JSON.parse(text);
@@ -34,13 +34,18 @@ document.addEventListener("DOMContentLoaded", () => {
           renderTabla(clientesData);
         } catch (err) {
           console.error("Respuesta no JSON de obtenerClientesInactivos.php:", text);
-          showModalMensaje("error", "Error servidor", "Respuesta inválida al cargar clientes. Revisa la consola (Network).");
+          showModalMensaje("error", "Error servidor", "Respuesta inválida al cargar clientes.");
         }
       })
       .catch(err => {
         console.error("Error cargando clientes inactivos:", err);
         showModalMensaje("error", "Error", "No se pudo conectar con el servidor.");
       });
+  }
+
+  // Función para mostrar guión si el campo está vacío o nulo
+  function mostrarCampo(valor) {
+    return (valor === null || valor === "" || valor === undefined) ? "-" : valor;
   }
 
   function renderTabla(lista) {
@@ -54,8 +59,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${c.nombre ?? "-"}</td>
-        <td>${c.correo ?? "-"}</td>
-        <td>${c.telefono ?? "-"}</td>
+        <td>${mostrarCampo(c.correo)}</td>
+        <td>${mostrarCampo(c.telefono)}</td>
         <td>${(c.estado == 1 || c.estado === "1") ? "Activo" : "Inactivo"}</td>
         <td>
           <button class="btn-habilitar" data-id="${c.id_cliente}">Habilitar</button>
@@ -64,7 +69,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const btn = tr.querySelector(".btn-habilitar");
       btn.addEventListener("click", () => {
         seleccionadoId = btn.dataset.id;
-        // mostrar modal de confirmación (tu modalConfirmar ya existe en el HTML)
         if (modalConfirmar) modalConfirmar.style.display = "block";
         else if (confirm("¿Seguro que deseas habilitar este cliente?")) habilitar(seleccionadoId);
       });
@@ -91,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       } catch (e) {
         console.error("Respuesta no JSON habilitarCliente:", text);
-        showModalMensaje("error", "Error", "Respuesta inválida del servidor. Revisa la consola.");
+        showModalMensaje("error", "Error", "Respuesta inválida del servidor.");
       }
     })
     .catch(err => {
@@ -99,7 +103,6 @@ document.addEventListener("DOMContentLoaded", () => {
       showModalMensaje("error", "Error", "No se pudo conectar con el servidor.");
     })
     .finally(() => {
-      // cerrar modalConfirmar si está abierto
       if (modalConfirmar) modalConfirmar.style.display = "none";
       seleccionadoId = null;
     });
@@ -113,13 +116,28 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Buscar por nombre (solo nombre)
+  // Buscar por nombre, correo y teléfono
   if (inputBuscar && btnLimpiar) {
+    console.log("Buscador inicializado correctamente");
+    
     inputBuscar.addEventListener("input", () => {
       const q = inputBuscar.value.toLowerCase().trim();
+      console.log("Buscando:", q);
+      
       if (q) {
         btnLimpiar.style.display = "inline";
-        const filtrados = clientesData.filter(c => (c.nombre ?? "").toLowerCase().includes(q));
+        
+        const filtrados = clientesData.filter(c => {
+          const nombre = (c.nombre || "").toLowerCase();
+          const correo = (c.correo || "").toLowerCase();
+          const telefono = (c.telefono || "").toLowerCase();
+          
+          return nombre.includes(q) || 
+                 correo.includes(q) || 
+                 telefono.includes(q);
+        });
+        
+        console.log("Resultados encontrados:", filtrados.length);
         renderTabla(filtrados);
       } else {
         btnLimpiar.style.display = "none";
@@ -134,11 +152,14 @@ document.addEventListener("DOMContentLoaded", () => {
       inputBuscar.focus();
     });
   } else {
-    console.warn("inputBuscarInactivos o btnLimpiarInactivas no encontrados (verifica ids).");
+    console.warn("Elementos del buscador no encontrados:", {
+      inputBuscar: !!inputBuscar,
+      btnLimpiar: !!btnLimpiar
+    });
   }
 
-  // Modal de mensajes (simple)
- function showModalMensaje(tipo, titulo, texto) {
+  // Modal de mensajes
+  function showModalMensaje(tipo, titulo, texto) {
     modalIcono.className = "modal-mensaje-icono";
 
     if (tipo === "error") {
@@ -159,13 +180,24 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
         modalMensaje.style.display = "none";
     }, 3000);
-}
-  if (cerrarMensaje) cerrarMensaje.addEventListener("click", () => { if (modalMensaje) modalMensaje.style.display = "none"; });
+  }
 
-  // cerrar modalConfirmar si haces click fuera (opcional)
+  if (cerrarMensaje) cerrarMensaje.addEventListener("click", () => { 
+    if (modalMensaje) modalMensaje.style.display = "none"; 
+  });
+
+  // cerrar modalConfirmar si haces click fuera
   window.addEventListener("click", (e) => {
     if (modalConfirmar && e.target === modalConfirmar) modalConfirmar.style.display = "none";
   });
+
+  // Función para cerrar modal de confirmación
+  function cerrarModalConfirmar() {
+    if (modalConfirmar) modalConfirmar.style.display = "none";
+  }
+
+  // Hacer la función global para que el HTML pueda llamarla
+  window.cerrarModalConfirmar = cerrarModalConfirmar;
 
   // iniciar
   cargar();
