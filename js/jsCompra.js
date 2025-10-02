@@ -241,7 +241,7 @@ function validarFecha() {
     const hace7dias = new Date();
     hace7dias.setDate(hoy.getDate() - 8);
 
-    if (seleccionada < hace7dias || seleccionada > hoy) {
+    if (seleccionada < hace7dias || seleccionada >= hoy) {
         if (errorFecha) errorFecha.textContent = "La fecha debe estar entre hoy y hace 7 días.";
         return false;
     }
@@ -497,6 +497,7 @@ const btnEnviar = document.getElementById("btn-registro");
 if (btnEnviar) {
     btnEnviar.addEventListener("click", (e) => {
         e.preventDefault();
+        contadorId = 1;
         if (productosCompra.length === 0) {
             showModalMensaje("advertencia", "Producto requerido", "Debe agregar al menos un producto antes de enviar la compra.");
             return;
@@ -529,6 +530,8 @@ if (btnEnviar) {
         if (factura) {
             formData.append("factura", factura);
         }
+        // Enviar datos al servidor
+        console.log("Enviando datos al servidor:", { proveedor, fecha, usuario: ID_USUARIO, productos: productosParaEnviar, factura });
 
         fetch("php/compra.php", {
             method: "POST",
