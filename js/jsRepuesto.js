@@ -164,11 +164,11 @@ btnRegistrar.addEventListener("click", (e) => {
     if (!datos) return;
 
     const duplicado = repuestosData.find(r => r.nombre.toLowerCase() === datos.nombre.toLowerCase());
+
     if (duplicado) {
         showModalMensaje("advertencia", "Duplicado", "Este repuesto ya está registrado.");
         return;
     }
-
     // Función para generar el código único de repuesto
 
     let nombrecodigo = document.getElementById("inputNombreProductos").value;
@@ -185,7 +185,6 @@ btnRegistrar.addEventListener("click", (e) => {
 
     // Concatenar todo (3 + 3 + 2 + 2 = 10)
     let codigo = parteNombre + parteMarca + parteMedida + aleatorio;
-
 
 
     fetch("http://localhost/TallerZelaya/php/ingresarRepuesto.php", {

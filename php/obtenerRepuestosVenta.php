@@ -1,22 +1,33 @@
 <?php
-include "conexion.php";
+header('Content-Type: application/json');
+include 'conexion.php';
 
-$sql = "SELECT r.codigo, r.id_repuesto, r.nombre, r.precio, r.stock_actual, m.nombre as marca, me.medida_bicicleta as medida
-        FROM repuesto r
-        INNER JOIN marca m ON r.id_marca = m.id_marca
-        INNER JOIN medida me ON r.id_medida = me.id_medida";
+$response = array('success' => false, 'repuestos' => array());
 
-$result = $conn->query($sql);
-
-$repuestos = [];
-
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        $repuestos[] = $row;
+try {
+    $sql = "SELECT r.id_repuesto, r.codigo, r.nombre, r.descripcion, 
+                   r.stock_minimo, r.stock_actual, r.precio, 
+                   m.nombre as marca, md.medida_bicicleta as medida
+            FROM repuesto r 
+            INNER JOIN marca m ON r.id_marca = m.id_marca 
+            INNER JOIN medida md ON r.id_medida = md.id_medida
+            WHERE r.stock_actual > 0 AND m.estado = 'Activo'";
+    
+    $result = $conn->query($sql);
+    
+    if ($result) {
+        while($row = $result->fetch_assoc()) {
+            $response['repuestos'][] = $row;
+        }
+        $response['success'] = true;
+    } else {
+        throw new Exception('Error en la consulta SQL: ' . $conn->error);
     }
+    
+} catch (Exception $e) {
+    $response['message'] = $e->getMessage();
 }
 
-echo json_encode($repuestos, JSON_UNESCAPED_UNICODE);
-
 $conn->close();
+echo json_encode($response);
 ?>

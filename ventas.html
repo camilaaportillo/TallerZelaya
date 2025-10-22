@@ -16,6 +16,36 @@
         }
 
         /* oculta el body si no se ha iniciado sesion */
+        
+        .tipo-articulo {
+            display: flex;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .tipo-articulo-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: #f5f5f5;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tipo-articulo-btn.active {
+            background: #007bff;
+            color: white;
+        }
+        
+        .campo-dinamico {
+            transition: all 0.3s;
+        }
+        
+        .campo-oculto {
+            display: none !important;
+        }
     </style>
     <script src="js/sesion.js"></script>
 
@@ -46,61 +76,51 @@
 
     <main>
 
-        <!-- Formulario 1 (Productos) -->
+        <!-- Formulario Único -->
         <section class="formulario">
-            <button class="btn-registrar">Agregar a Venta</button>
-            <button class="btn-actualizar" style="display:none;">Editar Producto</button>
-            <button class="btn-cancelar-edicion" style="display:none;">Cancelar edición</button>
+            <!-- Selector de tipo de artículo -->
+            <div class="tipo-articulo">
+                <button type="button" class="tipo-articulo-btn active" data-tipo="producto">
+                    Producto Inventariado
+                </button>
+                <button type="button" class="tipo-articulo-btn" data-tipo="reparacion">
+                    Servicio/Reparación
+                </button>
+            </div>
 
-            <label>Producto</label>
-            <select id="selectProducto">
-                <option value="" disabled selected>Seleccionar Producto</option>
-            </select>
-            <small class="error-msg"></small>
+            <!-- Campos para Producto Inventariado -->
+            <div id="campos-producto" class="campo-dinamico">
+                <label>Producto</label>
+                <select id="selectProducto">
+                    <option value="" disabled selected>Seleccionar Producto</option>
+                </select>
+                <small class="error-msg"></small>
+            </div>
 
-            <label>Cantidad a vender</label>
-            <input type="number" id="inputCantidadProducto" placeholder="Escriba aquí" autocomplete="off">
-            <small class="error-msg"></small>
+            <!-- Campos para Servicio/Reparación -->
+            <div id="campos-reparacion" class="campo-dinamico campo-oculto">
+                <label>Producto/Servicio</label>
+                <input type="text" id="inputProductoReparacion" placeholder="Escriba aquí" autocomplete="off">
+                <small class="error-msg"></small>
+            </div>
 
-            <label>Precio por unidad</label>
-            <input type="number" id="inputPrecioProducto" placeholder="0.00" autocomplete="off">
-            <small class="error-msg"></small>
-
-            <hr>
-            <a href="clientes.html"><label>Cliente</label></a>
-            <select id="selectCliente">
-                <option value="" selected>Consumidor Final</option>
-            </select>
-            <small class="error-msg"></small>
-
-            <label>Fecha de venta</label>
-            <input type="date" id="inputFecha" autocomplete="off">
-
-            <br>
-            <hr>
-            <button id="btnCambiarReparacion" type="button">Cambiar a Reparacion</button>
-        </section>
-
-        <!-- Formulario 2 (Reparaciones) -->
-        <section class="formulario2" style="display:none;">
-            <button class="btn-registrar">Agregar a Venta</button>
-            <button class="btn-actualizar" style="display:none;">Editar Servicio</button>
-            <button class="btn-cancelar-edicion" style="display:none;">Cancelar edición</button>
-
-            <label>Producto/Servicio</label>
-            <input type="text" id="inputProductoReparacion" placeholder="Escriba aquí" autocomplete="off">
-            <small class="error-msg"></small>
-
+            <!-- Campos comunes -->
             <label>Cantidad</label>
-            <input type="number" id="inputCantidadReparacion" placeholder="Escriba aquí" autocomplete="off">
+            <input type="number" id="inputCantidad" placeholder="Escriba aquí" autocomplete="off" min="1">
             <small class="error-msg"></small>
 
             <label>Precio por unidad</label>
-            <input type="number" id="inputPrecioReparacion" placeholder="0.00" autocomplete="off">
+            <input type="number" id="inputPrecio" placeholder="0.00" autocomplete="off" step="0.01" min="0">
             <small class="error-msg"></small>
 
+            <div class="botones-accion">
+                <button id="btnAgregar" class="btn-registrar">Agregar a Venta</button>
+                <button id="btnActualizar" class="btn-actualizar" style="display:none;">Actualizar Artículo</button>
+                <button id="btnCancelar" class="btn-cancelar-edicion" style="display:none;">Cancelar</button>
+            </div>
+
             <hr>
-            <!-- MANTENER EL MISMO CLIENTE Y FECHA -->
+
             <a href="clientes.html"><label>Cliente</label></a>
             <select id="selectCliente">
                 <option value="" selected>Consumidor Final</option>
@@ -108,11 +128,8 @@
             <small class="error-msg"></small>
 
             <label>Fecha de venta</label>
-            <input type="date" id="inputFecha" autocomplete="off">
+            <input type="date" id="inputFecha" autocomplete="off" disabled>
 
-            <br>
-            <hr>
-            <button id="btnCambiarProductos" type="button">Cambiar a Productos</button>
         </section>
 
         <!-- Tabla -->
@@ -120,42 +137,43 @@
 
             <div class="buscador">
                 <button id="listar_ventas"><img src="imgs/listar_ventas.png" alt="Listar ventas"></button>
-                <button id="btn-registro" class="btn-registro">Registrar Venta</button>
+                <button id="btnRegistrarVenta" class="btn-registro">Registrar Venta</button>
             </div>
             <div class="tabla-contenedor">
                 <table>
                     <thead>
                         <tr>
-                            <th>Numero de item</th>
+                            <th>#</th>
+                            <th>Tipo</th>
                             <th>Nombre Producto</th>
-                            <th>Cantidad vendida</th>
+                            <th>Cantidad</th>
                             <th>Precio Unitario</th>
                             <th>SubTotal</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
-
+                    <tbody id="tbodyVentas">
+                        <!-- Los artículos se agregarán aquí dinámicamente -->
                     </tbody>
                 </table>
             </div>
-            <div style="display: flex; justify-content: right; margin-top: 10px;">
-                <h3> Total de la venta: </h3>
-                <h3 id="totalVenta" style="margin-left: 10px;"> $0.00 </h3>
+            <div class="total-venta">
+                <h3>Total de la venta: </h3>
+                <h3 id="totalVenta">$0.00</h3>
             </div>
 
         </section>
 
-
-        <!-- Modal de acciones -->
-        <div id="modalAcciones" class="modal">
-            <div class="modal-contenido">
-                <h2>Acciones</h2>
-                <div class="modal-botones">
-                    <button id="btnEditarModal" class="btn-accion btn-azul">Editar</button>
-                    <button id="btnEliminarModal" class="btn-accion btn-rojo">Eliminar</button>
+        <!-- Modal de Confirmación -->
+        <div id="modalConfirmar" class="modal">
+            <div class="modal-content warning">
+                <span class="close" id="btnCerrarConfirmar">&times;</span>
+                <h1>⚠</h1>
+                <p>¿Seguro que deseas eliminar este artículo de la venta?</p>
+                <div class="modal-actions">
+                    <button id="btnConfirmarEliminar" class="btn-confirmar">Sí, eliminar</button>
+                    <button id="btnCancelarEliminar" class="btn-cancelar">Cancelar</button>
                 </div>
-                <button id="cerrarModal" class="btn-cerrar">X</button>
             </div>
         </div>
 
@@ -168,19 +186,6 @@
                     <p id="modalTexto"></p>
                 </div>
                 <button id="cerrarMensaje" class="btn-cerrar">X</button>
-            </div>
-        </div>
-
-        <!-- Modal de Confirmación -->
-        <div id="modalConfirmar" class="modal">
-            <div class="modal-content warning">
-                <span class="close" id="btnCerrarConfirmar">&times;</span>
-                <h1>⚠</h1>
-                <p>¿Seguro que deseas eliminar este registro?</p>
-                <div class="modal-actions">
-                    <button id="btnConfirmarEliminar" class="btn-confirmar">Sí, eliminar</button>
-                    <button id="btnCancelarEliminar" class="btn-cancelar">Cancelar</button>
-                </div>
             </div>
         </div>
 
