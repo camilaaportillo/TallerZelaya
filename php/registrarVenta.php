@@ -73,19 +73,21 @@ try {
     // 3. Registrar reparaciones
     if (isset($data['reparaciones']) && is_array($data['reparaciones'])) {
         foreach ($data['reparaciones'] as $reparacion) {
-            $sqlDetalleReparacion = "INSERT INTO detalleventa (cantidad, subtotal, id_venta, id_repuesto) 
-                                    VALUES (?, ?, ?, 0)";
-            $stmtDetalleRep = $conn->prepare($sqlDetalleReparacion);
-            $stmtDetalleRep->bind_param("idi", 
+            $sqlServicio = "INSERT INTO servicios_venta (descripcion, cantidad, precio, subtotal, id_venta) 
+                        VALUES (?, ?, ?, ?, ?)";
+            $stmtServicio = $conn->prepare($sqlServicio);
+            $stmtServicio->bind_param("siddi", 
+                $reparacion['nombre'],
                 $reparacion['cantidad'],
+                $reparacion['precio'],
                 $reparacion['subtotal'],
                 $id_venta
             );
             
-            if (!$stmtDetalleRep->execute()) {
-                throw new Exception('Error al registrar reparación: ' . $stmtDetalleRep->error);
+            if (!$stmtServicio->execute()) {
+                throw new Exception('Error al registrar servicio: ' . $stmtServicio->error);
             }
-            $stmtDetalleRep->close();
+            $stmtServicio->close();
         }
     }
 

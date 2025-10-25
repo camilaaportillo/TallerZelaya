@@ -16,7 +16,7 @@
         }
 
         /* oculta el body si no se ha iniciado sesion */
-        
+
         .tipo-articulo {
             display: flex;
             margin-bottom: 15px;
@@ -24,7 +24,7 @@
             border-radius: 5px;
             overflow: hidden;
         }
-        
+
         .tipo-articulo-btn {
             flex: 1;
             padding: 10px;
@@ -33,16 +33,16 @@
             cursor: pointer;
             transition: all 0.3s;
         }
-        
+
         .tipo-articulo-btn.active {
             background: #007bff;
             color: white;
         }
-        
+
         .campo-dinamico {
             transition: all 0.3s;
         }
-        
+
         .campo-oculto {
             display: none !important;
         }
@@ -123,7 +123,7 @@
 
             <a href="clientes.html"><label>Cliente</label></a>
             <select id="selectCliente">
-                <option value="" selected>Consumidor Final</option>
+                <option value="" disabled selected>Seleccionar Cliente</option>
             </select>
             <small class="error-msg"></small>
 
@@ -163,6 +163,121 @@
             </div>
 
         </section>
+
+        <!-- Modal para Listar Ventas -->
+        <div id="modalListarVentas" class="modal">
+            <div class="modal-contenido grande">
+                <div class="modal-header">
+                    <h2>Historial de Ventas</h2>
+                    <button id="cerrarListarVentas" class="btn-cerrar">X</button>
+                </div>
+
+                <div class="filtros-ventas">
+                    <div class="filtro-group">
+                        <label>Fecha desde:</label>
+                        <input type="date" id="filtroFechaDesde">
+                    </div>
+                    <div class="filtro-group">
+                        <label>Fecha hasta:</label>
+                        <input type="date" id="filtroFechaHasta">
+                    </div>
+                    <div class="filtro-group">
+                        <label>Cliente:</label>
+                        <select id="filtroCliente">
+                            <option value="">Todos los clientes</option>
+                        </select>
+                    </div>
+                    <button id="btnFiltrar" class="btn-filtrar">Filtrar</button>
+                    <button id="btnLimpiarFiltros" class="btn-limpiar">Limpiar</button>
+                </div>
+
+                <div class="tabla-contenedor-scroll">
+                    <table id="tablaVentas">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha</th>
+                                <th>Cliente</th>
+                                <th>Total</th>
+                                <th>Usuario</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyVentasLista">
+                            <!-- Las ventas se cargarán aquí -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para Detalles de Venta -->
+        <div id="modalDetalleVenta" class="modal">
+            <div class="modal-contenido grande">
+                <div class="modal-header">
+                    <h2>Detalles de Venta #<span id="detalleVentaId"></span></h2>
+                    <button id="cerrarDetalleVenta" class="btn-cerrar">X</button>
+                </div>
+
+                <div class="detalle-venta-info">
+                    <div class="info-group">
+                        <label>Fecha:</label>
+                        <span id="detalleFecha"></span>
+                    </div>
+                    <div class="info-group">
+                        <label>Cliente:</label>
+                        <span id="detalleCliente"></span>
+                    </div>
+                    <div class="info-group">
+                        <label>Usuario:</label>
+                        <span id="detalleUsuario"></span>
+                    </div>
+                    <div class="info-group">
+                        <label>Total:</label>
+                        <span id="detalleTotal"></span>
+                    </div>
+                </div>
+
+                <div class="tabla-contenedor-scroll">
+                    <h3>Productos</h3>
+                    <table id="tablaDetalleProductos">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unitario</th>
+                                <th>SubTotal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyDetalleProductos">
+                            <!-- Los productos se cargarán aquí -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="tabla-contenedor-scroll">
+                    <h3>Servicios/Reparaciones</h3>
+                    <table id="tablaDetalleServicios">
+                        <thead>
+                            <tr>
+                                <th>Descripción</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unitario</th>
+                                <th>SubTotal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyDetalleServicios">
+                            <!-- Los servicios se cargarán aquí -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="modal-footer">
+                    <button id="btnImprimirTicket" class="btn-imprimir">🖨️ Reimprimir Ticket</button>
+                    <button id="btnCerrarDetalle" class="btn-cerrar">Cerrar</button>
+                </div>
+            </div>
+        </div>
 
         <!-- Modal de Confirmación -->
         <div id="modalConfirmar" class="modal">

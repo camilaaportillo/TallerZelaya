@@ -1,4 +1,109 @@
-document.addEventListener('DOMContentLoaded', function() {
+// Variables para control de mensajes
+let timeoutMensaje = null;
+
+// Función mejorada para mostrar mensajes
+function mostrarMensaje(titulo, texto, tipo = 'info', autoCerrar = true) {
+    const modal = document.getElementById('modalMensaje');
+    const contenido = document.querySelector('.modal-mensaje-contenido');
+    const icono = document.getElementById('modalIcono');
+    const tituloElement = document.getElementById('modalTitulo');
+    const textoElement = document.getElementById('modalTexto');
+
+    // Limpiar timeout anterior si existe
+    if (timeoutMensaje) {
+        clearTimeout(timeoutMensaje);
+        timeoutMensaje = null;
+    }
+
+    // Configurar según el tipo
+    let iconoHTML = '';
+    switch (tipo) {
+        case 'success':
+        case 'exito':
+            iconoHTML = '✅';
+            contenido.className = 'modal-mensaje-contenido exito';
+            break;
+        case 'error':
+            iconoHTML = '❌';
+            contenido.className = 'modal-mensaje-contenido error';
+            break;
+        case 'warning':
+        case 'advertencia':
+            iconoHTML = '⚠️';
+            contenido.className = 'modal-mensaje-contenido advertencia';
+            break;
+        case 'info':
+        default:
+            iconoHTML = 'ℹ️';
+            contenido.className = 'modal-mensaje-contenido info';
+            break;
+    }
+
+    // Configurar contenido
+    icono.innerHTML = iconoHTML;
+    tituloElement.textContent = titulo;
+    textoElement.textContent = texto;
+
+    // Mostrar modal
+    modal.style.display = 'block';
+    contenido.classList.remove('saliendo');
+
+    // Configurar auto-cierre
+    if (autoCerrar) {
+        timeoutMensaje = setTimeout(() => {
+            cerrarMensaje();
+        }, 2000);
+    }
+}
+
+// Función para cerrar mensaje con animación
+function cerrarMensaje() {
+    const modal = document.getElementById('modalMensaje');
+    const contenido = document.querySelector('.modal-mensaje-contenido');
+
+    if (timeoutMensaje) {
+        clearTimeout(timeoutMensaje);
+        timeoutMensaje = null;
+    }
+
+    contenido.classList.add('saliendo');
+
+    setTimeout(() => {
+        modal.style.display = 'none';
+        contenido.classList.remove('saliendo');
+    }, 300);
+}
+
+// Inicializar event listeners para el modal de mensajes
+function inicializarModalMensajes() {
+    const modal = document.getElementById('modalMensaje');
+    const btnCerrar = document.getElementById('cerrarMensaje');
+
+    // Cerrar con botón
+    if (btnCerrar) {
+        btnCerrar.addEventListener('click', cerrarMensaje);
+    }
+
+    // Cerrar haciendo click fuera del modal
+    modal.addEventListener('click', function (event) {
+        if (event.target === modal) {
+            cerrarMensaje();
+        }
+    });
+
+    // Cerrar con tecla ESC
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && modal.style.display === 'block') {
+            cerrarMensaje();
+        }
+    });
+}
+
+// Variables globales para listar ventas
+let ventasCargadas = [];
+let ventaSeleccionada = null;
+
+document.addEventListener('DOMContentLoaded', function () {
     // Variables globales
     let articulosVenta = [];
     let clienteSeleccionado = null;
@@ -23,6 +128,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const camposProducto = document.getElementById('campos-producto');
     const camposReparacion = document.getElementById('campos-reparacion');
 
+    // Inicializar sistema de mensajes
+    inicializarModalMensajes();
+
     // Inicialización
     inicializarVenta();
 
@@ -30,13 +138,22 @@ document.addEventListener('DOMContentLoaded', function() {
     botonesTipo.forEach(btn => {
         btn.addEventListener('click', cambiarTipoArticulo);
     });
-    
+
     selectProducto.addEventListener('change', cargarPrecioProducto);
     btnAgregar.addEventListener('click', agregarArticulo);
     btnActualizar.addEventListener('click', actualizarArticulo);
     btnCancelar.addEventListener('click', cancelarEdicion);
     btnRegistrarVenta.addEventListener('click', registrarVenta);
     selectCliente.addEventListener('change', actualizarCliente);
+
+    // Event Listeners para listar ventas
+    document.getElementById('listar_ventas').addEventListener('click', mostrarModalVentas);
+    document.getElementById('cerrarListarVentas').addEventListener('click', cerrarModalVentas);
+    document.getElementById('btnFiltrar').addEventListener('click', cargarVentas);
+    document.getElementById('btnLimpiarFiltros').addEventListener('click', limpiarFiltros);
+    document.getElementById('cerrarDetalleVenta').addEventListener('click', cerrarModalDetalle);
+    document.getElementById('btnCerrarDetalle').addEventListener('click', cerrarModalDetalle);
+    document.getElementById('btnImprimirTicket').addEventListener('click', reimprimirTicket);
 
     // Funciones de inicialización
     function inicializarVenta() {
@@ -93,11 +210,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         const option = document.createElement('option');
                         option.value = repuesto.id_repuesto;
                         option.textContent = `${repuesto.nombre} - ${repuesto.codigo}`;
-                        
+
                         if (repuesto.stock_actual !== null) {
                             option.textContent += ` (Stock: ${repuesto.stock_actual})`;
                         }
-                        
+
                         option.dataset.precio = repuesto.precio || '0.00';
                         selectProducto.appendChild(option);
                     });
@@ -113,11 +230,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function cambiarTipoArticulo(event) {
         const tipo = event.target.dataset.tipo;
-        
+
         // Actualizar botones activos
         botonesTipo.forEach(btn => btn.classList.remove('active'));
         event.target.classList.add('active');
-        
+
         // Mostrar/ocultar campos según el tipo
         if (tipo === 'producto') {
             camposProducto.classList.remove('campo-oculto');
@@ -128,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
             camposReparacion.classList.remove('campo-oculto');
             tipoArticuloActual = 'reparacion';
         }
-        
+
         // Limpiar campos al cambiar tipo
         limpiarCamposArticulo();
     }
@@ -136,13 +253,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function cargarPrecioProducto() {
         if (selectProducto.value && tipoArticuloActual === 'producto') {
             const selectedOption = selectProducto.options[selectProducto.selectedIndex];
-            inputPrecio.value = selectedOption.dataset.precio || '0.00';
+            inputPrecio.value = selectedOption.dataset.precio || '';
         }
     }
 
     function actualizarCliente() {
         clienteSeleccionado = selectCliente.value;
-        
+
         // Bloquear cliente si ya hay artículos agregados
         if (articulosVenta.length > 0) {
             selectCliente.disabled = true;
@@ -251,8 +368,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Verificar si ya existe el artículo en la venta
-        const indexExistente = articulosVenta.findIndex(item => 
-            item.tipo === articulo.tipo && 
+        const indexExistente = articulosVenta.findIndex(item =>
+            item.tipo === articulo.tipo &&
             (item.tipo === 'producto' ? item.id_repuesto === articulo.id_repuesto : item.nombre === articulo.nombre)
         );
 
@@ -302,7 +419,7 @@ document.addEventListener('DOMContentLoaded', function() {
         btnActualizar.style.display = 'none';
         btnCancelar.style.display = 'none';
         limpiarCamposArticulo();
-        
+
         // Restaurar tipo por defecto
         botonesTipo.forEach(btn => btn.classList.remove('active'));
         document.querySelector('[data-tipo="producto"]').classList.add('active');
@@ -374,7 +491,7 @@ document.addEventListener('DOMContentLoaded', function() {
         selectProducto.value = '';
         inputProductoReparacion.value = '';
         inputCantidad.value = '';
-        inputPrecio.value = '0.00';
+        inputPrecio.value = '';
         limpiarError(selectProducto);
         limpiarError(inputProductoReparacion);
         limpiarError(inputCantidad);
@@ -384,7 +501,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Registro de venta
     function registrarVenta() {
         if (articulosVenta.length === 0) {
-            mostrarMensaje('Error', 'Debe agregar al menos un artículo a la venta', 'error');
+            mostrarMensaje('Advertencia', 'Debe agregar al menos un artículo a la venta', 'warning');
             return;
         }
 
@@ -404,20 +521,20 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify(ventaData)
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                mostrarMensaje('Éxito', 'Venta registrada correctamente', 'success');
-                generarTicket(data.id_venta);
-                reiniciarVenta();
-            } else {
-                mostrarMensaje('Error', data.message || 'Error al registrar la venta', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            mostrarMensaje('Error', 'Error al registrar la venta', 'error');
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    mostrarMensaje('Éxito', 'Venta registrada correctamente', 'success');
+                    generarTicket(data.id_venta);
+                    reiniciarVenta();
+                } else {
+                    mostrarMensaje('Error', data.message || 'Error al registrar la venta', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                mostrarMensaje('Error', 'Error al registrar la venta', 'error');
+            });
     }
 
     function obtenerIdUsuario() {
@@ -427,65 +544,228 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function generarTicket(idVenta) {
-        const ventanaTicket = window.open('', '_blank');
+        // Abrir ventana emergente minimalista
+        const ventanaTicket = window.open('', 'ticket', 'width=350,height=500,left=100,top=100,toolbar=no,scrollbars=no,resizable=no');
+
         const total = articulosVenta.reduce((sum, articulo) => sum + articulo.subtotal, 0);
         const iva = total * 0.13;
         const subtotal = total - iva;
         const ahora = new Date();
 
+        const fecha = ahora.toLocaleDateString();
+        const hora = ahora.toLocaleTimeString();
+
         ventanaTicket.document.write(`
-            <html>
-                <head>
-                    <title>Ticket de Venta #${idVenta}</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; margin: 20px; }
-                        .ticket { max-width: 300px; margin: 0 auto; }
-                        .header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; }
-                        .item { display: flex; justify-content: space-between; margin: 5px 0; }
-                        .total { border-top: 2px solid #000; margin-top: 10px; padding-top: 10px; }
-                        .mensaje { text-align: center; margin-top: 20px; font-style: italic; }
-                    </style>
-                </head>
-                <body>
-                    <div class="ticket">
-                        <div class="header">
-                            <h2>Taller de bicicletas Zelaya</h2>
-                            <p>Primera Avenida Sur, Barrio El Centro</p>
-                            <p>San Martín #11, San Salvador</p>
-                            <p>${ahora.toLocaleString()}</p>
-                            <p>Venta #${idVenta}</p>
-                        </div>
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <title>Ticket Venta #${idVenta}</title>
+                <meta charset="UTF-8">
+                <style>
+                    /* Reset completo */
+                    * {
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
+                    }
+                    
+                    body {
+                        font-family: 'Courier New', monospace;
+                        font-size: 12px;
+                        background: white;
+                        color: black;
+                        line-height: 1.2;
+                        width: 100%;
+                        margin: 0;
+                        padding: 15px;
+                    }
+                    
+                    .ticket-container {
+                        width: 300px;
+                        margin: 0 auto;
+                        padding: 10px;
+                        background: white;
+                    }
+                    
+                    .header {
+                        text-align: center;
+                        border-bottom: 1px dashed #000;
+                        padding-bottom: 8px;
+                        margin-bottom: 8px;
+                    }
+                    
+                    .header h2 {
+                        font-size: 16px;
+                        font-weight: bold;
+                        margin-bottom: 5px;
+                    }
+                    
+                    .header p {
+                        font-size: 11px;
+                        margin: 2px 0;
+                    }
+                    
+                    .cliente {
+                        margin: 8px 0;
+                        padding: 5px 0;
+                        border-bottom: 1px dashed #ccc;
+                    }
+                    
+                    .cliente p {
+                        font-size: 12px;
+                        margin: 2px 0;
+                    }
+                    
+                    .items {
+                        margin: 8px 0;
+                    }
+                    
+                    .item {
+                        display: flex;
+                        justify-content: space-between;
+                        margin: 3px 0;
+                        font-size: 11px;
+                    }
+                    
+                    .item-name {
+                        flex: 1;
+                    }
+                    
+                    .item-price {
+                        margin-left: 10px;
+                        text-align: right;
+                        min-width: 60px;
+                    }
+                    
+                    .total {
+                        border-top: 2px solid #000;
+                        margin-top: 10px;
+                        padding-top: 8px;
+                        font-weight: bold;
+                    }
+                    
+                    .total-line {
+                        display: flex;
+                        justify-content: space-between;
+                        margin: 3px 0;
+                        font-size: 12px;
+                    }
+                    
+                    .mensaje {
+                        text-align: center;
+                        margin-top: 15px;
+                        font-style: italic;
+                        font-size: 11px;
+                        border-top: 1px dashed #ccc;
+                        padding-top: 8px;
+                    }
+                    
+                    .instrucciones {
+                        text-align: center;
+                        margin-top: 10px;
+                        font-size: 10px;
+                        color: #666;
+                        font-style: italic;
+                    }
+                    
+                    /* Estilos para impresión */
+                    @media print {
+                        body {
+                            padding: 0 !important;
+                            margin: 0 !important;
+                        }
                         
-                        <div class="cliente">
-                            <p><strong>Cliente:</strong> ${clienteSeleccionado ? selectCliente.options[selectCliente.selectedIndex].textContent : 'Consumidor Final'}</p>
-                        </div>
+                        .ticket-container {
+                            width: 80mm !important;
+                            padding: 5mm !important;
+                            margin: 0 !important;
+                        }
                         
-                        <div class="items">
-                            ${articulosVenta.map(articulo => `
-                                <div class="item">
-                                    <span>${articulo.nombre} x${articulo.cantidad}</span>
-                                    <span>$${articulo.subtotal.toFixed(2)}</span>
-                                </div>
-                            `).join('')}
-                        </div>
+                        .instrucciones {
+                            display: none !important;
+                        }
                         
-                        <div class="total">
-                            <div class="item"><strong>Subtotal:</strong> <strong>$${subtotal.toFixed(2)}</strong></div>
-                            <div class="item"><strong>IVA (13%):</strong> <strong>$${iva.toFixed(2)}</strong></div>
-                            <div class="item"><strong>TOTAL:</strong> <strong>$${total.toFixed(2)}</strong></div>
+                        @page {
+                            margin: 0 !important;
+                            padding: 0 !important;
+                            size: 80mm auto;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="ticket-container">
+                    <div class="header">
+                        <h2>TALLER DE BICICLETAS ZELAYA</h2>
+                        <p>Primera Avenida Sur, Barrio El Centro</p>
+                        <p>San Martín #11, San Salvador</p>
+                        <p>${fecha} - ${hora}</p>
+                        <p><strong>VENTA #${idVenta}</strong></p>
+                    </div>
+                    
+                    <div class="cliente">
+                        <p><strong>CLIENTE:</strong> ${clienteSeleccionado ? selectCliente.options[selectCliente.selectedIndex].textContent : 'CONSUMIDOR FINAL'}</p>
+                    </div>
+                    
+                    <div class="items">
+                        ${articulosVenta.map(articulo => `
+                            <div class="item">
+                                <span class="item-name">${articulo.nombre} x${articulo.cantidad}</span>
+                                <span class="item-price">$${articulo.subtotal.toFixed(2)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="total">
+                        <div class="total-line">
+                            <span>SUBTOTAL:</span>
+                            <span>$${subtotal.toFixed(2)}</span>
                         </div>
-                        
-                        <div class="mensaje">
-                            <p>¡Gracias por su compra!</p>
-                            <p>Vuelva pronto</p>
+                        <div class="total-line">
+                            <span>IVA (13%):</span>
+                            <span>$${iva.toFixed(2)}</span>
+                        </div>
+                        <div class="total-line">
+                            <span>TOTAL:</span>
+                            <span>$${total.toFixed(2)}</span>
                         </div>
                     </div>
-                </body>
-            </html>
-        `);
+                    
+                    <div class="mensaje">
+                        <p>¡Gracias por su compra!</p>
+                        <p>Vuelva pronto</p>
+                    </div>
+                    
+                    <div class="instrucciones">
+                        <p>Use Ctrl+P para imprimir • Cierre esta ventana cuando termine</p>
+                    </div>
+                </div>
+                
+                <script>
+                    // Auto-imprimir después de un breve delay
+                    setTimeout(function() {
+                        window.print();
+                    }, 500);
+                    
+                    // Cerrar ventana después de imprimir
+                    window.onafterprint = function() {
+                        setTimeout(function() {
+                            window.close();
+                        }, 1000);
+                    };
+                    
+                    // También permitir cerrar con ESC
+                    document.addEventListener('keydown', function(event) {
+                        if (event.key === 'Escape') {
+                            window.close();
+                        }
+                    });
+                </script>
+            </body>
+        </html>
+    `);
 
         ventanaTicket.document.close();
-        ventanaTicket.print();
     }
 
     function reiniciarVenta() {
@@ -499,15 +779,439 @@ document.addEventListener('DOMContentLoaded', function() {
         cancelarEdicion();
     }
 
-    // Función para mostrar mensajes
-    function mostrarMensaje(titulo, texto, tipo) {
-        // Implementar según tu modal existente
-        alert(`${titulo}: ${texto}`);
+    // Funciones para listar ventas
+    function mostrarModalVentas() {
+        document.getElementById('modalListarVentas').style.display = 'block';
+        cargarClientesFiltro();
+        cargarVentas();
+    }
+
+    function cerrarModalVentas() {
+        document.getElementById('modalListarVentas').style.display = 'none';
+    }
+
+    function cerrarModalDetalle() {
+        document.getElementById('modalDetalleVenta').style.display = 'none';
+    }
+
+    function cargarClientesFiltro() {
+        const filtroCliente = document.getElementById('filtroCliente');
+
+        // Limpiar opciones excepto la primera
+        while (filtroCliente.options.length > 1) {
+            filtroCliente.remove(1);
+        }
+
+        // Cargar clientes (reutilizar la función existente o hacer nueva petición)
+        fetch('php/obtenerClientesVenta.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.clientes) {
+                    data.clientes.forEach(cliente => {
+                        const option = document.createElement('option');
+                        option.value = cliente.id_cliente;
+                        option.textContent = cliente.nombre;
+                        filtroCliente.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error cargando clientes para filtro:', error);
+                mostrarMensaje('Error', 'Error al cargar clientes para filtro: ' + error.message, 'error');
+            });
+    }
+
+    function cargarVentas() {
+        const fechaDesde = document.getElementById('filtroFechaDesde').value;
+        const fechaHasta = document.getElementById('filtroFechaHasta').value;
+        const idCliente = document.getElementById('filtroCliente').value;
+
+        // Construir URL con parámetros
+        let url = 'php/obtenerVentas.php?';
+        const params = new URLSearchParams();
+
+        if (fechaDesde) params.append('fecha_desde', fechaDesde);
+        if (fechaHasta) params.append('fecha_hasta', fechaHasta);
+        if (idCliente) params.append('id_cliente', idCliente);
+
+        url += params.toString();
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Ventas cargadas:', data);
+                if (data.success && data.ventas) {
+                    ventasCargadas = data.ventas;
+                    actualizarTablaVentas(data.ventas);
+                } else {
+                    mostrarMensaje('Error', data.message || 'No se pudieron cargar las ventas', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error cargando ventas:', error);
+                mostrarMensaje('Error', 'Error al cargar ventas: ' + error.message, 'error');
+            });
+    }
+
+    function actualizarTablaVentas(ventas) {
+        const tbody = document.getElementById('tbodyVentasLista');
+        tbody.innerHTML = '';
+
+        if (ventas.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No se encontraron ventas</td></tr>';
+            return;
+        }
+
+        ventas.forEach(venta => {
+            const fila = document.createElement('tr');
+            fila.className = 'fila-clickeable';
+            fila.dataset.idVenta = venta.id_venta;
+
+            fila.innerHTML = `
+                <td>${venta.id_venta}</td>
+                <td>${venta.fecha}</td>
+                <td>${venta.cliente_nombre}</td>
+                <td>${venta.total_formateado}</td>
+                <td>${venta.usuario_nombre}</td>
+                <td class="estado-${venta.estado.toLowerCase()}">${venta.estado}</td>
+            `;
+
+            fila.addEventListener('click', () => mostrarDetalleVenta(venta.id_venta));
+            tbody.appendChild(fila);
+        });
+    }
+
+    function limpiarFiltros() {
+        document.getElementById('filtroFechaDesde').value = '';
+        document.getElementById('filtroFechaHasta').value = '';
+        document.getElementById('filtroCliente').value = '';
+        cargarVentas();
+    }
+
+    function mostrarDetalleVenta(idVenta) {
+        ventaSeleccionada = idVenta;
+
+        fetch(`php/obtenerDetalleVenta.php?id_venta=${idVenta}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.detalle) {
+                    mostrarModalDetalleVenta(data.detalle);
+                } else {
+                    mostrarMensaje('Error', data.message || 'No se pudieron cargar los detalles', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error cargando detalle:', error);
+                mostrarMensaje('Error', 'Error al cargar detalles: ' + error.message, 'error');
+            });
+    }
+
+    function mostrarModalDetalleVenta(detalle) {
+        const venta = detalle.venta;
+
+        // Actualizar información general
+        document.getElementById('detalleVentaId').textContent = venta.id_venta;
+        document.getElementById('detalleFecha').textContent = venta.fecha;
+        document.getElementById('detalleCliente').textContent = venta.cliente_nombre || 'Consumidor Final';
+        document.getElementById('detalleUsuario').textContent = venta.usuario_nombre;
+        document.getElementById('detalleTotal').textContent = '$' + parseFloat(venta.total).toFixed(2);
+
+        // Actualizar tabla de productos
+        const tbodyProductos = document.getElementById('tbodyDetalleProductos');
+        tbodyProductos.innerHTML = '';
+
+        if (detalle.productos.length === 0) {
+            tbodyProductos.innerHTML = '<tr><td colspan="4" style="text-align: center;">No hay productos</td></tr>';
+        } else {
+            detalle.productos.forEach(producto => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td>${producto.nombre} (${producto.codigo})</td>
+                    <td>${producto.cantidad}</td>
+                    <td>$${parseFloat(producto.precio_unitario).toFixed(2)}</td>
+                    <td>$${parseFloat(producto.subtotal).toFixed(2)}</td>
+                `;
+                tbodyProductos.appendChild(fila);
+            });
+        }
+
+        // Actualizar tabla de servicios
+        const tbodyServicios = document.getElementById('tbodyDetalleServicios');
+        tbodyServicios.innerHTML = '';
+
+        if (detalle.servicios.length === 0) {
+            tbodyServicios.innerHTML = '<tr><td colspan="4" style="text-align: center;">No hay servicios/reparaciones</td></tr>';
+        } else {
+            detalle.servicios.forEach(servicio => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td>${servicio.descripcion}</td>
+                    <td>${servicio.cantidad}</td>
+                    <td>$${parseFloat(servicio.precio).toFixed(2)}</td>
+                    <td>$${parseFloat(servicio.subtotal).toFixed(2)}</td>
+                `;
+                tbodyServicios.appendChild(fila);
+            });
+        }
+
+        // Mostrar modal
+        document.getElementById('modalDetalleVenta').style.display = 'block';
+    }
+
+    function reimprimirTicket() {
+        if (!ventaSeleccionada) {
+            mostrarMensaje('Advertencia', 'No hay venta seleccionada para reimprimir', 'warning');
+            return;
+        }
+
+        // Abrir ventana emergente
+        const ventanaTicket = window.open('', 'ticket', 'width=350,height=500,left=100,top=100,toolbar=no,scrollbars=no,resizable=no');
+
+        const ahora = new Date();
+        const fecha = ahora.toLocaleDateString();
+        const hora = ahora.toLocaleTimeString();
+
+        const total = parseFloat(document.getElementById('detalleTotal').textContent.replace('$', ''));
+        const iva = total * 0.13;
+        const subtotal = total - iva;
+
+        ventanaTicket.document.write(`
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <title>Ticket Venta #${ventaSeleccionada}</title>
+                <meta charset="UTF-8">
+                <style>
+                    * {
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
+                    }
+                    
+                    body {
+                        font-family: 'Courier New', monospace;
+                        font-size: 12px;
+                        background: white;
+                        color: black;
+                        line-height: 1.2;
+                        width: 100%;
+                        margin: 0;
+                        padding: 15px;
+                    }
+                    
+                    .ticket-container {
+                        width: 300px;
+                        margin: 0 auto;
+                        padding: 10px;
+                        background: white;
+                    }
+                    
+                    .header {
+                        text-align: center;
+                        border-bottom: 1px dashed #000;
+                        padding-bottom: 8px;
+                        margin-bottom: 8px;
+                    }
+                    
+                    .header h2 {
+                        font-size: 16px;
+                        font-weight: bold;
+                        margin-bottom: 5px;
+                    }
+                    
+                    .header p {
+                        font-size: 11px;
+                        margin: 2px 0;
+                    }
+                    
+                    .cliente {
+                        margin: 8px 0;
+                        padding: 5px 0;
+                        border-bottom: 1px dashed #ccc;
+                    }
+                    
+                    .cliente p {
+                        font-size: 12px;
+                        margin: 2px 0;
+                    }
+                    
+                    .items {
+                        margin: 8px 0;
+                    }
+                    
+                    .item {
+                        display: flex;
+                        justify-content: space-between;
+                        margin: 3px 0;
+                        font-size: 11px;
+                    }
+                    
+                    .item-name {
+                        flex: 1;
+                    }
+                    
+                    .item-price {
+                        margin-left: 10px;
+                        text-align: right;
+                        min-width: 60px;
+                    }
+                    
+                    .total {
+                        border-top: 2px solid #000;
+                        margin-top: 10px;
+                        padding-top: 8px;
+                        font-weight: bold;
+                    }
+                    
+                    .total-line {
+                        display: flex;
+                        justify-content: space-between;
+                        margin: 3px 0;
+                        font-size: 12px;
+                    }
+                    
+                    .mensaje {
+                        text-align: center;
+                        margin-top: 15px;
+                        font-style: italic;
+                        font-size: 11px;
+                        border-top: 1px dashed #ccc;
+                        padding-top: 8px;
+                    }
+                    
+                    .instrucciones {
+                        text-align: center;
+                        margin-top: 10px;
+                        font-size: 10px;
+                        color: #666;
+                        font-style: italic;
+                    }
+                    
+                    @media print {
+                        body {
+                            padding: 0 !important;
+                            margin: 0 !important;
+                        }
+                        
+                        .ticket-container {
+                            width: 80mm !important;
+                            padding: 5mm !important;
+                            margin: 0 !important;
+                        }
+                        
+                        .instrucciones {
+                            display: none !important;
+                        }
+                        
+                        @page {
+                            margin: 0 !important;
+                            padding: 0 !important;
+                            size: 80mm auto;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="ticket-container">
+                    <div class="header">
+                        <h2>TALLER DE BICICLETAS ZELAYA</h2>
+                        <p>Primera Avenida Sur, Barrio El Centro</p>
+                        <p>San Martín #11, San Salvador</p>
+                        <p>${fecha} - ${hora}</p>
+                        <p><strong>VENTA #${ventaSeleccionada} (REIMPRESIÓN)</strong></p>
+                    </div>
+                    
+                    <div class="cliente">
+                        <p><strong>CLIENTE:</strong> ${document.getElementById('detalleCliente').textContent}</p>
+                    </div>
+                    
+                    <div class="items">
+                        ${obtenerItemsTicket()}
+                    </div>
+                    
+                    <div class="total">
+                        <div class="total-line">
+                            <span>SUBTOTAL:</span>
+                            <span>$${subtotal.toFixed(2)}</span>
+                        </div>
+                        <div class="total-line">
+                            <span>IVA (13%):</span>
+                            <span>$${iva.toFixed(2)}</span>
+                        </div>
+                        <div class="total-line">
+                            <span>TOTAL:</span>
+                            <span>$${total.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mensaje">
+                        <p>¡Gracias por su compra!</p>
+                        <p>Vuelva pronto</p>
+                    </div>
+                    
+                    <div class="instrucciones">
+                        <p>Use Ctrl+P para imprimir • Cierre esta ventana cuando termine</p>
+                    </div>
+                </div>
+                
+                <script>
+                    // Auto-imprimir
+                    setTimeout(function() {
+                        window.print();
+                    }, 500);
+                    
+                    // Cerrar después de imprimir
+                    window.onafterprint = function() {
+                        setTimeout(function() {
+                            window.close();
+                        }, 1000);
+                    };
+                    
+                    // Cerrar con ESC
+                    document.addEventListener('keydown', function(event) {
+                        if (event.key === 'Escape') {
+                            window.close();
+                        }
+                    });
+                </script>
+            </body>
+        </html>
+    `);
+
+        ventanaTicket.document.close();
+    }
+
+    function obtenerItemsTicket() {
+        let itemsHTML = '';
+
+        // Productos
+        const filasProductos = document.querySelectorAll('#tbodyDetalleProductos tr');
+        filasProductos.forEach(fila => {
+            if (fila.cells.length === 4) {
+                const nombre = fila.cells[0].textContent.split(' (')[0]; // Remover código
+                const cantidad = fila.cells[1].textContent;
+                const subtotal = fila.cells[3].textContent;
+                itemsHTML += `<div class="item"><span>${nombre} x${cantidad}</span><span>${subtotal}</span></div>`;
+            }
+        });
+
+        // Servicios
+        const filasServicios = document.querySelectorAll('#tbodyDetalleServicios tr');
+        filasServicios.forEach(fila => {
+            if (fila.cells.length === 4) {
+                const descripcion = fila.cells[0].textContent;
+                const cantidad = fila.cells[1].textContent;
+                const subtotal = fila.cells[3].textContent;
+                itemsHTML += `<div class="item"><span>${descripcion} x${cantidad}</span><span>${subtotal}</span></div>`;
+            }
+        });
+
+        return itemsHTML;
     }
 
     // Funciones globales para los botones
     window.editarArticulo = editarArticulo;
-    window.mostrarConfirmacionEliminar = function(index) {
+    window.mostrarConfirmacionEliminar = function (index) {
         if (confirm('¿Está seguro de eliminar este artículo de la venta?')) {
             eliminarArticulo(index);
         }
