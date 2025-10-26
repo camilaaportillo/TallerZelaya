@@ -65,25 +65,19 @@ header {
     color: white;
 }
 
-.logo-btn {
-    position: relative;
-    display: flex;
-    align-items: center;
+.logo-btn, .user-btn {
     background: none;
     border: none;
     cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
 }
 
 .logo-btn img {
     width: 70px;
     height: 40px;
     object-fit: contain;
-}
-
-.user-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
 }
 
 .user-btn img {
@@ -102,7 +96,7 @@ header {
     border-radius: 8px;
     padding: 10px;
     min-width: 150px;
-    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 }
 
 .menu-usuario a {
@@ -117,7 +111,7 @@ header {
     display: block;
 }
 
-/* Layout Principal - SIN CAMBIOS para mantener consistencia */
+/* Layout Principal */
 main {
     display: flex;
     flex: 1;
@@ -126,28 +120,23 @@ main {
     overflow: hidden;
 }
 
-/* FORMULARIOS - Estilos idénticos para ambos */
-.formulario,
-.formulario2 {
+/* Formularios */
+.formulario, .formulario2 {
     display: flex;
     flex-direction: column;
-    gap: 8px; /* Reducido para coincidir con otras vistas */
+    gap: 8px;
     width: 280px;
-    /* SIN padding, border, background para coincidir con otras vistas */
 }
 
 /* Labels */
-.formulario label,
-.formulario2 label {
+.formulario label, .formulario2 label {
     font-size: 14px;
     font-weight: bold;
 }
 
 /* Inputs y Selects */
-.formulario input,
-.formulario select,
-.formulario2 input,
-.formulario2 select {
+.formulario input, .formulario select,
+.formulario2 input, .formulario2 select {
     padding: 12px;
     font-size: 16px;
     border: 2px solid #0026ff;
@@ -157,25 +146,14 @@ main {
 }
 
 /* Select estilizado */
-.formulario select,
-.formulario2 select {
+.formulario select, .formulario2 select {
     appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
     cursor: pointer;
 }
 
-.formulario option,
-.formulario2 option {
-    border-radius: 10px;
-    padding: 8px;
-}
-
 /* Botones de formulario */
-.formulario .btn-registrar,
-.formulario .btn-actualizar,
-.formulario2 .btn-registrar,
-.formulario2 .btn-actualizar {
+.formulario .btn-registrar, .formulario .btn-actualizar,
+.formulario2 .btn-registrar, .formulario2 .btn-actualizar {
     background: #0026ff;
     color: white;
     border: none;
@@ -188,14 +166,12 @@ main {
     width: 100%;
 }
 
-.formulario .btn-actualizar,
-.formulario2 .btn-actualizar {
+.formulario .btn-actualizar, .formulario2 .btn-actualizar {
     display: none;
 }
 
 /* Botón cancelar edición */
-.formulario .btn-cancelar-edicion,
-.formulario2 .btn-cancelar-edicion {
+.formulario .btn-cancelar-edicion, .formulario2 .btn-cancelar-edicion {
     background-color: #f44336;
     color: white;
     border: none;
@@ -210,14 +186,12 @@ main {
     line-height: 1;
 }
 
-.formulario .btn-cancelar-edicion:hover,
-.formulario2 .btn-cancelar-edicion:hover {
+.formulario .btn-cancelar-edicion:hover, .formulario2 .btn-cancelar-edicion:hover {
     background-color: #d32f2f;
 }
 
 /* Botones de cambio entre formularios */
-#btnCambiarReparacion,
-#btnCambiarProductos {
+#btnCambiarReparacion, #btnCambiarProductos {
     background: #28a745;
     color: white;
     border: none;
@@ -230,21 +204,18 @@ main {
     margin-top: 8px;
 }
 
-#btnCambiarReparacion:hover,
-#btnCambiarProductos:hover {
+#btnCambiarReparacion:hover, #btnCambiarProductos:hover {
     background: #218838;
 }
 
 /* Líneas HR */
-.formulario hr,
-.formulario2 hr {
+.formulario hr, .formulario2 hr {
     border: none;
     border-top: 2px solid #0026ff;
     margin: 8px 0;
 }
 
-/* Resto del CSS se mantiene igual... */
-
+/* Buscador y botones */
 .buscador {
     display: flex;
     justify-content: space-between;
@@ -272,18 +243,34 @@ main {
     cursor: pointer;
 }
 
-.btn-volver {
-    background-color: #007bff;
+.btn-volver, .btn-registro {
+    background-color: #28a745;
     color: white;
     padding: 8px 15px;
     border-radius: 8px;
     font-size: 14px;
     font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-volver {
+    background-color: #007bff;
     width: 200px;
 }
 
 .btn-volver:hover {
     background-color: #0056b3;
+}
+
+.btn-registro:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+}
+
+.btn-registro:active {
+    transform: translateY(0);
 }
 
 /* Tabla */
@@ -346,15 +333,35 @@ table tbody tr:hover {
     margin-bottom: 10px;
 }
 
-.btn-editar {
-    background: none;
+/* Botones dentro de la tabla */
+.btn-editar, .btn-eliminar {
+    padding: 6px 12px;
+    font-size: 15px;
     border: none;
+    border-radius: 6px;
     cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+    margin: 0 4px;
 }
 
-.btn-editar img {
-    width: 20px;
-    height: 20px;
+.btn-editar {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-editar:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+.btn-eliminar {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-eliminar:hover {
+    background-color: #a71d2a;
+    transform: scale(1.05);
 }
 
 .nota {
@@ -363,65 +370,154 @@ table tbody tr:hover {
     text-align: right;
 }
 
-/* Modal */
+/* Modal Base */
 .modal {
     display: none;
     position: fixed;
-    z-index: 1000;
+    z-index: 9999;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.6);
     justify-content: center;
     align-items: center;
 }
 
-.modal-contenido {
+/* Modal de mensajes - Centrado y mejorado */
+.modal-mensaje-contenido {
     background: white;
-    padding: 30px;
+    padding: 25px 30px;
     border-radius: 15px;
-    width: 350px;
-    text-align: center;
-    position: relative;
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.modal-contenido h2 {
-    margin-bottom: 20px;
-}
-
-.modal-botones {
+    width: 420px;
+    max-width: 90vw;
     display: flex;
-    justify-content: space-around;
-    gap: 15px;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transform: translateY(-20px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    margin: auto;
 }
 
-.btn-accion {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 25px;
+.modal-mensaje-contenido.mostrando {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.modal-mensaje-contenido.saliendo {
+    transform: translateY(-20px);
+    opacity: 0;
+}
+
+.modal-mensaje-icono {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    color: white;
+}
+
+.modal-mensaje-texto {
+    flex: 1;
+}
+
+.modal-mensaje-texto h2 {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    color: #333;
+}
+
+.modal-mensaje-texto p {
+    margin: 0;
     font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
+    color: #666;
+    line-height: 1.4;
 }
 
-.btn-azul {
-    background: #0026ff;
-    color: white;
+/* Colores específicos para cada tipo de mensaje */
+.modal-mensaje-contenido.exito {
+    border-left: 5px solid #28a745;
 }
 
-.btn-azul:hover {
-    background: #3b4fff;
+.modal-mensaje-contenido.exito .modal-mensaje-icono {
+    background: #28a745;
 }
 
-.btn-rojo {
-    background: red;
-    color: white;
+.modal-mensaje-contenido.error {
+    border-left: 5px solid #dc3545;
 }
 
-.btn-rojo:hover {
-    background: darkred;
+.modal-mensaje-contenido.error .modal-mensaje-icono {
+    background: #dc3545;
+}
+
+.modal-mensaje-contenido.advertencia {
+    border-left: 5px solid #ffc107;
+}
+
+.modal-mensaje-contenido.advertencia .modal-mensaje-icono {
+    background: #ffc107;
+    color: #000;
+}
+
+.modal-mensaje-contenido.info {
+    border-left: 5px solid #17a2b8;
+}
+
+.modal-mensaje-contenido.info .modal-mensaje-icono {
+    background: #17a2b8;
+}
+
+/* Modal grande - Centrado */
+.modal-contenido.grande {
+    width: 90%;
+    max-width: 1200px;
+    max-height: 85vh;
+    margin: auto;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #ddd;
+    background: #f8f9fa;
+    border-radius: 15px 15px 0 0;
+    flex-shrink: 0;
+}
+
+/* Contenido scrollable del modal */
+.modal-contenido-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 20px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 20px;
+    border-top: 1px solid #ddd;
+    background: #f8f9fa;
+    border-radius: 0 0 15px 15px;
+    flex-shrink: 0;
 }
 
 .btn-cerrar {
@@ -433,299 +529,6 @@ table tbody tr:hover {
     font-size: 18px;
     cursor: pointer;
     color: #555;
-}
-
-/* Modal de mensajes */
-.modal-mensaje-contenido {
-    background: white;
-    padding: 20px 30px;
-    border-radius: 15px;
-    width: 420px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    position: relative;
-    box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
-}
-
-.modal-mensaje-icono {
-    flex-shrink: 0;
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 35px;
-    font-weight: bold;
-    color: white;
-}
-
-.modal-mensaje-texto h2 {
-    margin: 0;
-    font-size: 20px;
-}
-
-.modal-mensaje-texto p {
-    margin: 5px 0 0 0;
-    font-size: 16px;
-}
-
-/* Colores de los tipos */
-.icono-error {
-    background: red;
-}
-
-.icono-advertencia {
-    background: #f1c40f;
-    color: black;
-}
-
-.icono-exito {
-    background: green;
-}
-
-/* Estilos base del modal */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 999;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
-}
-
-.modal-content {
-  background: #fff;
-  margin: 15% auto;
-  padding: 20px;
-  border-radius: 12px;
-  max-width: 400px;
-  text-align: center;
-  position: relative;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-}
-
-.modal-content h1 {
-    font-size: 60px;
-  margin-top: 0;
-  color: #ff2f00;
-}
-
-.close {
-  position: absolute;
-  right: 10px; top: 10px;
-  font-size: 22px;
-  cursor: pointer;
-}
-
-/* Botones */
-.modal-actions {
-  margin-top: 20px;
-  display: flex;
-  justify-content: space-around;
-}
-
-.btn-confirmar {
-  background: #ff1900;
-  color: #fff;
-  padding: 10px 18px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.btn-confirmar:hover {
-  background: #c0392b;
-}
-
-.btn-cancelar {
-  background: #00f;
-  color: #ffffff;
-  padding: 10px 18px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.btn-cancelar:hover {
-  background: #3b4fff;
-}
-
-.btn-habilitar-registro {
-    margin-top: auto;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 20px;
-    padding: 5px 10px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-}
-
-.btn-habilitar-registro:hover {
-    background-color: #218838;
-}
-
-.error-msg {
-    color: red;
-    font-size: 13px;
-    margin-top: -8px;
-    margin-bottom: 8px;
-    display: block;
-}
-
-.tabla-contenedor.bloqueada {
-    pointer-events: none;
-    opacity: 0.8;
-}
-
-.btn-registro {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    font-size: 15px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background-color: #28a745;
-    color: white;
-}
-
-.btn-registro:hover {
-    background-color: #218838;
-    transform: translateY(-1px);
-}
-
-.btn-registro:active {
-    transform: translateY(0);
-}
-
-/* Botones dentro de la tabla */
-.tabla-contenedor table tbody td .btn-editar,
-.tabla-contenedor table tbody td .btn-eliminar {
-    padding: 6px 12px;
-    font-size: 15px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: transform 0.2s ease, background-color 0.3s ease;
-    margin: 0 4px;
-}
-
-/* Botón Editar (Azul) */
-.btn-editar {
-    background-color: #007bff;
-    color: white;
-}
-
-.btn-editar:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
-}
-
-/* Botón Eliminar (Rojo) */
-.btn-eliminar {
-    background-color: #dc3545;
-    color: white;
-}
-
-.btn-eliminar:hover {
-    background-color: #a71d2a;
-    transform: scale(1.05);
-}
-
-/* Para navegadores Webkit (Chrome, Safari, Edge) */
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-contenido {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  width: 400px;
-  position: relative;
-}
-
-.cerrar {
-  position: absolute;
-  right: 10px; top: 10px;
-  font-size: 24px;
-  cursor: pointer;
-}
-
-.listar_compras {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background-color: #007bff;
-    color: white;
-    padding: 8px 15px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-}
-
-.hover-text {
-    position: absolute;
-    bottom: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 13px;
-    color: #494949;
-    opacity: 0;
-    transition: opacity 0.3s;
-    white-space: nowrap;
-}
-
-.logo-btn:hover .hover-text {
-    opacity: 1;
-}
-
-select.bloqueado {
-    background-color: #f5f5f5;
-    color: #666;
-    cursor: not-allowed;
-}
-
-/* Modal grande */
-.modal-contenido.grande {
-    width: 90%;
-    max-width: 1200px;
-    max-height: 90vh;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    border-bottom: 1px solid #ddd;
-    background: #f8f9fa;
 }
 
 /* Filtros */
@@ -751,15 +554,14 @@ select.bloqueado {
     color: #555;
 }
 
-.filtro-group input,
-.filtro-group select {
+.filtro-group input, .filtro-group select {
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 14px;
 }
 
-.btn-filtrar {
+.btn-filtrar, .btn-limpiar, .btn-imprimir {
     background: #007bff;
     color: white;
     border: none;
@@ -767,16 +569,15 @@ select.bloqueado {
     border-radius: 4px;
     cursor: pointer;
     height: fit-content;
+    font-size: 14px;
 }
 
 .btn-limpiar {
     background: #6c757d;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    height: fit-content;
+}
+
+.btn-imprimir {
+    background: #28a745;
 }
 
 .btn-filtrar:hover {
@@ -787,11 +588,15 @@ select.bloqueado {
     background: #545b62;
 }
 
+.btn-imprimir:hover {
+    background: #218838;
+}
+
 /* Tablas con scroll */
 .tabla-contenedor-scroll {
     max-height: 300px;
     overflow-y: auto;
-    margin: 10px 20px;
+    margin: 10px 0;
     border: 1px solid #ddd;
     border-radius: 4px;
 }
@@ -801,8 +606,7 @@ select.bloqueado {
     border-collapse: collapse;
 }
 
-.tabla-contenedor-scroll th,
-.tabla-contenedor-scroll td {
+.tabla-contenedor-scroll th, .tabla-contenedor-scroll td {
     padding: 12px;
     text-align: left;
     border-bottom: 1px solid #ddd;
@@ -822,7 +626,7 @@ select.bloqueado {
     gap: 15px;
     padding: 20px;
     background: #f8f9fa;
-    margin: 10px 20px;
+    margin: 10px 0;
     border-radius: 4px;
 }
 
@@ -841,30 +645,6 @@ select.bloqueado {
 .info-group span {
     font-size: 14px;
     color: #333;
-}
-
-/* Footer del modal */
-.modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    padding: 20px;
-    border-top: 1px solid #ddd;
-    background: #f8f9fa;
-}
-
-.btn-imprimir {
-    background: #28a745;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.btn-imprimir:hover {
-    background: #218838;
 }
 
 /* Estados de venta */
@@ -890,4 +670,295 @@ select.bloqueado {
 
 .fila-clickeable:active {
     background-color: #e9ecef;
+}
+
+/* Botón habilitar registro */
+.btn-habilitar-registro {
+    margin-top: auto;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 20px;
+    padding: 5px 10px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.btn-habilitar-registro:hover {
+    background-color: #218838;
+}
+
+/* Estilos para combobox con búsqueda */
+.combobox-busqueda {
+    width: 100%;
+}
+
+.choices {
+    margin-bottom: 0;
+}
+
+.choices__inner {
+    padding: 12px;
+    font-size: 16px;
+    border: 2px solid #0026ff;
+    border-radius: 20px;
+    background-color: white;
+    min-height: auto;
+}
+
+.choices__list--dropdown .choices__item--selectable {
+    padding-right: 10px;
+}
+
+.choices__list--dropdown {
+    border: 2px solid #0026ff;
+    border-top: none;
+    border-radius: 0 0 20px 20px;
+}
+
+.choices[data-type*="select-one"]:after {
+    border-color: #0026ff transparent transparent transparent;
+}
+
+.choices__input {
+    background: transparent;
+    margin-bottom: 0;
+}
+
+/* Texto hover para logo */
+.hover-text {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 13px;
+    color: #494949;
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: nowrap;
+}
+
+.logo-btn:hover .hover-text {
+    opacity: 1;
+}
+
+/* Estados bloqueados */
+select.bloqueado, .tabla-contenedor.bloqueada {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+select.bloqueado {
+    background-color: #f5f5f5;
+    color: #666;
+    cursor: not-allowed;
+}
+
+/* Mensajes de error */
+.error-msg {
+    color: red;
+    font-size: 13px;
+    margin-top: -8px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* Para navegadores Webkit (Chrome, Safari, Edge) */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Tipos de artículo */
+.tipo-articulo {
+    display: flex;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.tipo-articulo-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: #f5f5f5;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.tipo-articulo-btn.active {
+    background: #007bff;
+    color: white;
+}
+
+.campo-dinamico {
+    transition: all 0.3s;
+}
+
+.campo-oculto {
+    display: none !important;
+}
+
+.tabla-contenedor.bloqueada {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.modal-acciones-confirmacion {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    justify-content: center;
+}
+
+.btn-confirmar {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-confirmar:hover {
+    background: #c82333;
+}
+
+.btn-cancelar {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-cancelar:hover {
+    background: #545b62;
+}
+
+/* Estilos específicos para el modal de confirmación */
+#modalConfirmar .modal-mensaje-contenido {
+    background: white;
+    padding: 25px 30px;
+    border-radius: 15px;
+    width: 420px;
+    max-width: 90vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transform: translateY(-20px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    margin: auto;
+    text-align: center;
+}
+
+#modalConfirmar .modal-mensaje-contenido.mostrando {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+#modalConfirmar .modal-mensaje-contenido.saliendo {
+    transform: translateY(-20px);
+    opacity: 0;
+}
+
+#modalConfirmar .modal-mensaje-icono {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    background: #ffc107;
+    color: #000;
+}
+
+#modalConfirmar .modal-mensaje-texto {
+    flex: 1;
+    width: 100%;
+}
+
+#modalConfirmar .modal-mensaje-texto h2 {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    color: #333;
+}
+
+#modalConfirmar .modal-mensaje-texto p {
+    margin: 0;
+    font-size: 16px;
+    color: #666;
+    line-height: 1.4;
+}
+
+.modal-acciones-confirmacion {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+    justify-content: center;
+    width: 100%;
+}
+
+.btn-confirmar {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    min-width: 100px;
+    transition: background-color 0.3s;
+}
+
+.btn-confirmar:hover {
+    background: #c82333;
+}
+
+.btn-cancelar {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    min-width: 100px;
+    transition: background-color 0.3s;
+}
+
+.btn-cancelar:hover {
+    background: #545b62;
+}
+
+/* Asegurar que el modal de confirmación se muestre correctamente */
+#modalConfirmar.modal {
+    display: none;
+    position: fixed;
+    z-index: 10000; /* Mayor z-index para estar sobre otros modales */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
 }

@@ -1,13 +1,19 @@
 // Variables para control de mensajes
 let timeoutMensaje = null;
 
+// Recuperar usuario de sessionStorage
+const usuarioData = JSON.parse(sessionStorage.getItem("usuario") || "{}");
+const ID_USUARIO = usuarioData.id || null;
+
 // Función mejorada para mostrar mensajes
 function mostrarMensaje(titulo, texto, tipo = 'info', autoCerrar = true) {
     const modal = document.getElementById('modalMensaje');
-    const contenido = document.querySelector('.modal-mensaje-contenido');
+    const contenido = modal.querySelector('.modal-mensaje-contenido');
     const icono = document.getElementById('modalIcono');
     const tituloElement = document.getElementById('modalTitulo');
     const textoElement = document.getElementById('modalTexto');
+
+    console.log('Mostrando mensaje:', titulo, texto, tipo);
 
     // Limpiar timeout anterior si existe
     if (timeoutMensaje) {
@@ -44,9 +50,14 @@ function mostrarMensaje(titulo, texto, tipo = 'info', autoCerrar = true) {
     tituloElement.textContent = titulo;
     textoElement.textContent = texto;
 
-    // Mostrar modal
-    modal.style.display = 'block';
+    // Mostrar modal centrado
+    modal.style.display = 'flex';
     contenido.classList.remove('saliendo');
+
+    // Forzar reflow para la animación
+    void contenido.offsetWidth;
+
+    contenido.classList.add('mostrando');
 
     // Configurar auto-cierre
     if (autoCerrar) {
@@ -56,22 +67,129 @@ function mostrarMensaje(titulo, texto, tipo = 'info', autoCerrar = true) {
     }
 }
 
-// Función para cerrar mensaje con animación
 function cerrarMensaje() {
     const modal = document.getElementById('modalMensaje');
-    const contenido = document.querySelector('.modal-mensaje-contenido');
+    const contenido = modal.querySelector('.modal-mensaje-contenido');
 
     if (timeoutMensaje) {
         clearTimeout(timeoutMensaje);
         timeoutMensaje = null;
     }
 
+    contenido.classList.remove('mostrando');
     contenido.classList.add('saliendo');
 
     setTimeout(() => {
         modal.style.display = 'none';
         contenido.classList.remove('saliendo');
     }, 300);
+}
+
+// Función para mostrar confirmación personalizada
+function mostrarConfirmacion(titulo, texto, callbackConfirmar, callbackCancelar = null) {
+    const modal = document.getElementById('modalConfirmar');
+    const contenido = modal.querySelector('.modal-mensaje-contenido');
+    const tituloElement = document.getElementById('confirmarTitulo');
+    const textoElement = document.getElementById('confirmarTexto');
+    const btnConfirmar = document.getElementById('btnConfirmarEliminar');
+    const btnCancelar = document.getElementById('btnCancelarEliminar');
+    const btnCerrar = document.getElementById('btnCerrarConfirmar');
+
+    console.log('Mostrando confirmación:', titulo, texto);
+
+    // Configurar contenido
+    tituloElement.textContent = titulo;
+    textoElement.textContent = texto;
+
+    // Mostrar modal con animación
+    modal.style.display = 'flex';
+    contenido.classList.remove('saliendo');
+
+    // Forzar reflow para la animación
+    void contenido.offsetWidth;
+
+    contenido.classList.add('mostrando');
+
+    // Función para cerrar el modal
+    const cerrarModal = function () {
+        contenido.classList.remove('mostrando');
+        contenido.classList.add('saliendo');
+
+        setTimeout(() => {
+            modal.style.display = 'none';
+            contenido.classList.remove('saliendo');
+        }, 300);
+    };
+
+    // Remover event listeners anteriores
+    const nuevoBtnConfirmar = btnConfirmar.cloneNode(true);
+    const nuevoBtnCancelar = btnCancelar.cloneNode(true);
+    const nuevoBtnCerrar = btnCerrar.cloneNode(true);
+
+    btnConfirmar.parentNode.replaceChild(nuevoBtnConfirmar, btnConfirmar);
+    btnCancelar.parentNode.replaceChild(nuevoBtnCancelar, btnCancelar);
+    btnCerrar.parentNode.replaceChild(nuevoBtnCerrar, btnCerrar);
+
+    // Configurar nuevos event listeners
+    nuevoBtnConfirmar.addEventListener('click', function () {
+        cerrarModal();
+        if (callbackConfirmar) {
+            setTimeout(callbackConfirmar, 300); // Esperar a que termine la animación
+        }
+    });
+
+    nuevoBtnCancelar.addEventListener('click', function () {
+        cerrarModal();
+        if (callbackCancelar) {
+            setTimeout(callbackCancelar, 300);
+        }
+    });
+
+    nuevoBtnCerrar.addEventListener('click', function () {
+        cerrarModal();
+        if (callbackCancelar) {
+            setTimeout(callbackCancelar, 300);
+        }
+    });
+
+    // Cerrar haciendo click fuera del modal
+    const cerrarClickExterno = function (event) {
+        if (event.target === modal) {
+            cerrarModal();
+            if (callbackCancelar) {
+                setTimeout(callbackCancelar, 300);
+            }
+        }
+    };
+
+    modal.addEventListener('click', cerrarClickExterno);
+
+    // Cerrar con tecla ESC
+    const cerrarConESC = function (event) {
+        if (event.key === 'Escape') {
+            cerrarModal();
+            if (callbackCancelar) {
+                setTimeout(callbackCancelar, 300);
+            }
+            document.removeEventListener('keydown', cerrarConESC);
+        }
+    };
+
+    document.addEventListener('keydown', cerrarConESC);
+
+    // Limpiar event listeners cuando se cierre el modal
+    const limpiarEventListeners = function () {
+        modal.removeEventListener('click', cerrarClickExterno);
+        document.removeEventListener('keydown', cerrarConESC);
+    };
+
+    // Agregar listener para cuando se cierre el modal
+    modal.addEventListener('transitionend', function handler(event) {
+        if (event.target === contenido && modal.style.display === 'none') {
+            limpiarEventListeners();
+            modal.removeEventListener('transitionend', handler);
+        }
+    });
 }
 
 // Inicializar event listeners para el modal de mensajes
@@ -93,8 +211,16 @@ function inicializarModalMensajes() {
 
     // Cerrar con tecla ESC
     document.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape' && modal.style.display === 'block') {
-            cerrarMensaje();
+        if (event.key === 'Escape') {
+            const modalMensaje = document.getElementById('modalMensaje');
+            const modalConfirmar = document.getElementById('modalConfirmar');
+
+            if (modalMensaje.style.display === 'flex') {
+                cerrarMensaje();
+            }
+            if (modalConfirmar.style.display === 'flex') {
+                modalConfirmar.style.display = 'none';
+            }
         }
     });
 }
@@ -102,6 +228,8 @@ function inicializarModalMensajes() {
 // Variables globales para listar ventas
 let ventasCargadas = [];
 let ventaSeleccionada = null;
+let choicesProducto = null;
+let choicesCliente = null;
 
 document.addEventListener('DOMContentLoaded', function () {
     // Variables globales
@@ -127,6 +255,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const botonesTipo = document.querySelectorAll('.tipo-articulo-btn');
     const camposProducto = document.getElementById('campos-producto');
     const camposReparacion = document.getElementById('campos-reparacion');
+    const tablaContenedor = document.querySelector('.tabla-contenedor');
 
     // Inicializar sistema de mensajes
     inicializarModalMensajes();
@@ -152,7 +281,6 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('btnFiltrar').addEventListener('click', cargarVentas);
     document.getElementById('btnLimpiarFiltros').addEventListener('click', limpiarFiltros);
     document.getElementById('cerrarDetalleVenta').addEventListener('click', cerrarModalDetalle);
-    document.getElementById('btnCerrarDetalle').addEventListener('click', cerrarModalDetalle);
     document.getElementById('btnImprimirTicket').addEventListener('click', reimprimirTicket);
 
     // Funciones de inicialización
@@ -178,6 +306,9 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(data => {
                 console.log('Clientes cargados:', data);
                 if (data.success && data.clientes) {
+                    // Limpiar select
+                    selectCliente.innerHTML = '<option value="" disabled selected>Seleccionar Cliente</option>';
+
                     data.clientes.forEach(cliente => {
                         const option = document.createElement('option');
                         option.value = cliente.id_cliente;
@@ -187,6 +318,20 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                         selectCliente.appendChild(option);
                     });
+
+                    // Inicializar Choices.js para cliente
+                    if (window.Choices) {
+                        choicesCliente = new Choices(selectCliente, {
+                            searchEnabled: true,
+                            searchPlaceholderValue: 'Buscar cliente...',
+                            itemSelectText: 'Seleccionar',
+                            placeholder: true,
+                            placeholderValue: 'Seleccionar Cliente',
+                            searchResultLimit: 10,
+                            shouldSort: false,
+                            allowHTML: true
+                        });
+                    }
                 } else {
                     mostrarMensaje('Error', data.message || 'No se pudieron cargar los clientes', 'error');
                 }
@@ -206,6 +351,9 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(data => {
                 console.log('Repuestos cargados:', data);
                 if (data.success && data.repuestos) {
+                    // Limpiar select
+                    selectProducto.innerHTML = '<option value="" disabled selected>Seleccionar Producto</option>';
+
                     data.repuestos.forEach(repuesto => {
                         const option = document.createElement('option');
                         option.value = repuesto.id_repuesto;
@@ -218,6 +366,20 @@ document.addEventListener('DOMContentLoaded', function () {
                         option.dataset.precio = repuesto.precio || '0.00';
                         selectProducto.appendChild(option);
                     });
+
+                    // Inicializar Choices.js para producto
+                    if (window.Choices) {
+                        choicesProducto = new Choices(selectProducto, {
+                            searchEnabled: true,
+                            searchPlaceholderValue: 'Buscar producto...',
+                            itemSelectText: 'Seleccionar',
+                            placeholder: true,
+                            placeholderValue: 'Seleccionar Producto',
+                            searchResultLimit: 10,
+                            shouldSort: false,
+                            allowHTML: true
+                        });
+                    }
                 } else {
                     mostrarMensaje('Error', data.message || 'No se pudieron cargar los productos', 'error');
                 }
@@ -262,7 +424,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Bloquear cliente si ya hay artículos agregados
         if (articulosVenta.length > 0) {
-            selectCliente.disabled = true;
+            if (choicesCliente) {
+                choicesCliente.disable();
+            } else {
+                selectCliente.disabled = true;
+                selectCliente.classList.add('bloqueado');
+            }
         }
     }
 
@@ -382,18 +549,45 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Bloquear cliente después del primer artículo
-        if (articulosVenta.length === 1) {
-            selectCliente.disabled = true;
-            clienteSeleccionado = selectCliente.value || '';
+        if (articulosVenta.length === 1 && clienteSeleccionado) {
+            if (choicesCliente) {
+                choicesCliente.disable();
+            } else {
+                selectCliente.disabled = true;
+                selectCliente.classList.add('bloqueado');
+            }
         }
 
         actualizarTabla();
         limpiarCamposArticulo();
         calcularTotal();
+
+        // Resetear combobox de producto correctamente
+        resetearComboboxProducto();
+
+        mostrarMensaje('Éxito', 'Artículo agregado correctamente', 'success');
+    }
+
+    function resetearComboboxProducto() {
+        if (choicesProducto) {
+            // Método correcto para resetear Choices.js
+            choicesProducto.setChoiceByValue('');
+            choicesProducto.clearInput();
+        } else {
+            selectProducto.value = '';
+        }
     }
 
     function actualizarArticulo() {
-        if (!validarFormulario() || editandoIndex === -1) return;
+        console.log('Actualizando artículo, índice:', editandoIndex);
+        if (!validarFormulario()) {
+            console.log('Validación falló');
+            return;
+        }
+        if (editandoIndex === -1) {
+            console.log('No hay artículo en edición');
+            return;
+        }
 
         const articuloActualizado = {
             ...articulosVenta[editandoIndex],
@@ -405,12 +599,23 @@ document.addEventListener('DOMContentLoaded', function () {
         // Actualizar nombre si es reparación
         if (tipoArticuloActual === 'reparacion') {
             articuloActualizado.nombre = inputProductoReparacion.value.trim();
+        } else if (tipoArticuloActual === 'producto') {
+            // Actualizar información del producto si es producto
+            const selectedOption = selectProducto.options[selectProducto.selectedIndex];
+            if (selectedOption) {
+                const texto = selectedOption.textContent;
+                articuloActualizado.nombre = texto.split(' - ')[0];
+                articuloActualizado.codigo = texto.split(' - ')[1]?.split(' ')[0] || '';
+            }
         }
 
+        console.log('Artículo actualizado:', articuloActualizado);
         articulosVenta[editandoIndex] = articuloActualizado;
         actualizarTabla();
         calcularTotal();
         cancelarEdicion();
+
+        mostrarMensaje('Éxito', 'Artículo actualizado correctamente', 'success');
     }
 
     function cancelarEdicion() {
@@ -419,6 +624,11 @@ document.addEventListener('DOMContentLoaded', function () {
         btnActualizar.style.display = 'none';
         btnCancelar.style.display = 'none';
         limpiarCamposArticulo();
+
+        // Habilitar interacción con la tabla
+        if (tablaContenedor) {
+            tablaContenedor.classList.remove('bloqueada');
+        }
 
         // Restaurar tipo por defecto
         botonesTipo.forEach(btn => btn.classList.remove('active'));
@@ -433,25 +643,45 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Si no hay más artículos, desbloquear cliente
         if (articulosVenta.length === 0) {
-            selectCliente.disabled = false;
+            if (choicesCliente) {
+                choicesCliente.enable();
+            } else {
+                selectCliente.disabled = false;
+                selectCliente.classList.remove('bloqueado');
+            }
             clienteSeleccionado = null;
         }
+
+        mostrarMensaje('Éxito', 'Artículo eliminado correctamente', 'success');
     }
 
     function editarArticulo(index) {
         const articulo = articulosVenta[index];
         editandoIndex = index;
 
+        console.log('Editando artículo:', articulo);
+
         // Configurar tipo y campos según el artículo
         const tipoBtn = document.querySelector(`[data-tipo="${articulo.tipo}"]`);
-        cambiarTipoArticulo({ target: tipoBtn });
+        if (tipoBtn) {
+            botonesTipo.forEach(btn => btn.classList.remove('active'));
+            tipoBtn.classList.add('active');
+            cambiarTipoArticulo({ target: tipoBtn });
+        }
 
         // Llenar campos con datos del artículo
         inputCantidad.value = articulo.cantidad;
         inputPrecio.value = articulo.precio;
 
         if (articulo.tipo === 'producto') {
-            selectProducto.value = articulo.id_repuesto;
+            if (choicesProducto) {
+                // Buscar y seleccionar el producto en el combobox
+                setTimeout(() => {
+                    choicesProducto.setChoiceByValue(articulo.id_repuesto.toString());
+                }, 100);
+            } else {
+                selectProducto.value = articulo.id_repuesto;
+            }
         } else {
             inputProductoReparacion.value = articulo.nombre;
         }
@@ -459,6 +689,11 @@ document.addEventListener('DOMContentLoaded', function () {
         btnAgregar.style.display = 'none';
         btnActualizar.style.display = 'block';
         btnCancelar.style.display = 'block';
+
+        // Bloquear interacción con la tabla mientras se edita
+        if (tablaContenedor) {
+            tablaContenedor.classList.add('bloqueada');
+        }
     }
 
     function actualizarTabla() {
@@ -474,8 +709,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 <td>$${articulo.precio.toFixed(2)}</td>
                 <td>$${articulo.subtotal.toFixed(2)}</td>
                 <td>
-                    <button class="btn-editar" onclick="editarArticulo(${index})">✏️</button>
-                    <button class="btn-eliminar" onclick="mostrarConfirmacionEliminar(${index})">🗑️</button>
+                    <button class="btn-editar" onclick="editarArticuloDesdeTabla(${index})">✏️</button>
+                    <button class="btn-eliminar" onclick="mostrarConfirmacionEliminarDesdeTabla(${index})">🗑️</button>
                 </td>
             `;
             tbodyVentas.appendChild(fila);
@@ -488,7 +723,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function limpiarCamposArticulo() {
-        selectProducto.value = '';
         inputProductoReparacion.value = '';
         inputCantidad.value = '';
         inputPrecio.value = '';
@@ -505,14 +739,19 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        // Si no hay cliente seleccionado, usar cliente por defecto (id=1)
+        const idClienteFinal = clienteSeleccionado || '1';
+
         const ventaData = {
             fecha: fechaVenta,
             total: articulosVenta.reduce((sum, articulo) => sum + articulo.subtotal, 0),
             id_usuario: obtenerIdUsuario(),
-            id_cliente: clienteSeleccionado || null,
+            id_cliente: idClienteFinal,
             productos: articulosVenta.filter(articulo => articulo.tipo === 'producto'),
             reparaciones: articulosVenta.filter(articulo => articulo.tipo === 'reparacion')
         };
+
+        console.log('Datos de venta a enviar:', ventaData);
 
         fetch('php/registrarVenta.php', {
             method: 'POST',
@@ -538,9 +777,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function obtenerIdUsuario() {
-        // Esta función debería obtener el ID del usuario desde la sesión
-        // Por ahora retornamos un valor por defecto
-        return 1;
+        return ID_USUARIO;
     }
 
     function generarTicket(idVenta) {
@@ -548,12 +785,16 @@ document.addEventListener('DOMContentLoaded', function () {
         const ventanaTicket = window.open('', 'ticket', 'width=350,height=500,left=100,top=100,toolbar=no,scrollbars=no,resizable=no');
 
         const total = articulosVenta.reduce((sum, articulo) => sum + articulo.subtotal, 0);
-        const iva = total * 0.13;
-        const subtotal = total - iva;
         const ahora = new Date();
 
         const fecha = ahora.toLocaleDateString();
         const hora = ahora.toLocaleTimeString();
+
+        // Obtener nombre del cliente
+        let nombreCliente = 'CONSUMIDOR FINAL';
+        if (clienteSeleccionado && selectCliente.options[selectCliente.selectedIndex]) {
+            nombreCliente = selectCliente.options[selectCliente.selectedIndex].textContent.split(' - ')[0];
+        }
 
         ventanaTicket.document.write(`
         <!DOCTYPE html>
@@ -651,6 +892,17 @@ document.addEventListener('DOMContentLoaded', function () {
                         font-size: 12px;
                     }
                     
+                    .nota-importante {
+                        text-align: center;
+                        margin: 10px 0;
+                        padding: 8px;
+                        background: #f8f9fa;
+                        border: 1px dashed #ccc;
+                        border-radius: 4px;
+                        font-size: 10px;
+                        font-style: italic;
+                    }
+                    
                     .mensaje {
                         text-align: center;
                         margin-top: 15px;
@@ -704,7 +956,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                     
                     <div class="cliente">
-                        <p><strong>CLIENTE:</strong> ${clienteSeleccionado ? selectCliente.options[selectCliente.selectedIndex].textContent : 'CONSUMIDOR FINAL'}</p>
+                        <p><strong>CLIENTE:</strong> ${nombreCliente}</p>
                     </div>
                     
                     <div class="items">
@@ -716,15 +968,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         `).join('')}
                     </div>
                     
+                    <div class="nota-importante">
+                        <p><strong>NOTA:</strong> La mano de obra está incluida en el precio total</p>
+                    </div>
+                    
                     <div class="total">
-                        <div class="total-line">
-                            <span>SUBTOTAL:</span>
-                            <span>$${subtotal.toFixed(2)}</span>
-                        </div>
-                        <div class="total-line">
-                            <span>IVA (13%):</span>
-                            <span>$${iva.toFixed(2)}</span>
-                        </div>
                         <div class="total-line">
                             <span>TOTAL:</span>
                             <span>$${total.toFixed(2)}</span>
@@ -771,12 +1019,26 @@ document.addEventListener('DOMContentLoaded', function () {
     function reiniciarVenta() {
         articulosVenta = [];
         clienteSeleccionado = null;
-        selectCliente.disabled = false;
-        selectCliente.value = '';
+
+        // Desbloquear cliente
+        if (choicesCliente) {
+            choicesCliente.enable();
+            choicesCliente.setChoiceByValue('');
+        } else {
+            selectCliente.disabled = false;
+            selectCliente.classList.remove('bloqueado');
+            selectCliente.value = '';
+        }
+
         actualizarTabla();
         calcularTotal();
         limpiarCamposArticulo();
         cancelarEdicion();
+
+        // Resetear combobox de producto
+        resetearComboboxProducto();
+
+        location.reload();
     }
 
     // Funciones para listar ventas
@@ -972,8 +1234,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const hora = ahora.toLocaleTimeString();
 
         const total = parseFloat(document.getElementById('detalleTotal').textContent.replace('$', ''));
-        const iva = total * 0.13;
-        const subtotal = total - iva;
 
         ventanaTicket.document.write(`
         <!DOCTYPE html>
@@ -1070,6 +1330,17 @@ document.addEventListener('DOMContentLoaded', function () {
                         font-size: 12px;
                     }
                     
+                    .nota-importante {
+                        text-align: center;
+                        margin: 10px 0;
+                        padding: 8px;
+                        background: #f8f9fa;
+                        border: 1px dashed #ccc;
+                        border-radius: 4px;
+                        font-size: 10px;
+                        font-style: italic;
+                    }
+                    
                     .mensaje {
                         text-align: center;
                         margin-top: 15px;
@@ -1129,15 +1400,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         ${obtenerItemsTicket()}
                     </div>
                     
+                    <div class="nota-importante">
+                        <p><strong>NOTA:</strong> La mano de obra está incluida en el precio total</p>
+                    </div>
+                    
                     <div class="total">
-                        <div class="total-line">
-                            <span>SUBTOTAL:</span>
-                            <span>$${subtotal.toFixed(2)}</span>
-                        </div>
-                        <div class="total-line">
-                            <span>IVA (13%):</span>
-                            <span>$${iva.toFixed(2)}</span>
-                        </div>
                         <div class="total-line">
                             <span>TOTAL:</span>
                             <span>$${total.toFixed(2)}</span>
@@ -1209,11 +1476,18 @@ document.addEventListener('DOMContentLoaded', function () {
         return itemsHTML;
     }
 
-    // Funciones globales para los botones
-    window.editarArticulo = editarArticulo;
-    window.mostrarConfirmacionEliminar = function (index) {
-        if (confirm('¿Está seguro de eliminar este artículo de la venta?')) {
-            eliminarArticulo(index);
-        }
+    // Funciones globales para los botones (CORREGIDAS)
+    window.editarArticuloDesdeTabla = function (index) {
+        editarArticulo(index);
+    };
+
+    window.mostrarConfirmacionEliminarDesdeTabla = function (index) {
+        mostrarConfirmacion(
+            'Confirmar Eliminación',
+            '¿Está seguro de eliminar este artículo de la venta?',
+            function () {
+                eliminarArticulo(index);
+            }
+        );
     };
 });

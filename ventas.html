@@ -88,10 +88,11 @@
                 </button>
             </div>
 
-            <!-- Campos para Producto Inventariado -->
+
+            <!-- En la sección de Producto -->
             <div id="campos-producto" class="campo-dinamico">
                 <label>Producto</label>
-                <select id="selectProducto">
+                <select id="selectProducto" class="combobox-busqueda">
                     <option value="" disabled selected>Seleccionar Producto</option>
                 </select>
                 <small class="error-msg"></small>
@@ -121,9 +122,10 @@
 
             <hr>
 
+            <!-- En la sección de Cliente -->
             <a href="clientes.html"><label>Cliente</label></a>
-            <select id="selectCliente">
-                <option value="" disabled selected>Seleccionar Cliente</option>
+            <select id="selectCliente" class="combobox-busqueda">
+                <option value="" disabled selected>Consumidor Final</option>
             </select>
             <small class="error-msg"></small>
 
@@ -191,22 +193,24 @@
                     <button id="btnLimpiarFiltros" class="btn-limpiar">Limpiar</button>
                 </div>
 
-                <div class="tabla-contenedor-scroll">
-                    <table id="tablaVentas">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Fecha</th>
-                                <th>Cliente</th>
-                                <th>Total</th>
-                                <th>Usuario</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbodyVentasLista">
-                            <!-- Las ventas se cargarán aquí -->
-                        </tbody>
-                    </table>
+                <div class="modal-contenido-scroll">
+                    <div class="tabla-contenedor-scroll">
+                        <table id="tablaVentas">
+                            <thead>
+                                <tr>
+                                    <th>Número de Compra</th>
+                                    <th>Fecha</th>
+                                    <th>Cliente</th>
+                                    <th>Total</th>
+                                    <th>Usuario</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyVentasLista">
+                                <!-- Las ventas se cargarán aquí -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -274,21 +278,24 @@
 
                 <div class="modal-footer">
                     <button id="btnImprimirTicket" class="btn-imprimir">🖨️ Reimprimir Ticket</button>
-                    <button id="btnCerrarDetalle" class="btn-cerrar">Cerrar</button>
+
                 </div>
             </div>
         </div>
 
         <!-- Modal de Confirmación -->
         <div id="modalConfirmar" class="modal">
-            <div class="modal-content warning">
-                <span class="close" id="btnCerrarConfirmar">&times;</span>
-                <h1>⚠</h1>
-                <p>¿Seguro que deseas eliminar este artículo de la venta?</p>
-                <div class="modal-actions">
+            <div class="modal-mensaje-contenido advertencia">
+                <div class="modal-mensaje-icono">⚠️</div>
+                <div class="modal-mensaje-texto">
+                    <h2 id="confirmarTitulo">Confirmar Eliminación</h2>
+                    <p id="confirmarTexto">¿Está seguro de eliminar este artículo de la venta?</p>
+                </div>
+                <div class="modal-acciones-confirmacion">
                     <button id="btnConfirmarEliminar" class="btn-confirmar">Sí, eliminar</button>
                     <button id="btnCancelarEliminar" class="btn-cancelar">Cancelar</button>
                 </div>
+                <button id="btnCerrarConfirmar" class="btn-cerrar">X</button>
             </div>
         </div>
 
