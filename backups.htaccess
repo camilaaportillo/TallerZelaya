@@ -1,0 +1,28 @@
+# =============================================
+# PROTECCIÓN TOTAL DEL DIRECTORIO BACKUPS
+# =============================================
+
+# Denegar acceso a TODOS los archivos
+Order Deny,Allow
+Deny from all
+
+# Deshabilitar completamente el listado de directorios
+Options -Indexes
+
+# Bloquear ejecución de cualquier script
+<FilesMatch "\.(php|php5|phtml|html|htm|js|css)$">
+    Deny from all
+</FilesMatch>
+
+# Bloquear acceso directo a archivos SQL
+<FilesMatch "\.(sql)$">
+    Deny from all
+</FilesMatch>
+
+# Prevenir acceso desde cualquier IP
+<RequireAll>
+    Require all denied
+</RequireAll>
+
+# Mensaje de error personalizado
+ErrorDocument 403 "Acceso denegado"

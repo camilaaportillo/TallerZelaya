@@ -1,0 +1,20 @@
+{
+    "schedules": [
+        {
+            "id": "6901594bd7408",
+            "type": "daily",
+            "time": "18:02",
+            "active": true,
+            "created_by": "camila",
+            "created_at": "2025-10-28 18:01:15"
+        },
+        {
+            "id": "69018590a8a4e",
+            "type": "daily",
+            "time": "02:00",
+            "active": true,
+            "created_by": "Camila Portillo",
+            "created_at": "2025-10-28 21:10:08"
+        }
+    ]
+}
