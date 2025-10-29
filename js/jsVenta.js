@@ -1491,3 +1491,150 @@ document.addEventListener('DOMContentLoaded', function () {
         );
     };
 });
+// Agregar el event listener para el botón de enviar factura
+document.getElementById('btnEnviarFactura').addEventListener('click', enviarFacturaElectronica);
+
+// Funciones para enviar factura
+function enviarFacturaElectronica() {
+    if (!ventaSeleccionada) {
+        mostrarMensaje('Advertencia', 'No hay venta seleccionada para enviar', 'warning');
+        return;
+    }
+
+    const btnEnviar = document.getElementById('btnEnviarFactura');
+    const btnOriginalText = btnEnviar.textContent;
+    
+    btnEnviar.disabled = true;
+    btnEnviar.textContent = 'Enviando...';
+    btnEnviar.classList.add('enviando');
+
+    // Obtener el correo del cliente
+    obtenerCorreoCliente(ventaSeleccionada)
+        .then(data => {
+            if (!data.success || !data.correo) {
+                mostrarMensaje('Advertencia', data.message || 'El cliente no tiene un correo electrónico vinculado', 'warning');
+                resetearBotonEnviar(btnEnviar, btnOriginalText);
+                return;
+            }
+
+            // Enviar la factura por correo
+            return enviarFacturaPorCorreo(ventaSeleccionada, data.correo);
+        })
+        .then(resultado => {
+            if (resultado && resultado.success) {
+                mostrarMensaje('Éxito', resultado.message || 'Factura enviada correctamente al correo del cliente', 'success');
+            } else if (resultado) {
+                mostrarMensaje('Error', resultado.message || 'Error al enviar la factura', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error enviando factura:', error);
+            mostrarMensaje('Error', 'Error al enviar la factura: ' + error.message, 'error');
+        })
+        .finally(() => {
+            resetearBotonEnviar(btnEnviar, btnOriginalText);
+        });
+}
+
+function obtenerCorreoCliente(idVenta) {
+    return fetch(`php/obtenerCorreoCliente.php?id_venta=${idVenta}`)
+        .then(response => {
+            if (!response.ok) throw new Error('Error en la respuesta del servidor');
+            return response.json();
+        });
+}
+
+function enviarFacturaPorCorreo(idVenta, correo) {
+    return fetch('php/enviarFacturaElectronica.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            id_venta: idVenta,
+            correo: correo
+        })
+    })
+    .then(response => {
+        return response.text().then(text => {
+            console.log('Respuesta del servidor:', text);
+            
+            try {
+                const data = JSON.parse(text);
+                return data;
+            } catch (e) {
+                console.error('Error parseando JSON:', e);
+                throw new Error('Error en la respuesta del servidor');
+            }
+        });
+    });
+}
+
+function resetearBotonEnviar(boton, textoOriginal) {
+    boton.disabled = false;
+    boton.textContent = textoOriginal;
+    boton.classList.remove('enviando');
+}
+
+// Actualizar la función mostrarModalDetalleVenta para obtener el correo del cliente
+function mostrarModalDetalleVenta(detalle) {
+    const venta = detalle.venta;
+
+    // Actualizar información general
+    document.getElementById('detalleVentaId').textContent = venta.id_venta;
+    document.getElementById('detalleFecha').textContent = venta.fecha;
+    document.getElementById('detalleCliente').textContent = venta.cliente_nombre || 'Consumidor Final';
+    document.getElementById('detalleUsuario').textContent = venta.usuario_nombre;
+    document.getElementById('detalleTotal').textContent = '$' + parseFloat(venta.total).toFixed(2);
+
+    // Obtener y almacenar el correo del cliente
+    obtenerCorreoCliente(venta.id_venta)
+        .then(correo => {
+            correoClienteActual = correo;
+        })
+        .catch(error => {
+            console.error('Error obteniendo correo:', error);
+            correoClienteActual = '';
+        });
+
+    // Actualizar tabla de productos
+    const tbodyProductos = document.getElementById('tbodyDetalleProductos');
+    tbodyProductos.innerHTML = '';
+
+    if (detalle.productos.length === 0) {
+        tbodyProductos.innerHTML = '<tr><td colspan="4" style="text-align: center;">No hay productos</td></tr>';
+    } else {
+        detalle.productos.forEach(producto => {
+            const fila = document.createElement('tr');
+            fila.innerHTML = `
+                <td>${producto.nombre} (${producto.codigo})</td>
+                <td>${producto.cantidad}</td>
+                <td>$${parseFloat(producto.precio_unitario).toFixed(2)}</td>
+                <td>$${parseFloat(producto.subtotal).toFixed(2)}</td>
+            `;
+            tbodyProductos.appendChild(fila);
+        });
+    }
+
+    // Actualizar tabla de servicios
+    const tbodyServicios = document.getElementById('tbodyDetalleServicios');
+    tbodyServicios.innerHTML = '';
+
+    if (detalle.servicios.length === 0) {
+        tbodyServicios.innerHTML = '<tr><td colspan="4" style="text-align: center;">No hay servicios/reparaciones</td></tr>';
+    } else {
+        detalle.servicios.forEach(servicio => {
+            const fila = document.createElement('tr');
+            fila.innerHTML = `
+                <td>${servicio.descripcion}</td>
+                <td>${servicio.cantidad}</td>
+                <td>$${parseFloat(servicio.precio).toFixed(2)}</td>
+                <td>$${parseFloat(servicio.subtotal).toFixed(2)}</td>
+            `;
+            tbodyServicios.appendChild(fila);
+        });
+    }
+
+    // Mostrar modal
+    document.getElementById('modalDetalleVenta').style.display = 'block';
+}

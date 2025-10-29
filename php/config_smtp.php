@@ -3,16 +3,16 @@
 // CONFIGURACIÓN SMTP CON GMAIL - TALLER ZELAYA
 // ============================================
 
-// DATOS DE LA CUENTA GMAIL DEL SISTEMA
-define('SMTP_HOST', 'smtp.gmail.com');
-define('SMTP_USERNAME', 'tallerzelaya104@gmail.com'); // tu email
-define('SMTP_PASSWORD', 'bjtq htae aebh fqds'); // tu contraseña de aplicación
-define('SMTP_PORT', 587);
-define('SMTP_SECURE', 'tls');
-
-// CONFIGURACIÓN DEL REMITENTE
-define('EMAIL_FROM', 'tallerzelaya104@gmail.com'); // Mismo que SMTP_USERNAME
-define('NOMBRE_FROM', 'Taller de Bicicletas Zelaya');
+// Verificar si las constantes ya están definidas
+if (!defined('SMTP_HOST')) {
+    define('SMTP_HOST', 'smtp.gmail.com');
+    define('SMTP_USERNAME', 'tallerzelaya104@gmail.com');
+    define('SMTP_PASSWORD', 'bjtq htae aebh fqds');
+    define('SMTP_PORT', 587);
+    define('SMTP_SECURE', 'tls');
+    define('EMAIL_FROM', 'tallerzelaya104@gmail.com');
+    define('NOMBRE_FROM', 'Taller de Bicicletas Zelaya');
+}
 
 return [
     'host' => SMTP_HOST,
