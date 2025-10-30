@@ -1191,3 +1191,20 @@ main {
     font-size: 14px;
     display: none;
 }
+
+.btn-exportar {
+    background: #dc3545; /* Rojo para indicar alerta */
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-exportar:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+}
