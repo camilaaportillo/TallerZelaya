@@ -293,8 +293,41 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function cargarFechaHora() {
         const ahora = new Date();
-        fechaVenta = ahora.toISOString().split('T')[0];
+
+        // Formatear a dd/mm/aaaa
+        const dia = String(ahora.getDate()).padStart(2, '0');
+        const mes = String(ahora.getMonth() + 1).padStart(2, '0');
+        const anio = ahora.getFullYear();
+
+        fechaVenta = `${anio}-${mes}-${dia}`; // Para el backend (formato ISO)
         inputFecha.value = fechaVenta;
+
+        // Mostrar en formato dd/mm/aaaa en la interfaz (opcional)
+        const fechaFormateada = `${dia}/${mes}/${anio}`;
+        console.log('Fecha de venta:', fechaFormateada);
+    }
+
+    // Función para formatear fechas a dd/mm/aaaa
+    function formatearFecha(fechaISO) {
+        if (!fechaISO) return '';
+
+        const fecha = new Date(fechaISO);
+        const dia = String(fecha.getDate()).padStart(2, '0');
+        const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+        const anio = fecha.getFullYear();
+
+        return `${dia}/${mes}/${anio}`;
+    }
+
+    // Función para convertir dd/mm/aaaa a ISO (para el backend)
+    function fechaToISO(fechaDDMMAAAA) {
+        if (!fechaDDMMAAAA) return '';
+
+        const partes = fechaDDMMAAAA.split('/');
+        if (partes.length === 3) {
+            return `${partes[2]}-${partes[1]}-${partes[0]}`;
+        }
+        return fechaDDMMAAAA;
     }
 
     function cargarClientes() {
@@ -307,7 +340,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log('Clientes cargados:', data);
                 if (data.success && data.clientes) {
                     // Limpiar select
-                    selectCliente.innerHTML = '<option value="" disabled selected>Seleccionar Cliente</option>';
+                    selectCliente.innerHTML = '<option value="" disabled selected>Consumidor Final</option>';
 
                     data.clientes.forEach(cliente => {
                         const option = document.createElement('option');
@@ -326,7 +359,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             searchPlaceholderValue: 'Buscar cliente...',
                             itemSelectText: 'Seleccionar',
                             placeholder: true,
-                            placeholderValue: 'Seleccionar Cliente',
+                            placeholderValue: 'Consumidor Final',
                             searchResultLimit: 10,
                             shouldSort: false,
                             allowHTML: true
@@ -570,12 +603,49 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function resetearComboboxProducto() {
         if (choicesProducto) {
-            // Método correcto para resetear Choices.js
-            choicesProducto.setChoiceByValue('');
-            choicesProducto.clearInput();
+            // Método CORRECTO para resetear Choices.js sin perder los datos
+            setTimeout(() => {
+                choicesProducto.clearStore();
+                choicesProducto.setChoices([{
+                    value: '',
+                    label: 'Seleccionar Producto',
+                    selected: true,
+                    disabled: true
+                }], 'value', 'label', true);
+
+                // Recargar las opciones originales
+                setTimeout(() => {
+                    cargarOpcionesChoices();
+                }, 100);
+            }, 0);
         } else {
             selectProducto.value = '';
         }
+    }
+
+    // Función auxiliar para recargar opciones en Choices.js
+    function cargarOpcionesChoices() {
+        if (!choicesProducto) return;
+
+        fetch('php/obtenerRepuestosVenta.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.repuestos) {
+                    const opciones = data.repuestos.map(repuesto => ({
+                        value: repuesto.id_repuesto.toString(),
+                        label: `${repuesto.nombre} - ${repuesto.codigo} ${repuesto.stock_actual !== null ? `(Stock: ${repuesto.stock_actual})` : ''}`,
+                        customProperties: {
+                            precio: repuesto.precio || '0.00',
+                            stock: repuesto.stock_actual || '0'
+                        }
+                    }));
+
+                    choicesProducto.setChoices(opciones, 'value', 'label', true);
+                }
+            })
+            .catch(error => {
+                console.error('Error recargando opciones:', error);
+            });
     }
 
     function actualizarArticulo() {
@@ -751,7 +821,6 @@ document.addEventListener('DOMContentLoaded', function () {
             reparaciones: articulosVenta.filter(articulo => articulo.tipo === 'reparacion')
         };
 
-        console.log('Datos de venta a enviar:', ventaData);
 
         fetch('php/registrarVenta.php', {
             method: 'POST',
@@ -1092,8 +1161,13 @@ document.addEventListener('DOMContentLoaded', function () {
         let url = 'php/obtenerVentas.php?';
         const params = new URLSearchParams();
 
-        if (fechaDesde) params.append('fecha_desde', fechaDesde);
-        if (fechaHasta) params.append('fecha_hasta', fechaHasta);
+        if (fechaDesde) {
+            // Si el input date da formato dd/mm/aaaa, convertirlo
+            params.append('fecha_desde', fechaToISO(fechaDesde));
+        }
+        if (fechaHasta) {
+            params.append('fecha_hasta', fechaToISO(fechaHasta));
+        }
         if (idCliente) params.append('id_cliente', idCliente);
 
         url += params.toString();
@@ -1131,11 +1205,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
             fila.innerHTML = `
                 <td>${venta.id_venta}</td>
-                <td>${venta.fecha}</td>
+                <td>${formatearFecha(venta.fecha)}</td>
                 <td>${venta.cliente_nombre}</td>
                 <td>${venta.total_formateado}</td>
                 <td>${venta.usuario_nombre}</td>
-                <td class="estado-${venta.estado.toLowerCase()}">${venta.estado}</td>
             `;
 
             fila.addEventListener('click', () => mostrarDetalleVenta(venta.id_venta));
@@ -1173,7 +1246,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Actualizar información general
         document.getElementById('detalleVentaId').textContent = venta.id_venta;
-        document.getElementById('detalleFecha').textContent = venta.fecha;
+        document.getElementById('detalleFecha').textContent = formatearFecha(venta.fecha);
         document.getElementById('detalleCliente').textContent = venta.cliente_nombre || 'Consumidor Final';
         document.getElementById('detalleUsuario').textContent = venta.usuario_nombre;
         document.getElementById('detalleTotal').textContent = '$' + parseFloat(venta.total).toFixed(2);
@@ -1503,7 +1576,7 @@ function enviarFacturaElectronica() {
 
     const btnEnviar = document.getElementById('btnEnviarFactura');
     const btnOriginalText = btnEnviar.textContent;
-    
+
     btnEnviar.disabled = true;
     btnEnviar.textContent = 'Enviando...';
     btnEnviar.classList.add('enviando');
@@ -1555,19 +1628,19 @@ function enviarFacturaPorCorreo(idVenta, correo) {
             correo: correo
         })
     })
-    .then(response => {
-        return response.text().then(text => {
-            console.log('Respuesta del servidor:', text);
-            
-            try {
-                const data = JSON.parse(text);
-                return data;
-            } catch (e) {
-                console.error('Error parseando JSON:', e);
-                throw new Error('Error en la respuesta del servidor');
-            }
+        .then(response => {
+            return response.text().then(text => {
+                console.log('Respuesta del servidor:', text);
+
+                try {
+                    const data = JSON.parse(text);
+                    return data;
+                } catch (e) {
+                    console.error('Error parseando JSON:', e);
+                    throw new Error('Error en la respuesta del servidor');
+                }
+            });
         });
-    });
 }
 
 function resetearBotonEnviar(boton, textoOriginal) {
