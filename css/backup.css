@@ -1,0 +1,179 @@
+ body {
+     background-color: #ffffff;
+     padding: 20px;
+ }
+
+ h1 {
+     font-weight: 700;
+     color: #000000;
+ }
+
+ .admin-badge {
+     background: linear-gradient(45deg, #0614d1, #145efd);
+     color: white;
+     padding: 6px 12px;
+     border-radius: 10px;
+ }
+
+ .card {
+     border: none;
+     border-radius: 10px;
+     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+ }
+
+ .card-header {
+     border-top-left-radius: 10px;
+     border-top-right-radius: 10px;
+ }
+
+ .action-section {
+     display: flex;
+     justify-content: center;
+     gap: 30px;
+     flex-wrap: wrap;
+     padding: 20px 0;
+ }
+
+ .action-section .btn {
+     width: 220px;
+     font-size: 1rem;
+     padding: 12px 0;
+     border-radius: 8px;
+     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.15);
+     transition: all 0.2s ease-in-out;
+ }
+
+ .action-section .btn:hover {
+     transform: translateY(-3px);
+ }
+
+ .progress {
+     height: 12px;
+     border-radius: 8px;
+     overflow: hidden;
+ }
+
+ .progress-bar {
+     background-color: #0d6efd;
+ }
+
+ /* Estilos mejorados para validación de contraseña */
+ .invalid-feedback {
+     display: none;
+     width: 100%;
+     margin-top: 0.25rem;
+     font-size: 0.875em;
+     color: #dc3545;
+ }
+
+ .valid-feedback {
+     display: none;
+     width: 100%;
+     margin-top: 0.25rem;
+     font-size: 0.875em;
+     color: #198754;
+ }
+
+ #password-alert {
+     margin-top: 1rem;
+     transition: all 0.3s ease;
+ }
+
+ /* Asegurar que los estados de validación de Bootstrap funcionen */
+ .was-validated .form-control:invalid~.invalid-feedback,
+ .was-validated .form-control:valid~.valid-feedback,
+ .form-control.is-invalid~.invalid-feedback,
+ .form-control.is-valid~.valid-feedback {
+     display: block;
+ }
+
+ /* Animaciones para las notificaciones */
+ @keyframes slideInRight {
+     from {
+         transform: translateX(100%);
+         opacity: 0;
+     }
+
+     to {
+         transform: translateX(0);
+         opacity: 1;
+     }
+ }
+
+ @keyframes slideOutRight {
+     from {
+         transform: translateX(0);
+         opacity: 1;
+     }
+
+     to {
+         transform: translateX(100%);
+         opacity: 0;
+     }
+ }
+
+ /* Estilos para el header de backups disponibles */
+ .card-header.bg-dark .d-flex {
+     flex-wrap: nowrap;
+     gap: 15px;
+ }
+
+ .card-header.bg-dark h5 {
+     margin-bottom: 0;
+     white-space: nowrap;
+ }
+
+ .card-header.bg-dark .form-check {
+     margin-bottom: 0;
+     display: flex;
+     align-items: center;
+     gap: 8px;
+ }
+
+ .card-header.bg-dark .form-check-label {
+     margin-bottom: 0;
+     white-space: nowrap;
+ }
+
+ /* Cambiar todos los encabezados oscuros */
+ .bg-dark {
+     background-color: #000000 !important;
+     /* Azul */
+ }
+
+ /* Específico para la tabla */
+/* CSS para la clase personalizada */
+.table-custom-header {
+    background-color: #000000 !important;
+    border-color: #000000 !important;
+}
+
+.table-custom-header th {
+    background-color: #000000 !important;
+    border-color: #000000 !important;
+    color: white !important;
+}
+
+ /* Para el badge del contador */
+ #backup-count {
+     font-size: 0.8em;
+     padding: 4px 8px;
+ }
+
+ /* Estilos para las notificaciones personalizadas */
+ .custom-alert-notification {
+     animation: slideInRight 0.3s ease-out;
+ }
+
+ .custom-alert-notification.fade-out {
+     animation: slideOutRight 0.3s ease-out;
+ }
+
+ /* Espaciado entre múltiples notificaciones */
+ .custom-alert-notification:not(:first-child) {
+     margin-top: 10px;
+ }
+
+ .backup-auto-notification:not(:first-child) {
+     margin-top: 10px;
+ }

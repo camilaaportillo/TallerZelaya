@@ -13,7 +13,7 @@ date_default_timezone_set('America/El_Salvador');
 
 // DEBUG: Verificar configuración
 error_log("🇸🇻 Zona horaria configurada: " . date_default_timezone_get());
-error_log("🕒 Hora actual en El Salvador: " . date('Y-m-d H:i:s'));
+error_log("🕒 Hora actual en El Salvador: " . date('d/m/Y H:i:s'));
 session_start();
 
 // Incluir archivo de conexión
@@ -596,7 +596,7 @@ function saveSchedule() {
         'time' => $time,
         'active' => $active,
         'created_by' => $_SESSION['usuario_nombre'],
-        'created_at' => date('Y-m-d H:i:s')
+        'created_at' => date('d/m/Y H:i:s')
     ];
     
     if ($type == 'weekly' || $type == 'monthly') {
@@ -675,6 +675,7 @@ function deleteSchedule() {
     }
 }
 // Función para verificar y ejecutar backups programados
+// Función para verificar y ejecutar backups programados
 function checkScheduledBackups() {
     global $schedule_file, $backup_dir;
 
@@ -710,6 +711,7 @@ function checkScheduledBackups() {
             return ['success' => true, 'executed' => 0, 'message' => 'Formato de programaciones inválido'];
         }
 
+        $current_time = time();
         $current_date = date('Y-m-d');
         $current_hour = date('H:i');
         $current_day_of_week = date('w');
@@ -723,72 +725,107 @@ function checkScheduledBackups() {
         error_log("Hora actual: " . $current_hour);
         error_log("Día de la semana: " . $current_day_of_week);
         error_log("Día del mes: " . $current_day_of_month);
+        error_log("Timestamp actual: " . $current_time);
 
         foreach ($schedules['schedules'] as $schedule) {
             if (!$schedule['active']) {
+                error_log("Programación " . $schedule['id'] . " está inactiva");
                 continue;
             }
             
             $last_run_file = $backup_dir . 'last_run_' . $schedule['id'] . '.txt';
-            $last_run = file_exists($last_run_file) ? file_get_contents($last_run_file) : '';
             
-            // Si ya se ejecutó hoy, saltar
-            if ($last_run == $current_date) {
-                error_log("Programación " . $schedule['id'] . " ya ejecutada hoy");
-                continue;
+            // Verificar si ya se ejecutó en los últimos 55 minutos (para evitar duplicados)
+            if (file_exists($last_run_file)) {
+                $last_run_time = file_get_contents($last_run_file);
+                $time_since_last_run = $current_time - $last_run_time;
+                
+                // Si se ejecutó hace menos de 55 minutos, saltar (protección contra duplicados)
+                if ($time_since_last_run < 3300) { // 55 minutos en segundos
+                    error_log("Programación " . $schedule['id'] . " ya ejecutada hace " . $time_since_last_run . " segundos");
+                    continue;
+                }
             }
             
             $should_run = false;
+            $schedule_time = $schedule['time'];
+            
+            // Convertir hora programada a timestamp para comparación más precisa
+            $schedule_timestamp = strtotime($schedule_time);
+            $current_timestamp = strtotime($current_hour);
+            
+            error_log("Verificando programación: " . $schedule['id'] . " - Hora programada: " . $schedule_time);
             
             switch ($schedule['type']) {
                 case 'daily':
-                    if ($current_hour == $schedule['time']) {
+                    // Verificar solo la hora y minuto, ignorando segundos
+                    if ($current_hour == $schedule_time) {
                         $should_run = true;
+                        error_log("✅ Programación DIARIA coincide: " . $schedule_time . " = " . $current_hour);
                     }
                     break;
                     
                 case 'weekly':
-                    if (isset($schedule['day']) && $current_day_of_week == $schedule['day'] && $current_hour == $schedule['time']) {
+                    if (isset($schedule['day']) && 
+                        $current_day_of_week == $schedule['day'] && 
+                        $current_hour == $schedule_time) {
                         $should_run = true;
+                        error_log("✅ Programación SEMANAL coincide: Día " . $schedule['day'] . " a las " . $schedule_time);
                     }
                     break;
                     
                 case 'monthly':
-                    if (isset($schedule['day']) && $current_day_of_month == $schedule['day'] && $current_hour == $schedule['time']) {
+                    if (isset($schedule['day']) && 
+                        $current_day_of_month == $schedule['day'] && 
+                        $current_hour == $schedule_time) {
                         $should_run = true;
+                        error_log("✅ Programación MENSUAL coincide: Día " . $schedule['day'] . " a las " . $schedule_time);
                     }
                     break;
             }
             
             if ($should_run) {
-                error_log("✅ Ejecutando programación: " . $schedule['id']);
+                error_log("✅ EJECUTANDO programación: " . $schedule['id']);
+                
                 // CREAR LOCK - evitar que otros usuarios ejecuten
-                file_put_contents($lock_file, time());
+                file_put_contents($lock_file, $current_time);
                 
-                // Ejecutar backup
-                $backup_result = createScheduledBackup($schedule['id']);
+                // Pequeño delay aleatorio para evitar conflictos si hay múltiples programaciones
+                usleep(rand(100000, 500000)); // 0.1 a 0.5 segundos
                 
-                if ($backup_result) {
-                    // Marcar como ejecutado hoy
-                    file_put_contents($last_run_file, $current_date);
-                    $executed_count++;
-                    $executed_backups[] = $schedule['id'];
+                // Verificar nuevamente el lock para evitar condiciones de carrera
+                if (file_exists($lock_file) && file_get_contents($lock_file) == $current_time) {
+                    // Ejecutar backup
+                    $backup_result = createScheduledBackup($schedule['id']);
                     
-                    // Registrar en log
-                    error_log("✅ Backup automático ejecutado: " . $schedule['id'] . " - " . date('Y-m-d H:i:s'));
+                    if ($backup_result) {
+                        // Marcar como ejecutado con timestamp actual
+                        file_put_contents($last_run_file, $current_time);
+                        $executed_count++;
+                        $executed_backups[] = $schedule['id'];
+                        
+                        // Registrar en log
+                        error_log("✅ Backup automático ejecutado EXITOSAMENTE: " . $schedule['id'] . " - " . date('d/m/Y H:i:s'));
+                    } else {
+                        error_log("❌ Falló backup programado: " . $schedule['id']);
+                    }
+                    
+                    // ELIMINAR LOCK después de ejecutar
+                    unlink($lock_file);
                 } else {
-                    error_log("❌ Falló backup programado: " . $schedule['id']);
+                    error_log("🚫 Lock fue tomado por otro proceso - cancelando ejecución");
                 }
-                
-                // ELIMINAR LOCK después de ejecutar
-                unlink($lock_file);
             } else {
-                error_log("❌ No cumple condiciones: " . $schedule['id'] . " - Hora programada: " . $schedule['time'] . " - Hora actual: " . $current_hour);
+                error_log("❌ No cumple condiciones: " . $schedule['id'] . 
+                         " - Hora programada: " . $schedule_time . 
+                         " - Hora actual: " . $current_hour . 
+                         " - Día semana: " . $current_day_of_week . 
+                         " - Día mes: " . $current_day_of_month);
             }
         }
         
         $message = $executed_count > 0 
-            ? "Se ejecutaron {$executed_count} backups programados"
+            ? "Se ejecutaron {$executed_count} backups programados: " . implode(', ', $executed_backups)
             : 'No se requirió ejecutar backups programados en este momento';
             
         return [
@@ -816,7 +853,7 @@ function createScheduledBackup($schedule_id) {
     global $conn, $backup_dir, $max_backups;
     
     try {
-        // Generar nombre de archivo con formato: backup_auto_dd-mm-YYYY_HH-MM-SS.sql
+        // Generar nombre de archivo con formato: backup_auto_YYYY-MM-DD_HH-MM-SS.sql
         $filename = 'backup_auto_' . date('d-m-Y_H-i-s') . '.sql';
         $filepath = $backup_dir . $filename;
         
@@ -881,13 +918,16 @@ function createScheduledBackup($schedule_id) {
             // Limpiar backups antiguos si excedemos el límite
             cleanupOldBackups();
             
-            error_log("Backup automático ejecutado: " . $filename);
+            error_log("✅ Backup automático creado exitosamente: " . $filename);
+            return true;
         } else {
-            error_log("Error al guardar backup automático: " . $filename);
+            error_log("❌ Error al guardar backup automático: " . $filename);
+            return false;
         }
         
     } catch (Exception $e) {
-        error_log("Error en backup automático: " . $e->getMessage());
+        error_log("❌ Error en backup automático: " . $e->getMessage());
+        return false;
     }
 }
 
