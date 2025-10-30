@@ -48,6 +48,10 @@ class ConfigEmail {
             $this->mail->SMTPSecure = $config['seguro'];
             $this->mail->Port = $config['puerto'];
             
+            // CONFIGURACIÓN UTF-8 PARA CARACTERES ESPECIALES
+            $this->mail->CharSet = 'UTF-8';
+            $this->mail->Encoding = 'base64';
+            
             // Configuración del remitente
             $this->mail->setFrom($config['email_from'], $config['nombre_from']);
             $this->mail->isHTML(true);
@@ -83,10 +87,12 @@ class ConfigEmail {
             $link_recuperacion = $base_url . '/restablecer_password.php?token=' . $token;
             
             if ($codigo_verificacion) {
+                // FORMATO CORRECTO PARA ASUNTO CON ACENTOS
                 $this->mail->Subject = 'Código de Verificación - Taller de Bicicletas Zelaya';
                 $body = $this->crearCuerpoCorreoConCodigo($nombre, $link_recuperacion, $codigo_verificacion);
                 $this->mail->AltBody = $this->crearCuerpoTextoPlanoConCodigo($nombre, $link_recuperacion, $codigo_verificacion);
             } else {
+                // FORMATO CORRECTO PARA ASUNTO CON ACENTOS
                 $this->mail->Subject = 'Restablecer Contraseña - Taller de Bicicletas Zelaya';
                 $body = $this->crearCuerpoCorreoConEnlace($nombre, $link_recuperacion);
                 $this->mail->AltBody = $this->crearCuerpoTextoPlanoConEnlace($nombre, $link_recuperacion);
@@ -110,6 +116,7 @@ class ConfigEmail {
 
     // ✅ NUEVO MÉTODO: Cuerpo de email con código
     private function crearCuerpoCorreoConCodigo($nombre, $link, $codigo) {
+        // FORMATO DÍA/MES/AÑO
         $expiracion = date('d/m/Y H:i', time() + (5 * 60));
         
         return "
@@ -173,6 +180,7 @@ class ConfigEmail {
 
     // ✅ NUEVO MÉTODO: Versión texto plano con código
     private function crearCuerpoTextoPlanoConCodigo($nombre, $link, $codigo) {
+        // FORMATO DÍA/MES/AÑO
         $expiracion = date('d/m/Y H:i', time() + (5 * 60));
         
         return "
@@ -210,6 +218,7 @@ Este es un correo automático, no respondas a este mensaje.
             $this->mail->clearAddresses();
             $this->mail->addAddress($destinatario, $nombre);
             
+            // ASUNTO CORREGIDO CON UTF-8
             $this->mail->Subject = "Factura Electrónica - Venta #" . $datos_factura['id_venta'] . " - Taller de Bicicletas Zelaya";
             
             $body = $this->crearCuerpoFacturaHTML($datos_factura);
@@ -231,6 +240,9 @@ Este es un correo automático, no respondas a este mensaje.
     }
 
     private function crearCuerpoFacturaHTML($datos) {
+        // CONVERTIR FECHA A FORMATO DÍA/MES/AÑO
+        $fecha_formateada = $this->formatearFecha($datos['fecha']);
+        
         $html = "
         <!DOCTYPE html>
         <html lang='es'>
@@ -261,7 +273,7 @@ Este es un correo automático, no respondas a este mensaje.
                     <h2>Factura Electrónica #" . $datos['id_venta'] . "</h2>
                     
                     <div class='info-box'>
-                        <p><strong>Fecha:</strong> " . $datos['fecha'] . "</p>
+                        <p><strong>Fecha:</strong> " . $fecha_formateada . "</p>
                         <p><strong>Cliente:</strong> " . htmlspecialchars($datos['cliente_nombre']) . "</p>
                         <p><strong>Atendido por:</strong> " . htmlspecialchars($datos['usuario_nombre']) . "</p>
                     </div>";
@@ -331,10 +343,13 @@ Este es un correo automático, no respondas a este mensaje.
     }
 
     private function crearCuerpoFacturaTexto($datos) {
+        // CONVERTIR FECHA A FORMATO DÍA/MES/AÑO
+        $fecha_formateada = $this->formatearFecha($datos['fecha']);
+        
         $texto = "FACTURA ELECTRONICA - Taller de Bicicletas Zelaya\n";
         $texto .= "=====================================================\n\n";
         $texto .= "Venta #" . $datos['id_venta'] . "\n";
-        $texto .= "Fecha: " . $datos['fecha'] . "\n";
+        $texto .= "Fecha: " . $fecha_formateada . "\n";
         $texto .= "Cliente: " . $datos['cliente_nombre'] . "\n";
         $texto .= "Atendido por: " . $datos['usuario_nombre'] . "\n\n";
         
@@ -364,8 +379,25 @@ Este es un correo automático, no respondas a este mensaje.
         return $texto;
     }
 
+    // ✅ NUEVO MÉTODO PARA FORMATEAR FECHAS
+    private function formatearFecha($fecha) {
+        // Si la fecha ya está en formato d/m/Y, la dejamos igual
+        if (preg_match('/^\d{1,2}\/\d{1,2}\/\d{4}/', $fecha)) {
+            return $fecha;
+        }
+        
+        // Si viene en formato Y-m-d (de base de datos), la convertimos
+        if (preg_match('/^\d{4}-\d{1,2}-\d{1,2}/', $fecha)) {
+            return date('d/m/Y', strtotime($fecha));
+        }
+        
+        // Si no reconocemos el formato, devolvemos la fecha original
+        return $fecha;
+    }
+
     // Métodos existentes que deben estar presentes
     private function crearCuerpoCorreoConEnlace($nombre, $link) {
+        // FORMATO DÍA/MES/AÑO
         $expiracion = date('d/m/Y H:i', time() + (5 * 60));
         
         return "
@@ -424,6 +456,7 @@ Este es un correo automático, no respondas a este mensaje.
     }
 
     private function crearCuerpoTextoPlanoConEnlace($nombre, $link) {
+        // FORMATO DÍA/MES/AÑO
         $expiracion = date('d/m/Y H:i', time() + (5 * 60));
         
         return "
