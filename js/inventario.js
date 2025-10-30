@@ -190,20 +190,20 @@ function mostrarRepuestosEnTabla() {
     repuestosData.forEach(repuesto => {
         const fila = document.createElement("tr");
         
-        // Determinar clase de stock
+        // NUEVA LÓGICA: Determinar clase de stock
         let stockClass = '';
         let badgeClass = 'badge-secondary';
         
         if (repuesto.stock_actual === 0) {
+            // Stock crítico: solo cuando es 0
             stockClass = 'stock-cero';
             badgeClass = 'badge-danger';
         } else if (repuesto.stock_actual <= repuesto.stock_minimo) {
-            stockClass = 'stock-critico';
-            badgeClass = 'badge-warning';
-        } else if (repuesto.stock_actual <= (repuesto.stock_minimo * 1.5)) {
+            // Stock bajo: cuando es igual o menor al mínimo
             stockClass = 'stock-bajo';
             badgeClass = 'badge-warning';
         } else {
+            // Stock normal: cuando es mayor al mínimo
             badgeClass = 'badge-success';
         }
 
@@ -429,6 +429,7 @@ function aplicarFiltros() {
 function calcularEstadisticas() {
     const totalRepuestos = repuestosData.length;
     
+    // NUEVA LÓGICA: Stock bajo cuando es igual o menor al mínimo (pero mayor que 0)
     const stockBajo = repuestosData.filter(r => 
         r.stock_actual > 0 && r.stock_actual <= r.stock_minimo
     ).length;
@@ -451,6 +452,7 @@ function calcularEstadisticas() {
 }
 
 function mostrarAlertas() {
+    // NUEVA LÓGICA:
     const repuestosCriticos = repuestosData.filter(r => r.stock_actual === 0);
     const repuestosBajos = repuestosData.filter(r => 
         r.stock_actual > 0 && r.stock_actual <= r.stock_minimo
@@ -476,7 +478,7 @@ function mostrarAlertas() {
     if (repuestosBajos.length > 0) {
         alertasHTML += `
             <div class="alerta alerta-peligro">
-                ⚠️ <strong>${repuestosBajos.length} repuestos con stock bajo</strong>
+                ⚠️ <strong>${repuestosBajos.length} repuestos con stock bajo </strong>
                 <button onclick="filtrarStockBajo()">Ver todos</button>
             </div>
         `;
