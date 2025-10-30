@@ -519,14 +519,127 @@ function filtrarSinPrecio() {
     aplicarFiltros();
 }
 
-// Funciones de exportación
-function exportarPDF() {
-    mostrarMensaje('advertencia', 'Exportar PDF', 'Función de exportación PDF en desarrollo', 3000);
+function generarPDFStockBajo() {
+    // Filtrar repuestos con stock bajo o crítico
+    const repuestosProblema = repuestosData.filter(repuesto => 
+        repuesto.stock_actual === 0 || repuesto.stock_actual <= repuesto.stock_minimo
+    );
+
+    if (repuestosProblema.length === 0) {
+        mostrarMensaje('info', 'Sin stock bajo', 'No hay repuestos con stock bajo o crítico para reportar.');
+        return;
+    }
+
+    try {
+        // Crear nuevo documento PDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Título
+        doc.setFontSize(16);
+        doc.setTextColor(40, 40, 40);
+        doc.text('LISTA DE COMPRA DE STOCK BAJO', 105, 15, { align: 'center' });
+        
+        // Subtítulo
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text('Taller de Bicicletas Zelaya', 105, 22, { align: 'center' });
+        doc.text(`Generado: ${new Date().toLocaleDateString()}`, 105, 28, { align: 'center' });
+
+        // Preparar datos para la tabla
+        const tableData = repuestosProblema.map((repuesto, index) => {
+            const estado = repuesto.stock_actual === 0 ? 'CRÍTICO' : 'BAJO';
+            const diferencia = repuesto.stock_minimo - repuesto.stock_actual;
+            
+            return [
+                index + 1,
+                repuesto.codigo,
+                repuesto.nombre,
+                repuesto.marca || 'N/A',
+                repuesto.medida || 'N/A',
+                repuesto.stock_actual,
+                repuesto.stock_minimo,
+                diferencia > 0 ? `Faltan ${diferencia}` : 'En mínimo',
+                estado,
+                repuesto.precio > 0 ? `$${parseFloat(repuesto.precio).toFixed(2)}` : 'Sin precio'
+            ];
+        });
+
+        // Configurar y generar la tabla
+        doc.autoTable({
+            startY: 35,
+            head: [
+                ['#', 'Código', 'Nombre', 'Marca', 'Medida', 'Stock', 'Mínimo', 'Diferencia', 'Estado', 'Precio']
+            ],
+            body: tableData,
+            theme: 'grid',
+            styles: {
+                fontSize: 8,
+                cellPadding: 2,
+                lineColor: [200, 200, 200],
+                lineWidth: 0.1
+            },
+            headStyles: {
+                fillColor: [220, 53, 69], // Rojo para alerta
+                textColor: [255, 255, 255],
+                fontStyle: 'bold'
+            },
+            alternateRowStyles: {
+                fillColor: [248, 249, 250]
+            },
+            columnStyles: {
+                0: { cellWidth: 10 }, // #
+                1: { cellWidth: 25 }, // Código
+                2: { cellWidth: 40 }, // Nombre
+                3: { cellWidth: 25 }, // Marca
+                4: { cellWidth: 25 }, // Medida
+                5: { cellWidth: 15 }, // Stock
+                6: { cellWidth: 15 }, // Mínimo
+                7: { cellWidth: 25 }, // Diferencia
+                8: { cellWidth: 20 }, // Estado
+                9: { cellWidth: 20 }  // Precio
+            },
+            didDrawCell: function(data) {
+                // Resaltar estado crítico en rojo
+                if (data.column.index === 8 && data.cell.raw === 'CRÍTICO') {
+                    doc.setFillColor(220, 53, 69);
+                    doc.setTextColor(255, 255, 255);
+                    doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height, 'F');
+                    doc.text(data.cell.raw, data.cell.x + 2, data.cell.y + 4);
+                }
+                // Resaltar estado bajo en naranja
+                else if (data.column.index === 8 && data.cell.raw === 'BAJO') {
+                    doc.setFillColor(255, 193, 7);
+                    doc.setTextColor(0, 0, 0);
+                    doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height, 'F');
+                    doc.text(data.cell.raw, data.cell.x + 5, data.cell.y + 4);
+                }
+            }
+        });
+
+        // Estadísticas al final
+        const finalY = doc.lastAutoTable.finalY + 10;
+        
+        const criticos = repuestosProblema.filter(r => r.stock_actual === 0).length;
+        const bajos = repuestosProblema.filter(r => r.stock_actual > 0 && r.stock_actual <= r.stock_minimo).length;
+        
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`Total de repuestos con problemas: ${repuestosProblema.length}`, 14, finalY);
+        
+
+        // Guardar el PDF
+        const fecha = new Date().toISOString().split('T')[0];
+        doc.save(`stock_bajo_${fecha}.pdf`);
+
+        mostrarMensaje('exito', 'PDF Generado', `Se generó el reporte con ${repuestosProblema.length} repuestos con stock bajo/crítico`);
+
+    } catch (error) {
+        console.error('Error generando PDF:', error);
+        mostrarMensaje('error', 'Error', 'No se pudo generar el PDF. Intenta nuevamente.');
+    }
 }
 
-function exportarExcel() {
-    mostrarMensaje('advertencia', 'Exportar Excel', 'Función de exportación Excel en desarrollo', 3000);
-}
 
 // Modal de mensajes
 function mostrarMensaje(tipo, titulo, texto, tiempoAutoCerrar = 4000) {
