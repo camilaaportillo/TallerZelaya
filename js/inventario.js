@@ -2,6 +2,10 @@
 let repuestosData = [];
 let repuestoSeleccionado = null;
 let filtrosActivos = {};
+let ultimoPrecioCompra = null;
+let precioCompraFecha = null;
+
+
 
 // Elementos del DOM
 const modalEditarPrecio = document.getElementById("modalEditarPrecio");
@@ -106,14 +110,21 @@ function configurarEventos() {
 function validarPrecioEnTiempoReal() {
     const precioInput = document.getElementById('nuevo_precio_venta');
     const alertaPrecioCero = document.getElementById('alertaPrecioCero');
+    const alertaPrecioInferior = document.getElementById('alertaPrecioInferior');
     const precio = parseFloat(precioInput.value);
+
+    // Resetear estilos
+    precioInput.style.borderColor = '#0026ff';
+    alertaPrecioCero.style.display = 'none';
+    alertaPrecioInferior.style.display = 'none';
 
     if (precio === 0) {
         alertaPrecioCero.style.display = 'block';
         precioInput.style.borderColor = '#dc3545';
-    } else {
-        alertaPrecioCero.style.display = 'none';
-        precioInput.style.borderColor = '#0026ff';
+    } else if (ultimoPrecioCompra && precio < ultimoPrecioCompra) {
+        // Mostrar advertencia si el precio es inferior al de compra
+        alertaPrecioInferior.style.display = 'block';
+        precioInput.style.borderColor = '#ffc107';
     }
 }
 
@@ -235,7 +246,7 @@ function mostrarRepuestosEnTabla() {
     });
 }
 
-function abrirModalEditarPrecio(idRepuesto) {
+async function abrirModalEditarPrecio(idRepuesto) {
     console.log('✏️ Editando precio para repuesto ID:', idRepuesto);
     
     const repuesto = repuestosData.find(r => r.id_repuesto === parseInt(idRepuesto));
@@ -260,6 +271,50 @@ function abrirModalEditarPrecio(idRepuesto) {
     
     document.getElementById('nuevo_precio_venta').value = precioActual > 0 ? precioActual : '';
     document.getElementById('alertaPrecioCero').style.display = 'none';
+    document.getElementById('alertaPrecioInferior').style.display = 'none';
+
+    // OBTENER ÚLTIMO PRECIO DE COMPRA - CON MÁS ROBUSTEZ
+    try {
+        console.log('📡 Solicitando último precio de compra...');
+        
+        const respuesta = await fetch(`php/obtenerUltimoPrecioCompra.php?id_repuesto=${idRepuesto}`);
+        
+        console.log('📥 Estado de respuesta:', respuesta.status);
+        
+        if (!respuesta.ok) {
+            throw new Error(`Error del servidor: ${respuesta.status} ${respuesta.statusText}`);
+        }
+        
+        const datos = await respuesta.json();
+        console.log('📊 Datos recibidos:', datos);
+        
+        if (datos.success && datos.ultimo_precio_compra !== null) {
+            ultimoPrecioCompra = parseFloat(datos.ultimo_precio_compra);
+            precioCompraFecha = datos.fecha_compra || 'Fecha no disponible';
+            
+            document.getElementById('precio_ultima_compra').textContent = 
+                `$${ultimoPrecioCompra.toFixed(2)} (${precioCompraFecha})`;
+            
+            console.log('✅ Último precio de compra cargado:', ultimoPrecioCompra);
+        } else if (datos.success && datos.ultimo_precio_compra === null) {
+            ultimoPrecioCompra = null;
+            precioCompraFecha = null;
+            document.getElementById('precio_ultima_compra').textContent = 
+                datos.message || 'No hay compras registradas';
+            console.log('ℹ️ No hay compras registradas para este repuesto');
+        } else {
+            throw new Error(datos.error || 'Error desconocido al obtener precio de compra');
+        }
+    } catch (error) {
+        console.error('💥 Error al obtener último precio de compra:', error);
+        ultimoPrecioCompra = null;
+        precioCompraFecha = null;
+        document.getElementById('precio_ultima_compra').textContent = 'Error al cargar';
+        
+        // Mostrar mensaje de error más específico
+        mostrarMensaje('error', 'Error', 
+            `No se pudo cargar el último precio de compra: ${error.message}`);
+    }
 
     // Mostrar modal
     modalEditarPrecio.style.display = 'flex';
@@ -273,6 +328,8 @@ function abrirModalEditarPrecio(idRepuesto) {
 function cerrarModalEditarPrecio() {
     modalEditarPrecio.style.display = 'none';
     repuestoSeleccionado = null;
+    ultimoPrecioCompra = null;
+    precioCompraFecha = null;
 }
 
 async function guardarPrecio(e) {
@@ -283,10 +340,11 @@ async function guardarPrecio(e) {
 
     console.log('🔄 Intentando guardar precio:', { 
         idRepuesto: idRepuesto, 
-        nuevoPrecio: nuevoPrecio
+        nuevoPrecio: nuevoPrecio,
+        ultimoPrecioCompra: ultimoPrecioCompra
     });
 
-    // Validaciones
+    // Validaciones básicas
     if (!idRepuesto || idRepuesto === '') {
         mostrarMensaje('error', 'Error', 'ID de repuesto no válido');
         return;
@@ -309,6 +367,16 @@ async function guardarPrecio(e) {
         return;
     }
 
+    // ✅ ADVERTENCIA: Si el precio es inferior al de compra, pedir confirmación
+    if (ultimoPrecioCompra && nuevoPrecio < ultimoPrecioCompra) {
+        const confirmar = confirm(`⚠️ ADVERTENCIA:\n\nEl precio de venta ($${nuevoPrecio.toFixed(2)}) es inferior al último precio de compra ($${ultimoPrecioCompra.toFixed(2)}).\n\n¿Estás seguro de que deseas continuar?`);
+        
+        if (!confirmar) {
+            return; // El usuario canceló
+        }
+    }
+
+    // Proceder con el guardado...
     try {
         const datos = {
             id_repuesto: parseInt(idRepuesto),

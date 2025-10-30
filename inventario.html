@@ -122,35 +122,43 @@
         </section>
     </main>
 
-    <!-- Modal para Editar Precio -->
-    <div id="modalEditarPrecio" class="modal" style="display:none;">
-        <div class="modal-contenido">
-            <h2>💰 Editar Precio de Venta</h2>
-            <form id="formEditarPrecio">
-                <input type="hidden" id="precio_id_repuesto">
-                
-                <div class="info-repuesto">
-                    <p><strong>Repuesto:</strong> <span id="precio_nombre_repuesto"></span></p>
-                    <p><strong>Código:</strong> <span id="precio_codigo_repuesto"></span></p>
-                    <p><strong>Precio Actual:</strong> <span id="precio_actual_repuesto"></span></p>
-                </div>
+   <!-- Modal para Editar Precio -->
+<div id="modalEditarPrecio" class="modal" style="display:none;">
+    <div class="modal-contenido">
+        <h2>💰 Editar Precio de Venta</h2>
+        <form id="formEditarPrecio">
+            <input type="hidden" id="precio_id_repuesto">
+            
+            <div class="info-repuesto">
+                <p><strong>Repuesto:</strong> <span id="precio_nombre_repuesto"></span></p>
+                <p><strong>Código:</strong> <span id="precio_codigo_repuesto"></span></p>
+                <p><strong>Precio Actual:</strong> <span id="precio_actual_repuesto"></span></p>
+                <!-- NUEVO: Mostrar último precio de compra -->
+                <p><strong>Último Precio de Compra:</strong> <span id="precio_ultima_compra">$0.00</span></p>
+            </div>
 
-                <label for="nuevo_precio_venta">Nuevo Precio de Venta *</label>
-                <input type="number" id="nuevo_precio_venta" name="nuevo_precio_venta" 
-                       step="0.01" min="0.01" required placeholder="0.00">
+            <label for="nuevo_precio_venta">Nuevo Precio de Venta *</label>
+            <input type="number" id="nuevo_precio_venta" name="nuevo_precio_venta" 
+                   step="0.01" min="0.01" required placeholder="0.00">
 
-                <div class="precio-alerta" id="alertaPrecioCero" style="display: none;">
-                    ⚠️ El precio no puede ser $0.00
-                </div>
+            <div class="precio-alerta" id="alertaPrecioCero" style="display: none;">
+                ⚠️ El precio no puede ser $0.00
+            </div>
+            
+            <!-- NUEVO: Alerta para precio inferior al de compra -->
+            <div class="precio-alerta precio-advertencia" id="alertaPrecioInferior" style="display: none;">
+                ⚠️ El precio de venta es inferior al último precio de compra. 
+                Esto podría generar pérdidas. ¿Estás seguro de continuar?
+            </div>
 
-                <div class="modal-botones">
-                    <button type="submit" class="btn-azul">💾 Guardar Precio</button>
-                    <button type="button" class="btn-cancelar" onclick="cerrarModalEditarPrecio()">Cancelar</button>
-                </div>
-            </form>
-            <button class="btn-cerrar-otro" onclick="cerrarModalEditarPrecio()">X</button>
-        </div>
+            <div class="modal-botones">
+                <button type="submit" class="btn-azul">💾 Guardar Precio</button>
+                <button type="button" class="btn-cancelar" onclick="cerrarModalEditarPrecio()">Cancelar</button>
+            </div>
+        </form>
+        <button class="btn-cerrar-otro" onclick="cerrarModalEditarPrecio()">X</button>
     </div>
+</div>
 
     <!-- Modal de Mensajes Global -->
     <div id="modalMensaje" class="modal-mensaje">
