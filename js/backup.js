@@ -1,25 +1,26 @@
 // FUNCIÓN AUXILIAR PARA CERRAR MODALES DE FORMA SEGURA
 function closeModal(modalId) {
     console.log('🚪 Cerrando modal:', modalId);
-    
+
     const modalElement = document.getElementById(modalId);
-    
+
     if (!modalElement) {
         console.error('❌ No se encontró el modal:', modalId);
         return;
     }
-    
-    // Método 1: Usar Bootstrap Modal
+
+    // Usar Bootstrap Modal si está inicializado
     const modal = bootstrap.Modal.getInstance(modalElement);
     if (modal) {
         modal.hide();
         console.log('✅ Modal cerrado con Bootstrap');
     } else {
-        // Método 2: Cierre manual
+        // Cierre manual como fallback
         modalElement.classList.remove('show');
         modalElement.style.display = 'none';
+        modalElement.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('modal-open');
-        
+
         // Remover backdrop
         const backdrop = document.querySelector('.modal-backdrop');
         if (backdrop) {
@@ -27,12 +28,14 @@ function closeModal(modalId) {
         }
         console.log('✅ Modal cerrado manualmente');
     }
-    
-    // Limpiar variables
+
+    // Limpiar variables globales
     if (modalId === 'restoreModal') {
         currentBackupToRestore = '';
     } else if (modalId === 'deleteModal') {
         currentBackupToDelete = '';
+    } else if (modalId === 'passwordModal') {
+        document.getElementById('admin-password').value = '';
     }
 }
 // =============================================
@@ -53,7 +56,7 @@ class BackupMonitor {
 
     startPolling() {
         // Verificar cada 1 minuto (60000 ms)
-        const jitter = Math.random() * 50000; // 0-30 segundos de variación
+        const jitter = Math.random() * 30000; // 0-30 segundos de variación
 
         setTimeout(() => {
             this.checkInterval = setInterval(() => {
@@ -244,72 +247,78 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Inicializar campos de programación
         updateScheduleFields();
+        // INICIALIZAR VALIDACIÓN DE CONTRASEÑA
+        setupPasswordValidation();
     }
 
     function setupEventListeners() {
-    // Botón crear backup
-    btnCreateBackup.addEventListener('click', function () {
-        currentActionType = 'create_backup';
-        showPasswordModal('crear un nuevo backup');
-    });
+        // Botón crear backup
+        btnCreateBackup.addEventListener('click', function () {
+            currentActionType = 'create_backup';
+            showPasswordModal('crear un nuevo backup');
+        });
 
-    // Botón programar backup
-    btnScheduleBackup.addEventListener('click', function () {
-        currentActionType = 'save_schedule';
-        showPasswordModal('programar un backup automático');
-    });
+        // Botón programar backup
+        btnScheduleBackup.addEventListener('click', function () {
+            currentActionType = 'save_schedule';
+            showPasswordModal('programar un backup automático');
+        });
 
-    // Botón confirmar subida
-    btnUploadSubmit.addEventListener('click', uploadBackup);
+        // Botón confirmar subida
+        btnUploadSubmit.addEventListener('click', uploadBackup);
 
-    // Botón confirmar programación
-    btnScheduleSubmit.addEventListener('click', saveSchedule);
+        // Botón confirmar programación
+        btnScheduleSubmit.addEventListener('click', saveSchedule);
 
-    // Botón actualizar programaciones
-    btnRefreshSchedules.addEventListener('click', function () {
-        loadSchedules();
-        showAlert('Programaciones actualizadas', 'info');
-    });
+        // Botón actualizar programaciones
+        btnRefreshSchedules.addEventListener('click', function () {
+            loadSchedules();
+            showAlert('Programaciones actualizadas', 'info');
+        });
 
-    // Botón confirmar contraseña
-    btnPasswordSubmit.addEventListener('click', verifyPassword);
+        // Botón confirmar contraseña
+        btnPasswordSubmit.addEventListener('click', verifyPassword);
 
-    //  BOTÓN CONFIRMAR RESTAURACIÓN 
-    btnRestoreConfirm.addEventListener('click', function () {
-        console.log('🖱️ Botón restaurar confirmado clickeado - SOLICITANDO CONTRASEÑA');
-        currentActionType = 'restore_backup';
-        showPasswordModal('restaurar el backup');
-    });
+        // BOTÓN CONFIRMAR RESTAURACIÓN - CORREGIDO
+        btnRestoreConfirm.addEventListener('click', function () {
+            console.log('🖱️ Botón restaurar confirmado clickeado - SOLICITANDO CONTRASEÑA');
+            currentActionType = 'restore_backup';
+            // Cerrar modal de confirmación primero
+            closeModal('restoreModal');
+            showPasswordModal('restaurar el backup');
+        });
 
-    // BOTÓN CONFIRMAR ELIMINACIÓN 
-    btnDeleteConfirm.addEventListener('click', function () {
-        console.log('🖱️ Botón eliminar confirmado clickeado - SOLICITANDO CONTRASEÑA');
-        currentActionType = 'delete_backup';
-        showPasswordModal('eliminar el backup');
-    });
+        // BOTÓN CONFIRMAR ELIMINACIÓN - CORREGIDO
+        btnDeleteConfirm.addEventListener('click', function () {
+            console.log('🖱️ Botón eliminar confirmado clickeado - SOLICITANDO CONTRASEÑA');
+            currentActionType = 'delete_backup';
+            // Cerrar modal de confirmación primero
+            closeModal('deleteModal');
+            showPasswordModal('eliminar el backup');
+        });
 
- 
-    // Cambio en tipo de programación
-    scheduleType.addEventListener('change', function () {
-        updateScheduleFields();
-    });
+        // Cambio en tipo de programación
+        scheduleType.addEventListener('change', function () {
+            updateScheduleFields();
+        });
 
-    // Auto-actualización de interfaz
-    autoRefresh.addEventListener('change', function () {
-        if (this.checked) {
-            startAutoRefresh();
-        } else {
-            stopAutoRefresh();
-        }
-    });
+        // Auto-actualización de interfaz
+        autoRefresh.addEventListener('change', function () {
+            if (this.checked) {
+                startAutoRefresh();
+            } else {
+                stopAutoRefresh();
+            }
+        });
 
-    // Enter en campo de contraseña
-    document.getElementById('admin-password').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            verifyPassword();
-        }
-    });
-}
+        // Enter en campo de contraseña
+        document.getElementById('admin-password').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Prevenir envío del formulario
+                verifyPassword();
+            }
+        });
+    }
     // Función para verificar permisos
     function verificarPermisosBackup() {
         const usuario = JSON.parse(sessionStorage.getItem('usuario') || '{}');
@@ -337,29 +346,191 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Función para mostrar modal de contraseña
     function showPasswordModal(action) {
-        document.getElementById('password-message').textContent =
-            `Para ${action}, ingrese su contraseña de administrador:`;
-        document.getElementById('admin-password').value = '';
-
-        const passwordModal = new bootstrap.Modal(document.getElementById('passwordModal'));
-        passwordModal.show();
-
-        // Enfocar campo de contraseña
-        setTimeout(() => {
-            document.getElementById('admin-password').focus();
-        }, 500);
+    const passwordMessage = document.getElementById('password-message');
+    if (passwordMessage) {
+        passwordMessage.textContent = `Para ${action}, ingrese su contraseña de administrador:`;
     }
+    
+    // Resetear estado del formulario
+    resetPasswordForm();
+    
+    const passwordModal = new bootstrap.Modal(document.getElementById('passwordModal'));
+    passwordModal.show();
+
+    // Enfocar campo de contraseña
+    setTimeout(() => {
+        const passwordInput = document.getElementById('admin-password');
+        if (passwordInput) {
+            passwordInput.focus();
+        }
+    }, 500);
+}
+    // Función para resetear el formulario de contraseña
+   function resetPasswordForm() {
+    const passwordInput = document.getElementById('admin-password');
+    const passwordError = document.getElementById('password-error');
+    const passwordSuccess = document.getElementById('password-success');
+    const passwordAlert = document.getElementById('password-alert');
+    
+    if (passwordInput) {
+        // Limpiar campo
+        passwordInput.value = '';
+        
+        // Resetear clases de validación
+        passwordInput.classList.remove('is-invalid', 'is-valid');
+    }
+    
+    if (passwordError) {
+        passwordError.style.display = 'none';
+        passwordError.textContent = 'Por favor ingrese su contraseña';
+    }
+    
+    if (passwordSuccess) {
+        passwordSuccess.style.display = 'none';
+    }
+    
+    if (passwordAlert) {
+        passwordAlert.classList.add('d-none');
+    }
+    
+    // Restaurar botón
+    const submitBtn = document.getElementById('btn-password-submit');
+    if (submitBtn) {
+        submitBtn.innerHTML = '<i class="fas fa-check me-2"></i>Verificar';
+        submitBtn.disabled = false;
+    }
+}
+
+    // Función para mostrar error en el campo de contraseña
+   function showPasswordError(message) {
+    console.log('🔴 Mostrando error de contraseña:', message);
+    
+    const passwordInput = document.getElementById('admin-password');
+    const passwordError = document.getElementById('password-error');
+    const passwordAlert = document.getElementById('password-alert');
+    const passwordAlertMessage = document.getElementById('password-alert-message');
+    
+    // Validar que los elementos existan
+    if (!passwordInput) {
+        console.error('❌ No se encontró passwordInput');
+        return;
+    }
+    
+    // Mostrar error en el campo
+    passwordInput.classList.remove('is-valid');
+    passwordInput.classList.add('is-invalid');
+    
+    // Mostrar mensaje de error debajo del input
+    if (passwordError) {
+        passwordError.textContent = message || 'Contraseña incorrecta';
+        passwordError.style.display = 'block';
+    }
+    
+    // Mostrar alerta adicional si existe
+    if (passwordAlert && passwordAlertMessage) {
+        passwordAlertMessage.textContent = message || 'Contraseña incorrecta';
+        passwordAlert.classList.remove('d-none');
+    }
+    
+    // Enfocar y seleccionar el campo
+    passwordInput.focus();
+    passwordInput.select();
+}
+
+    // Función para mostrar éxito en el campo de contraseña
+   function showPasswordSuccess() {
+    const passwordInput = document.getElementById('admin-password');
+    const passwordSuccess = document.getElementById('password-success');
+    const passwordAlert = document.getElementById('password-alert');
+    
+    if (passwordInput) {
+        // Mostrar éxito en el campo
+        passwordInput.classList.remove('is-invalid');
+        passwordInput.classList.add('is-valid');
+    }
+    
+    if (passwordAlert) {
+        passwordAlert.classList.add('d-none');
+    }
+    
+    // Mostrar mensaje de éxito si existe
+    if (passwordSuccess) {
+        passwordSuccess.style.display = 'block';
+    }
+}
+    // Función mejorada para validar contraseña en tiempo real
+   function setupPasswordValidation() {
+    const passwordInput = document.getElementById('admin-password');
+    
+    if (!passwordInput) {
+        console.error('❌ No se encontró el campo de contraseña');
+        return;
+    }
+    
+    passwordInput.addEventListener('input', function() {
+        if (this.value.trim().length > 0) {
+            // Remover estados de error cuando el usuario empiece a escribir
+            this.classList.remove('is-invalid');
+            hidePasswordError();
+        }
+    });
+    
+    // Validar al perder el foco
+    passwordInput.addEventListener('blur', function() {
+        if (this.value.trim().length === 0) {
+            showPasswordError('Por favor ingrese su contraseña');
+        }
+    });
+}
+
+// Función para ocultar errores de contraseña
+function hidePasswordError() {
+    const passwordError = document.getElementById('password-error');
+    const passwordAlert = document.getElementById('password-alert');
+    
+    if (passwordError) {
+        passwordError.style.display = 'none';
+    }
+    
+    if (passwordAlert) {
+        passwordAlert.classList.add('d-none');
+    }
+}
 
     // Función para verificar contraseña
     function verifyPassword() {
-        const password = document.getElementById('admin-password').value;
+    const passwordInput = document.getElementById('admin-password');
+    
+    if (!passwordInput) {
+        console.error('❌ No se encontró el campo de contraseña');
+        showAlert('Error: No se puede acceder al campo de contraseña', 'danger');
+        return;
+    }
+    
+    const password = passwordInput.value.trim();
 
-        if (!password) {
-            showAlert('Por favor ingrese su contraseña', 'warning');
-            return;
-        }
+    // Validación básica del lado del cliente
+    if (!password) {
+        showPasswordError('Por favor ingrese su contraseña');
+        return;
+    }
 
-        console.log('🔐 Verificando contraseña para acción:', currentActionType);
+    if (password.length < 4) {
+        showPasswordError('La contraseña debe tener al menos 4 caracteres');
+        return;
+    }
+
+    console.log('🔐 Verificando contraseña para acción:', currentActionType);
+
+    // Mostrar estado de carga en el botón
+    const submitBtn = document.getElementById('btn-password-submit');
+    if (submitBtn) {
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Verificando...';
+        submitBtn.disabled = true;
+
+        // Ocultar errores previos
+        hidePasswordError();
 
         fetch('php/backup_manager.php', {
             method: 'POST',
@@ -368,81 +539,99 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             body: `action=check_password&password=${encodeURIComponent(password)}&action_type=${currentActionType}`
         })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error en la respuesta del servidor: ' + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('📨 Respuesta de verificación:', data);
-                if (data.success) {
-                    // Cerrar modal
-                    const passwordModal = bootstrap.Modal.getInstance(document.getElementById('passwordModal'));
-                    passwordModal.hide();
-
-                    // Ejecutar la acción correspondiente
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('📨 Respuesta de verificación:', data);
+            
+            // Restaurar botón
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            
+            if (data.success) {
+                // Mostrar éxito y proceder
+                showPasswordSuccess();
+                
+                // Pequeño delay para que el usuario vea el check verde
+                setTimeout(() => {
+                    closeModal('passwordModal');
                     console.log('✅ Contraseña correcta, ejecutando acción:', currentActionType);
                     executeActionAfterPassword();
-                } else {
-                    showAlert('Error: ' + data.message, 'danger');
-                    document.getElementById('admin-password').value = '';
-                    document.getElementById('admin-password').focus();
-                }
-            })
-            .catch(error => {
-                console.error('❌ Error de conexión:', error);
-                showAlert('Error de conexión: ' + error.message, 'danger');
-            });
-    }
-
-    // Función para ejecutar acción después de verificar contraseña
-   // Función para ejecutar acción después de verificar contraseña
-function executeActionAfterPassword() {
-    console.log('🎯 Ejecutando acción después de contraseña:', currentActionType);
-    
-    // Cerrar modal de contraseña primero
-    closeModal('passwordModal');
-    
-    switch (currentActionType) {
-        case 'create_backup':
-            console.log('🚀 Iniciando creación de backup...');
-            createBackup();
-            break;
-        case 'upload_backup':
-            console.log('📤 Mostrando modal de subida...');
-            const uploadModal = new bootstrap.Modal(document.getElementById('uploadModal'));
-            uploadModal.show();
-            break;
-        case 'restore_backup':
-            console.log('🔁 Restaurando backup:', currentBackupToRestore);
-            if (currentBackupToRestore) {
-                restoreBackup(currentBackupToRestore);
+                }, 800);
+                
             } else {
-                console.error('❌ No hay backup seleccionado para restaurar');
-                showAlert('Error: No hay backup seleccionado', 'danger');
+                // Mostrar error específico del servidor
+                showPasswordError(data.message || 'Contraseña incorrecta');
             }
-            break;
-        case 'delete_backup':
-            console.log('🗑️ Eliminando backup:', currentBackupToDelete);
-            if (currentBackupToDelete) {
-                deleteBackup(currentBackupToDelete);
-            } else {
-                console.error('❌ No hay backup seleccionado para eliminar');
-                showAlert('Error: No hay backup seleccionado', 'danger');
-            }
-            break;
-        case 'save_schedule':
-            console.log('⏰ Mostrando modal de programación...');
-            const scheduleModal = new bootstrap.Modal(document.getElementById('scheduleModal'));
-            scheduleModal.show();
-            break;
-        case 'delete_schedule':
-            console.log('🗑️ Eliminando programación...');
-            deleteScheduleConfirmed();
-            break;
+        })
+        .catch(error => {
+            console.error('❌ Error de conexión:', error);
+            
+            // Restaurar botón
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            
+            showPasswordError('Error de conexión con el servidor');
+        });
+    } else {
+        console.error('❌ No se encontró el botón de verificar');
+        showAlert('Error: No se puede acceder al botón de verificación', 'danger');
     }
 }
+    // Función para ejecutar acción después de verificar contraseña
+    function executeActionAfterPassword() {
+        console.log('🎯 Ejecutando acción después de contraseña:', currentActionType);
+
+        // Cerrar modal de contraseña primero
+        closeModal('passwordModal');
+
+        switch (currentActionType) {
+            case 'create_backup':
+                console.log('🚀 Iniciando creación de backup...');
+                createBackup();
+                break;
+            case 'upload_backup':
+                console.log('📤 Mostrando modal de subida...');
+                const uploadModal = new bootstrap.Modal(document.getElementById('uploadModal'));
+                uploadModal.show();
+                break;
+            case 'restore_backup':
+                console.log('🔁 Restaurando backup:', currentBackupToRestore);
+                if (currentBackupToRestore) {
+                    // CERRAR MODAL DE CONFIRMACIÓN PRIMERO
+                    closeModal('restoreModal');
+                    restoreBackup(currentBackupToRestore);
+                } else {
+                    console.error('❌ No hay backup seleccionado para restaurar');
+                    showAlert('No hay backup seleccionado para restaurar', 'danger');
+                }
+                break;
+            case 'delete_backup':
+                console.log('🗑️ Eliminando backup:', currentBackupToDelete);
+                if (currentBackupToDelete) {
+                    // CERRAR MODAL DE CONFIRMACIÓN PRIMERO
+                    closeModal('deleteModal');
+                    deleteBackup(currentBackupToDelete);
+                } else {
+                    console.error('❌ No hay backup seleccionado para eliminar');
+                    showAlert('No hay backup seleccionado para eliminar', 'danger');
+                }
+                break;
+            case 'save_schedule':
+                console.log('⏰ Mostrando modal de programación...');
+                const scheduleModal = new bootstrap.Modal(document.getElementById('scheduleModal'));
+                scheduleModal.show();
+                break;
+            case 'delete_schedule':
+                console.log('🗑️ Eliminando programación...');
+                deleteScheduleConfirmed();
+                break;
+        }
+    }
     // Función para crear backup
     function createBackup() {
         console.log('🛠️ Iniciando proceso de creación de backup...');
@@ -551,89 +740,72 @@ function executeActionAfterPassword() {
             });
     }
 
-    // Función para restaurar backup
- 
-function restoreBackup(filename) {
-    console.log('🔁 Restaurando backup:', filename);
-    
-    fetch('php/backup_manager.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'action=restore_backup&filename=' + encodeURIComponent(filename)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Error HTTP: ' + response.status);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('📨 Respuesta de restauración:', data);
-        
-        // CERRAR EL MODAL PRIMERO - FORZAR CIERRE
-        closeModal('restoreModal');
-        
-        if (data.success) {
-            showAlert('✅ Backup restaurado correctamente', 'success');
-        } else {
-            showAlert('❌ Error al restaurar backup: ' + data.message, 'danger');
-        }
-    })
-    .catch(error => {
-        console.error('❌ Error en restoreBackup:', error);
-        
-        // Cerrar modal incluso en caso de error
-        closeModal('restoreModal');
-        
-        showAlert('❌ Error de conexión: ' + error.message, 'danger');
-    });
-}
+    // Función mejorada para restaurar backup
+    function restoreBackup(filename) {
+        console.log('🔁 Restaurando backup:', filename);
+
+        fetch('php/backup_manager.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'action=restore_backup&filename=' + encodeURIComponent(filename)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error HTTP: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('📨 Respuesta de restauración:', data);
+
+                if (data.success) {
+                    showAlert('✅ Backup restaurado correctamente', 'success');
+                } else {
+                    showAlert('❌ Error al restaurar backup: ' + data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('❌ Error en restoreBackup:', error);
+                showAlert('❌ Error de conexión: ' + error.message, 'danger');
+            });
+    }
 
     // Función para eliminar backup
-function deleteBackup(filename) {
-    console.log('🗑️ Eliminando backup:', filename);
-    
-    fetch('php/backup_manager.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'action=delete_backup&filename=' + encodeURIComponent(filename)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Error HTTP: ' + response.status);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('📨 Respuesta de eliminación:', data);
-        
-        // CERRAR EL MODAL PRIMERO - FORZAR CIERRE
-        closeModal('deleteModal');
-        
-        if (data.success) {
-            showAlert('✅ Backup eliminado correctamente', 'success');
-            // Actualizar lista
-            loadBackups();
-            loadStats();
-            if (typeof loadBackupLogs === 'function') loadBackupLogs();
-        } else {
-            showAlert('❌ Error al eliminar backup: ' + data.message, 'danger');
-        }
-    })
-    .catch(error => {
-        console.error('❌ Error en deleteBackup:', error);
-        
-        // Cerrar modal incluso en caso de error
-        closeModal('deleteModal');
-        
-        showAlert('❌ Error de conexión: ' + error.message, 'danger');
-    });
-}
+    function deleteBackup(filename) {
+        console.log('🗑️ Eliminando backup:', filename);
 
+        fetch('php/backup_manager.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'action=delete_backup&filename=' + encodeURIComponent(filename)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error HTTP: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('📨 Respuesta de eliminación:', data);
+                if (data.success) {
+                    showAlert('✅ Backup eliminado correctamente', 'success');
+                    // Actualizar lista
+                    loadBackups();
+                    loadStats();
+                    if (typeof loadBackupLogs === 'function') loadBackupLogs();
+                } else {
+                    showAlert('❌ Error al eliminar backup: ' + data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('❌ Error en deleteBackup:', error);
+                showAlert('❌ Error de conexión: ' + error.message, 'danger');
+            });
+    }
 
     // Función para guardar programación
     function saveSchedule() {
@@ -754,7 +926,7 @@ function deleteBackup(filename) {
                     document.getElementById('storage-used').textContent = data.stats.storage_used;
                     document.getElementById('db-status').textContent = data.stats.db_status;
                     document.getElementById('schedule-count').textContent = data.stats.schedule_count;
-                   
+
                 }
             })
             .catch(error => {
@@ -890,14 +1062,23 @@ function deleteBackup(filename) {
     function showRestoreModal(filename) {
         currentBackupToRestore = filename;
         document.getElementById('restore-filename').textContent = filename;
+
+        // Cerrar cualquier modal de contraseña abierto primero
+        closeModal('passwordModal');
+
         const restoreModal = new bootstrap.Modal(document.getElementById('restoreModal'));
         restoreModal.show();
     }
+
 
     // Función para mostrar modal de eliminación
     function showDeleteModal(filename) {
         currentBackupToDelete = filename;
         document.getElementById('delete-filename').textContent = filename;
+
+        // Cerrar cualquier modal de contraseña abierto primero
+        closeModal('passwordModal');
+
         const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
         deleteModal.show();
     }
@@ -939,24 +1120,150 @@ function deleteBackup(filename) {
         progressPercent.textContent = Math.round(percent) + '%';
     }
 
-    // Función para mostrar alertas
-    function showAlert(message, type) {
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-        alertDiv.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  // Función para mostrar notificaciones estilo toast
+function showAlert(message, type = 'info') {
+    console.log(`📢 Mostrando alerta [${type}]:`, message);
+    
+    // Definir iconos y colores según el tipo
+    const alertConfig = {
+        'success': {
+            icon: 'fa-check-circle',
+            bgClass: 'alert-success',
+            title: 'Éxito'
+        },
+        'danger': {
+            icon: 'fa-exclamation-circle',
+            bgClass: 'alert-danger',
+            title: 'Error'
+        },
+        'warning': {
+            icon: 'fa-exclamation-triangle',
+            bgClass: 'alert-warning',
+            title: 'Advertencia'
+        },
+        'info': {
+            icon: 'fa-info-circle',
+            bgClass: 'alert-info',
+            title: 'Información'
+        }
+    };
+    
+    const config = alertConfig[type] || alertConfig.info;
+    
+    // Buscar si ya existe una notificación con el mismo mensaje
+    const existingNotifications = document.querySelectorAll('.custom-alert-notification');
+    for (let notif of existingNotifications) {
+        if (notif.querySelector('.alert-message').textContent === message) {
+            console.log('⚠️ Notificación duplicada, ignorando...');
+            return;
+        }
+    }
+    
+    // Crear elemento de notificación
+    const notification = document.createElement('div');
+    notification.className = `alert ${config.bgClass} custom-alert-notification position-fixed`;
+    notification.style.cssText = `
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 350px;
+        max-width: 500px;
+        animation: slideInRight 0.3s ease-out;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border-radius: 8px;
+        border: none;
+    `;
+    
+    notification.innerHTML = `
+        <div class="d-flex align-items-start">
+            <i class="fas ${config.icon} fa-2x me-3 mt-1"></i>
+            <div class="flex-grow-1">
+                <h6 class="mb-1 fw-bold">${config.title}</h6>
+                <p class="mb-0 small alert-message">${message}</p>
+                <small class="text-muted">${new Date().toLocaleTimeString()}</small>
+            </div>
+            <button type="button" class="btn-close btn-sm ms-2 mt-1" onclick="closeNotification(this)"></button>
+        </div>
+    `;
+    
+    // Agregar al cuerpo del documento
+    document.body.appendChild(notification);
+    
+    // Auto-eliminar después de 6 segundos
+    setTimeout(() => {
+        if (notification.parentNode) {
+            fadeOutNotification(notification);
+        }
+    }, 6000);
+    
+    console.log('✅ Notificación mostrada correctamente');
+}
+
+// Función para cerrar notificaciones
+function closeNotification(closeButton) {
+    const notification = closeButton.closest('.custom-alert-notification');
+    if (notification) {
+        fadeOutNotification(notification);
+    }
+}
+
+// Función para animación de desvanecimiento
+function fadeOutNotification(notification) {
+    notification.style.transition = 'all 0.3s ease-out';
+    notification.style.opacity = '0';
+    notification.style.transform = 'translateX(100%)';
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 300);
+}
+
+// Función para mostrar notificaciones del sistema (backups automáticos)
+function showSystemNotification(message, type = 'info') {
+    const alertClass = type === 'info' ? 'alert-info' : 'alert-success';
+    const icon = type === 'info' ? 'fa-info-circle' : 'fa-robot';
+    const title = type === 'info' ? '🔒 Sistema' : '🤖 Backup Automático';
+
+    // Buscar si ya existe una notificación del sistema
+    let existingNotification = document.querySelector('.backup-auto-notification');
+
+    if (!existingNotification) {
+        const notification = document.createElement('div');
+        notification.className = `alert ${alertClass} backup-auto-notification position-fixed`;
+        notification.style.cssText = `
+            top: 20px;
+            right: 20px;
+            z-index: 9998;
+            min-width: 350px;
+            animation: slideInRight 0.3s ease-out;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            border: none;
+        `;
+        notification.innerHTML = `
+            <div class="d-flex align-items-center">
+                <i class="fas ${icon} fa-2x me-3"></i>
+                <div class="flex-grow-1">
+                    <h6 class="mb-1">${title}</h6>
+                    <p class="mb-0 small">${message}</p>
+                    <small class="text-muted">${new Date().toLocaleTimeString()}</small>
+                </div>
+                <button type="button" class="btn-close btn-sm" onclick="this.parentElement.parentElement.remove()"></button>
+            </div>
         `;
 
-        const container = document.querySelector('.container');
-        container.insertBefore(alertDiv, container.firstChild);
+        document.body.appendChild(notification);
 
+        // Auto-eliminar después de 8 segundos
         setTimeout(() => {
-            if (alertDiv.parentNode) {
-                alertDiv.remove();
+            if (notification.parentNode) {
+                fadeOutNotification(notification);
             }
-        }, 5000);
+        }, 8000);
     }
+}
 
     // Función para iniciar auto-actualización de interfaz
     function startAutoRefresh() {
@@ -984,4 +1291,9 @@ function deleteBackup(filename) {
     window.loadStats = loadStats;
     window.loadSchedules = loadSchedules;
     window.closeModal = closeModal;
+    // Hacer funciones globales para las notificaciones
+    window.showAlert = showAlert;
+    window.closeNotification = closeNotification;
+    window.fadeOutNotification = fadeOutNotification;
+    window.showSystemNotification = showSystemNotification;
 }); 
