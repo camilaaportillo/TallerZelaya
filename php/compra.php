@@ -37,7 +37,6 @@ try {
     $conn->begin_transaction();
 
     // Primero calculamos el total en base a los productos
-    
     $precioTotal = 0;
     foreach ($productos as $i => $p) {
         if (!isset($p["producto"], $p["cantidad"], $p["precio"])) {
@@ -50,7 +49,6 @@ try {
         $precioTotal += $productos[$i]["subtotal"];
     }
 
-    
     // Insertar compra
     $stmt = $conn->prepare("INSERT INTO compra (precio, fecha, id_proveedor, id_usuario, facturaImagen) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("dsiis", $precioTotal, $fecha, $proveedor, $usuario, $facturaNombreFinal);
@@ -58,35 +56,49 @@ try {
     $idCompra = $stmt->insert_id;
     $stmt->close();
 
-    // Insertar detalles
+    // Insertar detalles y ACTUALIZAR STOCK
     $stmtDetalle = $conn->prepare(
-    "INSERT INTO detallescompra (cantidad, id_compra, id_repuesto, precioUnitario, subTotal)
-     VALUES (?, ?, ?, ?, ?)"
+        "INSERT INTO detallescompra (cantidad, id_compra, id_repuesto, precioUnitario, subTotal)
+         VALUES (?, ?, ?, ?, ?)"
     );
-
     $stmtDetalle->bind_param("iiidd", $cantidad, $idCompra, $idRepuesto, $precioUnitario, $subTotal);
+
+    // ✅ CORREGIDO: Quitamos la columna ultima_compra que no existe
+    $stmtStock = $conn->prepare(
+        "UPDATE repuesto 
+         SET stock_actual = stock_actual + ?
+         WHERE id_repuesto = ?"
+    );
+    $stmtStock->bind_param("ii", $cantidadStock, $idRepuestoStock);
 
     foreach ($productos as $p) {
         $cantidad = intval($p["cantidad"]);
         $idRepuesto = intval($p["producto"]);
         $precioUnitario = floatval($p["precio"]);
         $subTotal = $p["subtotal"];
+        
+        // Insertar detalle de compra
         $stmtDetalle->execute();
 
+        // ✅ ACTUALIZAR stock del repuesto (sin ultima_compra)
+        $cantidadStock = $cantidad;
+        $idRepuestoStock = $idRepuesto;
+        $stmtStock->execute();
     }
 
+    $stmtDetalle->close();
+    $stmtStock->close();
 
-    // Confirmar
+    // Confirmar transacción
     $conn->commit();
 
     echo json_encode([
         "status" => "success",
-        "message" => "Compra registrada correctamente.",
+        "message" => "Compra registrada correctamente y stock actualizado.",
         "id_compra" => $idCompra,
         "precio_total" => $precioTotal
     ]);
 
-    
 } catch (Exception $e) {
     if ($conn && $conn->connect_errno === 0) {
         $conn->rollback();
@@ -98,4 +110,3 @@ try {
     ]);
 }
 ?>
-
