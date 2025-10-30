@@ -592,13 +592,22 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         actualizarTabla();
-        limpiarCamposArticulo();
         calcularTotal();
 
         // Resetear combobox de producto correctamente
-        resetearComboboxProducto();
+        limpiarCamposArticulo();
 
-        mostrarMensaje('Éxito', 'Artículo agregado correctamente', 'success');
+        if (choicesProducto) {
+            choicesProducto.clearInput();
+            choicesProducto.setValue([]);
+        } else {
+            selectProducto.value = '';
+        }
+
+        // Limpiar el precio también
+        inputPrecio.value = '';
+
+        //mostrarMensaje('Éxito', 'Artículo agregado correctamente', 'success');
     }
 
     function resetearComboboxProducto() {
@@ -796,6 +805,14 @@ document.addEventListener('DOMContentLoaded', function () {
         inputProductoReparacion.value = '';
         inputCantidad.value = '';
         inputPrecio.value = '';
+
+        // Limpiar combobox sin destruirlo
+        if (choicesProducto) {
+            choicesProducto.clearInput();
+        } else {
+            selectProducto.value = '';
+        }
+
         limpiarError(selectProducto);
         limpiarError(inputProductoReparacion);
         limpiarError(inputCantidad);
