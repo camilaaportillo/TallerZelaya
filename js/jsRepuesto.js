@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function cargarMarcas() {
-    fetch("http://localhost/TallerZelaya/php/obtenerMarcas.php")
+    fetch("php/obtenerMarcas.php")
         .then(res => res.json())
         .then(data => {
             selectMarca.innerHTML = '<option value="" disabled selected>Seleccionar Marca</option>';
@@ -107,7 +107,7 @@ function cargarMarcas() {
 }
 
 function cargarMedidas() {
-    fetch("http://localhost/TallerZelaya/php/obtenerMedidas.php")
+    fetch("php/obtenerMedidas.php")
         .then(res => res.json())
         .then(data => {
             selectMedida.innerHTML = '<option value="" disabled selected>Seleccionar Medida</option>';
@@ -121,7 +121,7 @@ function cargarMedidas() {
 }
 
 function cargarRepuestos() {
-    fetch("http://localhost/TallerZelaya/php/obtenerRepuestos.php")
+    fetch("php/obtenerRepuestos.php")
         .then(res => res.json())
         .then(data => {
             repuestosData = data;
@@ -187,7 +187,7 @@ btnRegistrar.addEventListener("click", (e) => {
     let codigo = parteNombre + parteMarca + parteMedida + aleatorio;
 
 
-    fetch("http://localhost/TallerZelaya/php/ingresarRepuesto.php", {
+    fetch("php/ingresarRepuesto.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `codigo=${codigo}&nombre=${datos.nombre}&descripcion=${datos.descripcion}&stock=${datos.stock}&id_marca=${datos.marca}&id_medida=${datos.medida}`
@@ -322,7 +322,7 @@ btnActualizar.addEventListener("click", () => {
     const datos = validarRepuesto();
     if (!datos) return;
 
-    fetch("http://localhost/TallerZelaya/php/editarProducto.php", {
+    fetch("php/editarProducto.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `id=${idSeleccionado}&nombre=${datos.nombre}&descripcion=${datos.descripcion}&stock=${datos.stock}&id_marca=${datos.marca}&id_medida=${datos.medida}`
@@ -483,7 +483,7 @@ document.getElementById("btnConfirmarEliminar").addEventListener("click", () => 
     cerrarModalConfirmar();
     if (!idSeleccionado) return;
 
-    fetch("http://localhost/TallerZelaya/php/eliminarRepuesto.php", {
+    fetch("php/eliminarRepuesto.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `id=${idSeleccionado}`

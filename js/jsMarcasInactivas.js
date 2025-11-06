@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function cargarMarcasInactivas() {
-    fetch("http://localhost/TallerZelaya/php/obtenerMarcasInactivas.php")
+    fetch("php/obtenerMarcasInactivas.php")
         .then(res => res.json())
         .then(data => {
             marcasInactivasData = data;
@@ -67,7 +67,7 @@ function mostrarConfirmarHabilitar(id) {
 btnConfirmarHabilitar.addEventListener("click", () => {
     if (!marcaSeleccionada) return;
 
-    fetch("http://localhost/TallerZelaya/php/habilitarMarca.php", {
+    fetch("php/habilitarMarca.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: "id=" + marcaSeleccionada

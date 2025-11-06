@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /* ========== Cargar datos para los combos ========== */
 function cargarProductos() {
-    fetch("http://localhost/TallerZelaya/php/obtenerRepuestos.php")
+    fetch("php/obtenerRepuestos.php")
         .then(res => res.json())
         .then(data => {
             const opciones = data.map(p => {
@@ -148,7 +148,7 @@ function cargarProductos() {
 }
 
 function cargarProveedores() {
-    fetch("http://localhost/TallerZelaya/php/obtenerProveedores.php")
+    fetch("php/obtenerProveedores.php")
         .then(res => res.json())
         .then(data => {
             const opciones = data.map(p => ({

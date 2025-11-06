@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Cargar datos al iniciar
 function cargarEmpresasActivas() {
-    fetch("http://localhost/TallerZelaya/php/obtenerEmpresasActivas.php")
+    fetch("php/obtenerEmpresasActivas.php")
         .then(res => res.json())
         .then(data => {
             const select = document.getElementById("selectEmpresa");
@@ -134,7 +134,7 @@ function cargarEmpresasActivas() {
 
 // Cargar proveedores activos
 function cargarProveedores() {
-    fetch("http://localhost/TallerZelaya/php/obtenerProveedores.php")
+    fetch("php/obtenerProveedores.php")
         .then(res => res.json())
         .then(data => {
             proveedoresData = data;
@@ -200,7 +200,7 @@ btnRegistrar.addEventListener("click", (e) => {
         }
     }
 
-    fetch("http://localhost/TallerZelaya/php/ingresarProveedor.php", {
+    fetch("php/ingresarProveedor.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `nombre=${datos.nombre}` +
@@ -262,7 +262,7 @@ btnActualizar.addEventListener("click", () => {
         return;
     }
 
-    fetch("http://localhost/TallerZelaya/php/editarProveedor.php", {
+    fetch("php/editarProveedor.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `id=${idSeleccionado}&nombre=${nombre}&correo=${correo}&telefono=${telefono}&id_empresa=${empresa}`
@@ -491,7 +491,7 @@ document.getElementById("btnConfirmarEliminar").addEventListener("click", () => 
     cerrarModalConfirmar();
     if (!idSeleccionado) return;
 
-    fetch("http://localhost/TallerZelaya/php/eliminarProveedor.php", {
+    fetch("php/eliminarProveedor.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `id=${idSeleccionado}`
@@ -540,7 +540,7 @@ btnHabilitarRegistro.addEventListener("click", () => {
     document.querySelector(".formulario").style.display = "none";
     document.querySelector(".buscador-derecha").style.display = "none";
     // Cargar proveedores inactivos
-    fetch("http://localhost/TallerZelaya/php/obtenerProveedoresInactivos.php")
+    fetch("php/obtenerProveedoresInactivos.php")
         .then(res => res.json())
         .then(data => {
             renderTablaInactivos(data);
@@ -581,7 +581,7 @@ function renderTablaInactivos(datos) {
 
 // Función para habilitar proveedor
 function habilitarProveedor(id) {
-    fetch("http://localhost/TallerZelaya/php/habilitarProveedor.php", {
+    fetch("php/habilitarProveedor.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `id=${id}`
@@ -592,7 +592,7 @@ function habilitarProveedor(id) {
                 showModalMensaje("exito", "Éxito", data.mensaje);
 
                 // Recargar lista de inactivos
-                fetch("http://localhost/TallerZelaya/php/obtenerProveedoresInactivos.php")
+                fetch("php/obtenerProveedoresInactivos.php")
                     .then(res => res.json())
                     .then(datos => renderTablaInactivos(datos));
             } else {
@@ -613,7 +613,7 @@ btnHabilitarRegistro.addEventListener("click", () => {
     btnVolver.style.display = "inline-block";
 
     // Cargar proveedores inactivos
-    fetch("http://localhost/TallerZelaya/php/obtenerProveedoresInactivos.php")
+    fetch("php/obtenerProveedoresInactivos.php")
         .then(res => res.json())
         .then(data => {
             renderTablaInactivos(data);

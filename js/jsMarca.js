@@ -41,7 +41,7 @@ function validarMarca() {
 document.addEventListener("DOMContentLoaded", cargarMarcas);
 
 function cargarMarcas() {
-    fetch("http://localhost/TallerZelaya/php/obtenerMarcas.php")
+    fetch("php/obtenerMarcas.php")
         .then(res => res.json())
         .then(data => {
             marcasData = data;
@@ -82,7 +82,7 @@ btnRegistrar.addEventListener("click", (e) => {
     const datos = validarMarca();
     if (!datos) return;
 
-    fetch("http://localhost/TallerZelaya/php/ingresarMarca.php", {
+    fetch("php/ingresarMarca.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `nombre=${encodeURIComponent(datos.nombre)}`
@@ -111,7 +111,7 @@ btnRegistrar.addEventListener("click", (e) => {
 btnActualizar.addEventListener("click", () => {
     const nombre = inputNombre.value;
 
-    fetch("http://localhost/TallerZelaya/php/editarMarca.php", {
+    fetch("php/editarMarca.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `id=${idSeleccionado}&nombre=${nombre}`
@@ -148,7 +148,7 @@ btnEliminarModal.addEventListener("click", () => {
     abrirModalConfirmar();
     document.getElementById("btnConfirmarEliminar").addEventListener("click", () => {
         cerrarModalConfirmar();
-        fetch("http://localhost/TallerZelaya/php/eliminarMarca.php", {
+        fetch("php/eliminarMarca.php", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: `id=${idSeleccionado}`

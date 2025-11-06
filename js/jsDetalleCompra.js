@@ -15,7 +15,7 @@
   }
 
   try {
-    const res = await fetch(`http://localhost/TallerZelaya/php/obtenerDetalleCompra.php?id=${id}`);
+    const res = await fetch(`php/obtenerDetalleCompra.php?id=${id}`);
     const data = await res.json();
     if (data.error) {
       showModalMensaje("error", "Error en petición", data.error);

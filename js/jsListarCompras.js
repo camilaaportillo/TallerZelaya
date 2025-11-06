@@ -10,7 +10,7 @@ window.irInicio = function () {
 };
 
 function cargarCompras() {
-    fetch("http://localhost/TallerZelaya/php/obtenerCompras.php")
+    fetch("php/obtenerCompras.php")
         .then(res => res.json())
         .then(data => {
             const tablaBody = document.querySelector("#tablaCompras tbody");
