@@ -128,7 +128,7 @@ inputTelefono.addEventListener("blur", () => {
 document.addEventListener("DOMContentLoaded", cargarClientes);
 
 function cargarClientes() {
-    fetch("http://localhost/TallerZelaya/php/obtenerClientes.php")
+    fetch("php/obtenerClientes.php")
         .then(res => res.json())
         .then(data => {
             clientesData = data;
@@ -192,7 +192,7 @@ btnRegistrar.addEventListener("click", (e) => {
         return;
     }
 
-    fetch("http://localhost/TallerZelaya/php/ingresarClientes.php", {
+    fetch("php/ingresarClientes.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `nombre=${encodeURIComponent(datos.nombre)}&apellido=${encodeURIComponent(datos.apellido)}&telefono=${encodeURIComponent(datos.telefono)}&correo=${encodeURIComponent(datos.correo)}`
@@ -234,7 +234,7 @@ btnActualizar.addEventListener("click", () => {
         return;
     }
 
-    fetch("http://localhost/TallerZelaya/php/editarClientes.php", {
+    fetch("php/editarClientes.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `id_cliente=${idSeleccionado}&nombre=${encodeURIComponent(datos.nombre)}&telefono=${encodeURIComponent(datos.telefono)}&correo=${encodeURIComponent(datos.correo)}`
@@ -274,7 +274,7 @@ btnEliminarModal.addEventListener("click", () => {
     abrirModalConfirmar();
     document.getElementById("btnConfirmarEliminar").addEventListener("click", () => {
         cerrarModalConfirmar();
-        fetch("http://localhost/TallerZelaya/php/eliminarCliente.php", {
+        fetch("php/eliminarCliente.php", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: `id_cliente=${idSeleccionado}`

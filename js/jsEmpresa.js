@@ -112,7 +112,7 @@ function validarEmpresa() {
 document.addEventListener("DOMContentLoaded", cargarEmpresas);
 
 function cargarEmpresas() {
-    fetch("http://localhost/TallerZelaya/php/obtenerEmpresas.php")
+    fetch("php/obtenerEmpresas.php")
         .then(res => res.json())
         .then(data => {
             empresasData = data;
@@ -176,7 +176,7 @@ btnRegistrar.addEventListener("click", (e) => {
     }
 
 
-    fetch("http://localhost/TallerZelaya/php/ingresarEmpresa.php", {
+    fetch("php/ingresarEmpresa.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams(datos) // serializa seguro
@@ -228,7 +228,7 @@ btnActualizar.addEventListener("click", () => {
         return;
     }
 
-    fetch("http://localhost/TallerZelaya/php/editarEmpresa.php", {
+    fetch("php/editarEmpresa.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `id=${idSeleccionado}&nombre=${nombre}&correo=${correo}&telefono=${telefono}`
@@ -320,7 +320,7 @@ btnEliminar.addEventListener("click", () => {
     abrirModalConfirmar();
     document.getElementById("btnConfirmarEliminar").addEventListener("click", () => {
         cerrarModalConfirmar();
-        fetch("http://localhost/TallerZelaya/php/eliminarEmpresa.php", {
+        fetch("php/eliminarEmpresa.php", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: `id=${idSeleccionado}`
@@ -500,7 +500,7 @@ btnHabilitarRegistro.addEventListener("click", () => {
     btnVolver.style.display = "inline-block";
 
     // Cargar proveedores inactivos
-    fetch("http://localhost/TallerZelaya/php/obtenerEmpresasInactivas.php")
+    fetch("php/obtenerEmpresasInactivas.php")
         .then(res => res.json())
         .then(data => {
             renderTablaInactivos(data);
@@ -540,7 +540,7 @@ function renderTablaInactivos(datos) {
 
 // Función para habilitar proveedor
 function habilitarProveedor(id) {
-    fetch("http://localhost/TallerZelaya/php/habilitarEmpresa.php", {
+    fetch("php/habilitarEmpresa.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `id=${id}`
@@ -551,7 +551,7 @@ function habilitarProveedor(id) {
                 showModalMensaje("exito", "Éxito", data.mensaje);
 
                 // Recargar lista de inactivos
-                fetch("http://localhost/TallerZelaya/php/obtenerEmpresasInactivas.php")
+                fetch("php/obtenerEmpresasInactivas.php")
                     .then(res => res.json())
                     .then(datos => renderTablaInactivos(datos));
             } else {

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="imgs/favicon.png" type="image/png">
     <title>Reporte de Inventario - Taller de Bicicletas Zelaya</title>
     <link rel="stylesheet" href="css/inventario.css">
     <style>
@@ -36,7 +37,7 @@
         <!-- Sección de tabla (ocupa todo el ancho) -->
         <section class="tabla-completa">
             <div class="tabla-header">
-                <h2>📊 Reporte de Inventario</h2>
+                <h2>📊 Inventario</h2>
                 <div class="buscador">
                     <input type="text" id="buscarRepuesto" placeholder="🔍 Buscar por código, nombre o descripción...">
                 
@@ -117,7 +118,9 @@
             
             <div class="tabla-footer">
                 <p class="nota">💡 Haz clic en el botón 💰 para editar el precio de venta de un repuesto</p>
-               
+                <div class="exportar-acciones">
+                   <button class="btn-exportar" onclick="generarPDFStockBajo()">📄 Generar PDF Stock Bajo/Crítico</button>
+                </div>
             </div>
         </section>
     </main>
@@ -176,6 +179,9 @@
 
     <script src="js/sesion.js"></script>
     <script src="js/inventario.js"></script>
+    <!-- Bibliotecas para generar PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
 
 </body>

@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Cargar datos desde PHP
   function cargar() {
-    fetch("http://localhost/TallerZelaya/php/obtenerClientesInactivos.php")
+    fetch("php/obtenerClientesInactivos.php")
       .then(res => res.text())
       .then(text => {
         try {
@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Habilitar (llama PHP)
   function habilitar(id) {
-    fetch("http://localhost/TallerZelaya/php/habilitarCliente.php", {
+    fetch("php/habilitarCliente.php", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: `id=${encodeURIComponent(id)}`
