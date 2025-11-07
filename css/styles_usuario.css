@@ -40,12 +40,12 @@ header {
     opacity: 0;
     transition: opacity 0.3s;
     white-space: nowrap;
-    
 }
 
 .logo-btn:hover .hover-text {
     opacity: 1;
 }
+
 .info-usuario {
     display: flex;
     flex-direction: column;
@@ -82,7 +82,6 @@ header {
     color: white;
 }
 
-
 .logo-btn {
     position: relative;
     display: flex;
@@ -90,15 +89,13 @@ header {
     background: none;
     border: none;
     cursor: pointer;
-    
 }
+
 .logo-btn img {
     width: 70px;
     height: 40px;
     object-fit: contain;
 }
-
-
 
 .user-btn {
     background: none;
@@ -137,12 +134,14 @@ header {
     display: block;
 }
 
+/* MAIN LAYOUT - RESPONSIVE */
 main {
     display: flex;
     flex: 1;
     padding: 20px;
     gap: 40px;
     overflow: hidden;
+    justify-content: flex-start;
 }
 
 .formulario {
@@ -154,9 +153,18 @@ main {
     gap: 15px;
     width: 400px;
     height: 730px;
-    margin-left: auto;
 }
 
+.tabla {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-height: 0;
+    margin-top: 0;
+}
+
+/* Formulario Styles */
 .formulario label {
     gap: 15px;
     font-size: 16px;
@@ -199,7 +207,6 @@ main {
 }
 
 .formulario select {
-
     box-shadow: 0 5px 15px rgba(0, 38, 255, 0.3);
     appearance: none;
     -webkit-appearance: none;
@@ -230,9 +237,9 @@ select:focus {
     transform: translateY(-2px) scale(1.02);
     box-shadow: 0 5px 15px rgba(0, 38, 255, 0.5);
     border-color: #0026ff;
-
 }
 
+/* Buttons */
 .btn-registrar,
 .btn-actualizar {
     background: #0026ff;
@@ -264,15 +271,7 @@ select:focus {
     display: none;
 }
 
-.tabla {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    min-height: 0;
-    margin-top: 0;
-}
-
+/* Tabla Styles */
 .buscador {
     display: flex;
     justify-content: flex-end;
@@ -311,7 +310,6 @@ select:focus {
     margin-top: 0;
 }
 
-
 table {
     width: 100%;
     border: 2px solid #aaa;
@@ -346,6 +344,7 @@ table tbody tr:hover {
     background-color: #cfe1fd;
 }
 
+/* Resto de tus estilos existentes... */
 .nota {
     font-size: 12px;
     color: #0026ff;
@@ -544,7 +543,6 @@ body *:not(input):not(textarea):not(select) {
 
 .tabla-info {
     text-align: right;
-
     color: #242697;
     margin-bottom: 0;
     font-size: 14px;
@@ -650,7 +648,6 @@ body *:not(input):not(textarea):not(select) {
         opacity: 0;
         transform: translateY(-10px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -705,23 +702,6 @@ body *:not(input):not(textarea):not(select) {
     margin: 0;
 }
 
-/* Estilos responsivos */
-@media (max-width: 768px) {
-    .btn-volver {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .filtros {
-        flex-direction: column;
-        width: 100%;
-    }
-
-    .btn-filtro {
-        width: 100%;
-    }
-}
-
 /* Estilos para el botón de activar */
 .btn-activar {
     padding: 6px 12px;
@@ -773,34 +753,8 @@ body *:not(input):not(textarea):not(select) {
     margin-left: auto;
 }
 
-/* Responsive para móviles */
-@media (max-width: 900px) {
-    .tabla-header {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .btn-volver {
-        order: 1;
-        align-self: flex-start;
-        margin-bottom: 10px;
-    }
-
-    .tabla-header h2 {
-        order: 2;
-        margin: 10px 0;
-    }
-
-    .tabla-header .buscador {
-        order: 3;
-        margin-left: 0;
-        width: 100%;
-    }
-}
-
 #contenedorFormulario {
     margin-top: 0;
-
 }
 
 /* Estilos para cuando el formulario está oculto (vista inactivos) */
@@ -813,7 +767,6 @@ body *:not(input):not(textarea):not(select) {
 }
 
 /* Estilos para los botones del modal de confirmación */
-/* Estilos para los botones del modal de confirmación - TAMAÑO PEQUEÑO */
 .botones-confirmacion {
     display: flex;
     gap: 15px;
@@ -884,38 +837,9 @@ body *:not(input):not(textarea):not(select) {
     font-size: 14px;
 }
 
-/* Responsive para móviles */
-@media (max-width: 480px) {
-    .botones-confirmacion {
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .botones-confirmacion .btn {
-        width: 100%;
-        min-width: auto;
-        border-bottom: #0026ff;
-    }
-
-    #modalConfirmacion .modal-contenido {
-        margin: 20px;
-        padding: 25px 20px;
-    }
-
-    #confirmacionTitulo {
-        font-size: 20px;
-    }
-
-    #confirmacionMensaje {
-        font-size: 15px;
-    }
-}
-
 .tabla-bloqueada {
     pointer-events: none;
-    /* bloquea clics */
     opacity: 0.6;
-    /* opcional: se ve más apagada */
 }
 
 .input-password {
@@ -928,15 +852,14 @@ input[type="password"],
 input[type="text"] {
     width: 100%;
     padding-right: 120px;
-    /* espacio para checkbox + texto */
 }
-
 
 /* Mostrar mensaje solo cuando hay algo escrito */
 input[type="password"]:not(:placeholder-shown)~.toggle-password,
 input[type="text"]:not(:placeholder-shown)~.toggle-password {
     display: flex;
 }
+
 /*css para usuario y rol del header*/
 .info-usuario {
     display: flex;
@@ -946,11 +869,338 @@ input[type="text"]:not(:placeholder-shown)~.toggle-password {
     margin-right: 10px;
 }
 
-
 .usuario {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
+/* MEDIA QUERIES - RESPONSIVE */
 
+/* Tablets (768px - 1024px) */
+@media (max-width: 1024px) {
+    main {
+        flex-direction: row;
+        gap: 20px;
+        padding: 15px;
+        flex-wrap: nowrap; 
+    }
+    
+    .formulario {
+        width: 350px;
+        height: auto;
+        margin-left: 0;
+        margin-top: 0;
+        padding: 30px 20px;
+        flex-shrink: 0;
+    }
+    
+    .tabla {
+         width: auto; /* CAMBIAR de '100%' a 'auto' */
+        flex: 1;
+        min-width: 0; /* PERMITIR que se reduzca */
+    }
+    
+    .tabla-contenedor {
+        max-height: 400px;
+    }
+    
+    header {
+        padding: 12px 15px;
+    }
+    
+    .logo-btn img {
+        width: 60px;
+        height: 35px;
+    }
+    
+    .user-btn img {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .nombre-usuario {
+        font-size: 14px;
+    }
+    
+    .rol-usuario {
+        font-size: 12px;
+    }
+}
+
+/* Móviles Grandes (576px - 768px) */
+@media (max-width: 768px) {
+    body {
+        height: auto;
+        min-height: 100vh;
+    }
+    
+    main {
+        padding: 10px;
+        gap: 15px;
+        flex-direction:column;
+    }
+    
+    .formulario {
+        padding: 20px 15px;
+        gap: 12px;
+        width: 100%;
+    }
+    
+    .formulario input,
+    .formulario select {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+    
+    .btn-registrar,
+    .btn-actualizar,
+    .btn-cancelar {
+        padding: 15px 25px;
+        font-size: 16px;
+    }
+    
+    .tabla-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .btn-volver {
+        order: 1;
+        align-self: flex-start;
+        margin-bottom: 10px;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .tabla-header h2 {
+        order: 2;
+        margin: 10px 0;
+        font-size: 1.3rem;
+    }
+    
+    .tabla-header .buscador {
+        order: 3;
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    .buscador input {
+        width: 100%;
+    }
+    
+    .filtros {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn-filtro {
+        width: 100%;
+    }
+    
+    table {
+        font-size: 13px;
+        min-width: 500px;
+    }
+    
+    table th,
+    table td {
+        padding: 8px 6px;
+    }
+    
+    .modal-contenido {
+        width: 90%;
+        max-width: 300px;
+        padding: 20px;
+        margin: 20px;
+    }
+    
+    .botones-confirmacion {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .botones-confirmacion .btn {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    header {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .info-usuario {
+        margin-right: 5px;
+    }
+    
+    .nombre-usuario {
+        font-size: 13px;
+    }
+    
+    .rol-usuario {
+        font-size: 11px;
+        padding: 1px 6px;
+    }
+}
+
+/* Móviles Pequeños (320px - 576px) */
+@media (max-width: 576px) {
+    header {
+        padding: 10px;
+    }
+    
+    .usuario {
+        gap: 5px;
+    }
+    
+    .logo-btn img {
+        width: 50px;
+        height: 30px;
+    }
+    
+    .user-btn img {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .info-usuario {
+        display: none; /* Ocultar info usuario en móviles muy pequeños */
+    }
+    
+    main {
+        padding: 8px;
+    }
+    
+    .formulario {
+        padding: 15px 10px;
+        border-radius: 15px;
+    }
+    
+    .formulario label {
+        font-size: 14px;
+    }
+    
+    .formulario input,
+    .formulario select {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+    
+    .btn-registrar,
+    .btn-actualizar,
+    .btn-cancelar {
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+    
+    .tabla-contenedor {
+        max-height: 350px;
+        margin: 10px 0;
+    }
+    
+    table {
+        font-size: 12px;
+        min-width: 400px;
+    }
+    
+    table th,
+    table td {
+        padding: 6px 4px;
+    }
+    
+    .btn-editar {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    
+    .modal-contenido {
+        padding: 15px;
+    }
+    
+    #confirmacionTitulo {
+        font-size: 18px;
+    }
+    
+    #confirmacionMensaje {
+        font-size: 14px;
+    }
+    
+    .menu-usuario {
+        top: 55px;
+        min-width: 130px;
+        font-size: 14px;
+    }
+}
+
+/* Móviles Muy Pequeños (hasta 320px) */
+@media (max-width: 320px) {
+    .formulario {
+        padding: 10px 8px;
+    }
+    
+    .btn-registrar,
+    .btn-actualizar,
+    .btn-cancelar {
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+    
+    table {
+        font-size: 11px;
+        min-width: 300px;
+    }
+    
+    .modal-contenido {
+        padding: 12px;
+    }
+}
+
+/* Orientación Landscape en móviles */
+@media (max-height: 500px) and (orientation: landscape) {
+    body {
+        height: auto;
+    }
+    
+    .formulario {
+        height: auto;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    
+    .tabla-contenedor {
+        max-height: 200px;
+    }
+    
+    main {
+        flex-direction: row;
+    }
+}
+
+/* Ajustes para alta resolución */
+@media (min-width: 1400px) {
+    main {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .formulario {
+        width: 450px;
+    }
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .btn-registrar:hover,
+    .btn-actualizar:hover,
+    .btn-cancelar:hover {
+        transform: none;
+    }
+}

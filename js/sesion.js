@@ -11,24 +11,24 @@
 
         inicializar() {
             console.log('🔍 Inicializando sistema de sesión...');
-            
+
             // Verificación básica de sesión
             if (!this.verificarSesionBasica()) {
                 return;
             }
-            
+
             this.cargarUsuario();
-            
+
             // ✅ SI NO ES ADMINISTRADOR Y ESTÁ EN PÁGINA ADMIN, REDIRIGIR AL INDEX
             if (this.esPaginaAdmin() && !this.esAdministrador()) {
                 console.log('🚫 No es administrador - Redirigiendo al index...');
                 this.redirigirAlIndex();
                 return;
             }
-            
+
             this.configurarMenu();
             this.mostrarContenido();
-            
+
             if (this.quitarLoader) {
                 this.quitarLoader();
             }
@@ -37,17 +37,17 @@
         verificarSesionBasica() {
             const loggedin = sessionStorage.getItem('loggedin');
             const usuarioStorage = sessionStorage.getItem('usuario');
-            
+
             console.log('📊 Estado sesión:');
             console.log('- loggedin:', loggedin);
             console.log('- usuarioStorage:', usuarioStorage ? 'EXISTE' : 'NO EXISTE');
-            
+
             if (loggedin !== 'true' || !usuarioStorage) {
                 console.warn('⚠️ No hay sesión activa - Redirigiendo al login');
                 this.redirigirALogin();
                 return false;
             }
-            
+
             return true;
         }
 
@@ -57,7 +57,7 @@
                 this.rol = this.obtenerRolUsuario();
                 console.log('👤 Usuario cargado:', this.usuario.nombre);
                 console.log('🎭 Rol determinado:', this.rol);
-                
+
                 this.actualizarHeader();
             } catch (error) {
                 console.error('❌ Error cargando usuario:', error);
@@ -87,7 +87,7 @@
         normalizarRol(rol) {
             const rolString = String(rol).trim();
             console.log('🛠️ Normalizando rol:', rolString);
-            
+
             const mapeoRoles = {
                 '1': 'Administrador',
                 '2': 'Empleado',
@@ -99,20 +99,24 @@
             const rolLower = rolString.toLowerCase();
             const rolNormalizado = mapeoRoles[rolLower] || mapeoRoles[rolString] || rolString;
             console.log('🎯 Rol normalizado:', rolNormalizado);
-            
+
             return rolNormalizado;
         }
 
         esPaginaAdmin() {
-            const paginaActual = window.location.pathname.split('/').pop();
+            let paginaActual = window.location.pathname.split('/').pop();
+            if (paginaActual === '' || paginaActual === 'TallerZelaya') {
+                paginaActual = 'index.html';
+            }
+
             const paginasAdmin = [
                 'usuario.html',
-                'empresa.html', 
+                'empresa.html',
                 'marcas.html',
                 'proveedor.html',
                 'compra.html'
             ];
-            
+
             const esAdmin = paginasAdmin.includes(paginaActual);
             console.log('📄 Verificando página:', paginaActual, 'Es admin?:', esAdmin);
             return esAdmin;
@@ -150,7 +154,7 @@
         configurarMenu() {
             console.log('🔧 Configurando interfaz para rol:', this.rol);
             const elementosAdmin = document.querySelectorAll('.admin-only');
-            
+
             if (this.esEmpleado()) {
                 console.log('👷 Ocultando elementos admin - MODO EMPLEADO');
                 elementosAdmin.forEach(el => {
@@ -218,30 +222,41 @@
         }
     }
 
-    // LÓGICA PRINCIPAL (SIMPLIFICADA)
+
     const loggedin = sessionStorage.getItem('loggedin');
     const paginasProtegidas = [
         'index.html', 'usuario.html', 'clientes.html', 'compra.html',
         'marcas.html', 'clientesInactivos.html', 'empresa.html',
         'marcasInactivas.html', 'medidas.html', 'proveedor.html', 'repuestos.html'];
-    const paginaActual = window.location.pathname.split('/').pop();
+    let paginaActual = window.location.pathname.split('/').pop();
+    console.log('📍 Página actual original:', paginaActual);
 
-    // REDIRIGIR INMEDIATAMENTE SI NO ESTÁ LOGUEADO
-    if (loggedin !== 'true' && paginasProtegidas.includes(paginaActual)) {
+    // Si la página está vacía,(muestra index.html por defecto)
+    if (paginaActual === '' || paginaActual === 'TallerZelaya') {
+        paginaActual = 'index.html';
+        console.log('🔄 Página actual corregida a:', paginaActual);
+    }
+    //REDIRIGIR INMEDIATAMENTE SI NO ESTÁ LOGUEADO
+    if (loggedin !== 'true' && (paginaActual === 'index.html' || paginasProtegidas.includes(paginaActual))) {
         console.log('🚫 No logueado - Redirigiendo a login');
         window.location.replace('login.html');
         return;
     }
-
-    // ✅ INICIALIZACIÓN MEJORADA
+    //redirigir si está logueado y accede a login
+    if (loggedin === 'true' && paginaActual === 'login.html') {
+        console.log('✅ Ya logueado - Redirigiendo a index');
+        window.location.replace('index.html');
+        return;
+    }
+   
     if (loggedin === 'true') {
         document.addEventListener('DOMContentLoaded', function () {
             console.log('🚀 DOM cargado - Iniciando sistema de sesión...');
-            
-            // ✅ CREAR LOADER SOLO SI ES NECESARIO
+
+            // CREAR LOADER SOLO SI ES NECESARIO
             let loader = null;
-            let quitarLoader = function() {};
-            
+            let quitarLoader = function () { };
+
             if (paginaActual !== 'index.html') {
                 const crearLoader = function () {
                     const loader = document.createElement('div');
@@ -282,7 +297,7 @@
                 };
 
                 loader = crearLoader();
-                
+
                 quitarLoader = function () {
                     if (loader && loader.parentNode) {
                         loader.parentNode.removeChild(loader);
