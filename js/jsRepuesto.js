@@ -157,6 +157,25 @@ function renderTabla(datos) {
     tablaBody.innerHTML = "";
     datos.forEach(rep => {
         const fila = document.createElement("tr");
+        
+        // Generar HTML para la imagen
+        let imagenHTML = '';
+        if (rep.imagen_path) {
+            imagenHTML = `
+                <img src="${rep.imagen_path}" 
+                     alt="${rep.nombre}" 
+                     class="imagen-repuesto"
+                     onclick="ampliarImagen('${rep.imagen_path}', '${rep.nombre}')"
+                     title="Haz clic para ver imagen completa">
+            `;
+        } else {
+            imagenHTML = `
+                <div class="sin-imagen" title="Sin imagen">
+                    📷<br>No disponible
+                </div>
+            `;
+        }
+        
         fila.innerHTML = `
             <td>${rep.codigo}</td>
             <td>${rep.nombre}</td>
@@ -164,11 +183,8 @@ function renderTabla(datos) {
             <td>${rep.stock_minimo}</td>
             <td>${rep.marca}</td>
             <td>${rep.medida}</td>
-            <td>
-                ${rep.imagen_path ? 
-                    `<img src="${rep.imagen_path}" alt="Imagen" style="width: 30px; height: 30px; object-fit: cover; border-radius: 4px;">` : 
-                    'Sin imagen'
-                }
+            <td style="text-align: center; padding: 5px;">
+                ${imagenHTML}
             </td>
             <td>
                 <button class="btn-editar" data-id="${rep.id_repuesto}">
@@ -184,7 +200,6 @@ function renderTabla(datos) {
         tablaBody.appendChild(fila);
     });
 }
-
 // Registrar
 btnRegistrar.addEventListener("click", (e) => {
     e.preventDefault();
@@ -349,7 +364,7 @@ btnEditarModal.addEventListener("click", () => {
         inputDescripcion.value = celdas[2].innerText;
         inputStockMinimo.value = celdas[3].innerText;
 
-        // Establecer marca y medida
+        // Establecer empresa en el select (buscando por nombre)
         const marca = celdas[4].innerText;
         const select = document.getElementById("selectMarca");
         for (let option of select.options) {
@@ -358,7 +373,6 @@ btnEditarModal.addEventListener("click", () => {
                 break;
             }
         }
-        
         const medida = celdas[5].innerText;
         const selectM = document.getElementById("selectMedida");
         for (let option of selectM.options) {
@@ -371,7 +385,8 @@ btnEditarModal.addEventListener("click", () => {
         // Cargar información de la imagen si existe
         const repuesto = repuestosData.find(r => r.id_repuesto == idSeleccionado);
         if (repuesto && repuesto.imagen_path) {
-            mostrarVistaPreviaExistente(repuesto.imagen_path);
+            // Si quieres mostrar la imagen en el formulario de edición, puedes agregarla aquí
+            console.log("Imagen del repuesto:", repuesto.imagen_path);
         }
 
         modal.style.display = "none";
@@ -673,3 +688,45 @@ function mostrarVistaPreviaNueva(file) {
     };
     reader.readAsDataURL(file);
 }
+
+// Función para ampliar imagen (igual que en inventario)
+function ampliarImagen(rutaImagen, nombreRepuesto) {
+    // Crear modal si no existe
+    let modalImagen = document.getElementById('modalImagen');
+    if (!modalImagen) {
+        modalImagen = document.createElement('div');
+        modalImagen.id = 'modalImagen';
+        modalImagen.className = 'modal-imagen';
+        modalImagen.innerHTML = `
+            <button class="cerrar-modal-imagen">&times;</button>
+            <img class="modal-imagen-contenido" id="imagenAmpliada">
+        `;
+        document.body.appendChild(modalImagen);
+        
+        // Event listeners para cerrar modal
+        modalImagen.querySelector('.cerrar-modal-imagen').addEventListener('click', () => {
+            modalImagen.style.display = 'none';
+        });
+        
+        modalImagen.addEventListener('click', (e) => {
+            if (e.target === modalImagen) {
+                modalImagen.style.display = 'none';
+            }
+        });
+        
+        // Cerrar con tecla ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modalImagen.style.display === 'flex') {
+                modalImagen.style.display = 'none';
+            }
+        });
+    }
+    
+    // Mostrar imagen
+    const imagenAmpliada = document.getElementById('imagenAmpliada');
+    imagenAmpliada.src = rutaImagen;
+    imagenAmpliada.alt = nombreRepuesto;
+    
+    modalImagen.style.display = 'flex';
+}
+

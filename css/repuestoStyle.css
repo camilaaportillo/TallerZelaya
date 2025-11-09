@@ -164,21 +164,53 @@ main {
 }
 
 /* Botón registrar */
+/* Botón registrar - Reducir tamaño */
 .btn-registrar,
 .btn-actualizar {
     background: #0026ff;
     color: white;
     border: none;
-    border-radius: 25px;
-    padding: 18px;
-    font-size: 18px;
+    border-radius: 20px; /* Cambiado de 25px a 20px */
+    padding: 10px 15px;  /* Reducido de 18px a 10px 15px */
+    font-size: 14px;     /* Reducido de 18px a 14px */
     cursor: pointer;
-    margin-bottom: 15px;
+    margin-bottom: 5px;
     font-weight: bold;
+    height: 36px;        /* Misma altura que btn-cancelar-edicion */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
 }
 
 .btn-actualizar {
     display: none;
+}
+
+/* Botón cancelar edición - Mantener igual */
+.btn-cancelar-edicion {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 20px; 
+    cursor: pointer;
+    margin-bottom: 5px;
+    font-size: 14px;
+    padding: 10px 15px;
+    height: 36px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.btn-cancelar-edicion:hover {
+    background-color: #d32f2f;
+}
+
+/* Asegurar que ambos botones estén alineados */
+.btn-actualizar:hover {
+    background: #3b4fff;
 }
 
 .buscador {
@@ -286,24 +318,7 @@ table tbody tr:hover {
     margin-bottom: 10px;
 }
 
-.btn-cancelar-edicion {
-    background-color: #f44336;
-    color: white;
-    border: none;
-    border-radius: 20px; 
-    cursor: pointer;
-    font-size: 14px;
-    padding: 5px 10px;
-    height: 36px; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-}
 
-.btn-cancelar-edicion:hover {
-    background-color: #d32f2f;
-}
 
 
 .btn-editar {
@@ -636,3 +651,82 @@ table tbody tr:hover {
 .btn-eliminar-imagen:hover {
     background: #cc0000;
 }
+
+/* Estilos para imágenes en la tabla de repuestos */
+.imagen-repuesto {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.imagen-repuesto:hover {
+    transform: scale(1.8);
+    z-index: 1000;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.sin-imagen {
+    width: 50px;
+    height: 50px;
+    background-color: #f8f9fa;
+    border: 1px dashed #ddd;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 10px;
+    text-align: center;
+    padding: 2px;
+    cursor: default;
+}
+
+/* Modal para vista ampliada de imagen */
+.modal-imagen {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.9);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-imagen-contenido {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.cerrar-modal-imagen {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    color: #fff;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    background: none;
+    border: none;
+    z-index: 10001;
+}
+
+.cerrar-modal-imagen:hover {
+    color: #ccc;
+}
+
+/* Ajustes para la tabla con imágenes */
+.tabla-contenedor table td {
+    vertical-align: middle;
+}
+
