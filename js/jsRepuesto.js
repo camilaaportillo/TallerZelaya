@@ -37,6 +37,11 @@ const errorNombre = document.getElementById("errorNombre");
 const errorDescripcion = document.getElementById("errorTelefono");
 const errorStock = document.getElementById("errorCorreo");
 
+// Agregar después de las otras variables
+const inputImagen = document.getElementById("inputImagen");
+const errorImagen = document.getElementById("errorImagen");
+let imagenActual = null; // Para manejar la imagen durante edición
+
 // ========================= VALIDACIONES =========================
 inputNombre.addEventListener("input", () => {
     errorNombre.textContent = inputNombre.value.trim() === "" ? "El nombre no puede estar vacío." : "";
@@ -55,7 +60,9 @@ function validarRepuesto() {
     const stock = inputStockMinimo.value.trim();
     const marca = selectMarca.value;
     const medida = selectMedida.value;
+    const imagen = inputImagen.files[0];
 
+    // Validaciones existentes...
     if (!nombre) {
         showModalMensaje("advertencia", "Falta nombre", "El nombre no puede estar vacío.");
         inputNombre.focus();
@@ -81,7 +88,22 @@ function validarRepuesto() {
         selectMedida.focus();
         return false;
     }
-    return { nombre, descripcion, stock, marca, medida };
+
+    // Validar imagen (opcional durante edición)
+    if (!idSeleccionado && !imagen) {
+        showModalMensaje("advertencia", "Falta imagen", "Debe seleccionar una imagen del producto.");
+        inputImagen.focus();
+        return false;
+    }
+
+    return { 
+        nombre, 
+        descripcion, 
+        stock, 
+        marca, 
+        medida, 
+        imagen 
+    };
 }
 
 
@@ -143,6 +165,12 @@ function renderTabla(datos) {
             <td>${rep.marca}</td>
             <td>${rep.medida}</td>
             <td>
+                ${rep.imagen_path ? 
+                    `<img src="${rep.imagen_path}" alt="Imagen" style="width: 30px; height: 30px; object-fit: cover; border-radius: 4px;">` : 
+                    'Sin imagen'
+                }
+            </td>
+            <td>
                 <button class="btn-editar" data-id="${rep.id_repuesto}">
                     <img src="imgs/editar.png" alt="Editar">
                 </button>
@@ -163,14 +191,20 @@ btnRegistrar.addEventListener("click", (e) => {
     const datos = validarRepuesto();
     if (!datos) return;
 
-    const duplicado = repuestosData.find(r => r.nombre.toLowerCase() === datos.nombre.toLowerCase());
+    // Validar duplicado: nombre, marca Y medida deben ser iguales
+    const duplicado = repuestosData.find(r => 
+        r.nombre.toLowerCase() === datos.nombre.toLowerCase() &&
+        r.id_marca == datos.marca &&
+        r.id_medida == datos.medida
+    );
 
     if (duplicado) {
-        showModalMensaje("advertencia", "Duplicado", "Este repuesto ya está registrado.");
+        showModalMensaje("advertencia", "Duplicado", 
+            "Ya existe un repuesto con el mismo nombre, marca y medida.");
         return;
     }
-    // Función para generar el código único de repuesto
 
+    // Función para generar el código único de repuesto
     let nombrecodigo = document.getElementById("inputNombreProductos").value;
     let marcacodigo = document.getElementById("selectMarca").options[document.getElementById("selectMarca").selectedIndex].text;
     let medidacodigo = document.getElementById("selectMedida").options[document.getElementById("selectMedida").selectedIndex].text;
@@ -186,22 +220,36 @@ btnRegistrar.addEventListener("click", (e) => {
     // Concatenar todo (3 + 3 + 2 + 2 = 10)
     let codigo = parteNombre + parteMarca + parteMedida + aleatorio;
 
+    // Crear FormData para enviar archivo
+    const formData = new FormData();
+    formData.append('codigo', codigo);
+    formData.append('nombre', datos.nombre);
+    formData.append('descripcion', datos.descripcion);
+    formData.append('stock', datos.stock);
+    formData.append('id_marca', datos.marca);
+    formData.append('id_medida', datos.medida);
+    
+    if (datos.imagen) {
+        formData.append('imagen', datos.imagen);
+    }
 
     fetch("php/ingresarRepuesto.php", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `codigo=${codigo}&nombre=${datos.nombre}&descripcion=${datos.descripcion}&stock=${datos.stock}&id_marca=${datos.marca}&id_medida=${datos.medida}`
+        body: formData
     })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === "exito") {
-                showModalMensaje("exito", "Éxito", data.mensaje);
-                cargarRepuestos();
-                limpiarFormulario();
-            } else {
-                showModalMensaje("error", "Error", data.mensaje || "No se pudo insertar el registro.");
-            }
-        });
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "exito") {
+            showModalMensaje("exito", "Éxito", data.mensaje);
+            cargarRepuestos();
+            limpiarFormulario();
+        } else {
+            showModalMensaje("error", "Error", data.mensaje || "No se pudo insertar el registro.");
+        }
+    })
+    .catch(err => {
+        showModalMensaje("error", "Error", "Error al enviar los datos.");
+    });
 });
 
 btnCancelarEdicion.addEventListener("click", () => {
@@ -257,13 +305,21 @@ function limpiarFormulario() {
     [inputNombre, inputDescripcion, inputStockMinimo].forEach(i => i.value = "");
     selectMarca.selectedIndex = 0;
     selectMedida.selectedIndex = 0;
+    inputImagen.value = ""; // Limpiar input de imagen
     errorNombre.textContent = "";
     errorDescripcion.textContent = "";
     errorStock.textContent = "";
+    errorImagen.textContent = "";
     filaSeleccionada = null;
     idSeleccionado = null;
+    imagenActual = null;
+    
+    // Remover vista previa si existe
+    const vistaPrevia = document.querySelector('.vista-previa');
+    if (vistaPrevia) {
+        vistaPrevia.remove();
+    }
 }
-
 
 // Cerrar modal
 cerrarModal.addEventListener("click", () => {
@@ -293,7 +349,7 @@ btnEditarModal.addEventListener("click", () => {
         inputDescripcion.value = celdas[2].innerText;
         inputStockMinimo.value = celdas[3].innerText;
 
-        // Establecer empresa en el select (buscando por nombre)
+        // Establecer marca y medida
         const marca = celdas[4].innerText;
         const select = document.getElementById("selectMarca");
         for (let option of select.options) {
@@ -302,6 +358,7 @@ btnEditarModal.addEventListener("click", () => {
                 break;
             }
         }
+        
         const medida = celdas[5].innerText;
         const selectM = document.getElementById("selectMedida");
         for (let option of selectM.options) {
@@ -309,12 +366,44 @@ btnEditarModal.addEventListener("click", () => {
                 selectM.value = option.value;
                 break;
             }
-
-            modal.style.display = "none";
         }
+
+        // Cargar información de la imagen si existe
+        const repuesto = repuestosData.find(r => r.id_repuesto == idSeleccionado);
+        if (repuesto && repuesto.imagen_path) {
+            mostrarVistaPreviaExistente(repuesto.imagen_path);
+        }
+
+        modal.style.display = "none";
     }
 });
 
+// Función para mostrar vista previa de imagen existente
+function mostrarVistaPreviaExistente(rutaImagen) {
+    // Remover vista previa anterior si existe
+    const vistaPreviaAnterior = document.querySelector('.vista-previa');
+    if (vistaPreviaAnterior) {
+        vistaPreviaAnterior.remove();
+    }
+
+    const contenedor = document.createElement('div');
+    contenedor.className = 'vista-previa';
+    contenedor.innerHTML = `
+        <p><strong>Imagen actual:</strong></p>
+        <img src="${rutaImagen}" alt="Imagen actual del producto" onerror="this.style.display='none'">
+        <br>
+        <button type="button" class="btn-eliminar-imagen">Eliminar imagen</button>
+    `;
+
+    // Insertar después del input de imagen
+    inputImagen.parentNode.insertBefore(contenedor, inputImagen.nextSibling);
+
+    // Evento para eliminar imagen
+    contenedor.querySelector('.btn-eliminar-imagen').addEventListener('click', function() {
+        imagenActual = 'eliminar';
+        contenedor.remove();
+    });
+}
 
 const btnActualizar = document.querySelector(".btn-actualizar");
 
@@ -322,34 +411,61 @@ btnActualizar.addEventListener("click", () => {
     const datos = validarRepuesto();
     if (!datos) return;
 
+    // Validar duplicado al editar (excluyendo el registro actual)
+    const duplicado = repuestosData.find(r => 
+        r.id_repuesto != idSeleccionado && // Excluir el registro actual
+        r.nombre.toLowerCase() === datos.nombre.toLowerCase() &&
+        r.id_marca == datos.marca &&
+        r.id_medida == datos.medida
+    );
+
+    if (duplicado) {
+        showModalMensaje("advertencia", "Duplicado", 
+            "Ya existe otro repuesto con el mismo nombre, marca y medida.");
+        return;
+    }
+
+    // Crear FormData para enviar archivo
+    const formData = new FormData();
+    formData.append('id', idSeleccionado);
+    formData.append('nombre', datos.nombre);
+    formData.append('descripcion', datos.descripcion);
+    formData.append('stock', datos.stock);
+    formData.append('id_marca', datos.marca);
+    formData.append('id_medida', datos.medida);
+    
+    if (datos.imagen) {
+        formData.append('imagen', datos.imagen);
+    }
+    if (imagenActual === 'eliminar') {
+        formData.append('eliminar_imagen', '1');
+    }
+
     fetch("php/editarProducto.php", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `id=${idSeleccionado}&nombre=${datos.nombre}&descripcion=${datos.descripcion}&stock=${datos.stock}&id_marca=${datos.marca}&id_medida=${datos.medida}`
+        body: formData
     })
-        .then(res => res.json())
-        .then(data => {
-            modal.style.display = "none";
-            btnActualizar.style.display = "none";
-            btnRegistrar.style.display = "inline-block";
-            btnCancelarEdicion.style.display = "none";
-            limpiarFormulario();
-            inputNombre.focus();
-            document.querySelector(".tabla-contenedor").classList.remove("bloqueada");
+    .then(res => res.json())
+    .then(data => {
+        modal.style.display = "none";
+        btnActualizar.style.display = "none";
+        btnRegistrar.style.display = "inline-block";
+        btnCancelarEdicion.style.display = "none";
+        limpiarFormulario();
+        inputNombre.focus();
+        document.querySelector(".tabla-contenedor").classList.remove("bloqueada");
 
-            if (data.status === "exito") {
-                showModalMensaje("exito", "Éxito", data.mensaje);
-                cargarRepuestos();
-            } else {
-                showModalMensaje("error", "Error", data.mensaje);
-            }
-        })
-        .catch(err => {
-            showModalMensaje("error", "Error", "No se pudo editar el registro.");
-        });
+        if (data.status === "exito") {
+            showModalMensaje("exito", "Éxito", data.mensaje);
+            cargarRepuestos();
+        } else {
+            showModalMensaje("error", "Error", data.mensaje);
+        }
+    })
+    .catch(err => {
+        showModalMensaje("error", "Error", "No se pudo editar el registro.");
+    });
 });
-
-
 
 btnEliminar.addEventListener("click", () => {
     if (!idSeleccionado) {
@@ -358,8 +474,6 @@ btnEliminar.addEventListener("click", () => {
     }
     abrirModalConfirmar();
 });
-
-
 
 function irInicio() {
     window.location.href = "index.html";
@@ -508,3 +622,54 @@ document.getElementById("btnCancelarEliminar").addEventListener("click", () => {
     cerrarModalConfirmar();
 });
 
+// Vista previa de imagen seleccionada
+inputImagen.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        // Validar tipo de archivo
+        if (!file.type.startsWith('image/')) {
+            showModalMensaje("error", "Error", "Por favor seleccione un archivo de imagen válido.");
+            inputImagen.value = '';
+            return;
+        }
+
+        // Validar tamaño (max 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            showModalMensaje("error", "Error", "La imagen no debe pesar más de 2MB.");
+            inputImagen.value = '';
+            return;
+        }
+
+        mostrarVistaPreviaNueva(file);
+    }
+});
+
+function mostrarVistaPreviaNueva(file) {
+    // Remover vista previa anterior si existe
+    const vistaPreviaAnterior = document.querySelector('.vista-previa');
+    if (vistaPreviaAnterior) {
+        vistaPreviaAnterior.remove();
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const contenedor = document.createElement('div');
+        contenedor.className = 'vista-previa';
+        contenedor.innerHTML = `
+            <p><strong>Vista previa:</strong></p>
+            <img src="${e.target.result}" alt="Vista previa de la imagen">
+            <br>
+            <button type="button" class="btn-eliminar-imagen">Quitar imagen</button>
+        `;
+
+        // Insertar después del input de imagen
+        inputImagen.parentNode.insertBefore(contenedor, inputImagen.nextSibling);
+
+        // Evento para eliminar imagen
+        contenedor.querySelector('.btn-eliminar-imagen').addEventListener('click', function() {
+            inputImagen.value = '';
+            contenedor.remove();
+        });
+    };
+    reader.readAsDataURL(file);
+}

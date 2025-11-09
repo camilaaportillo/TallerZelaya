@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     $sql = "SELECT r.id_repuesto, r.codigo, r.nombre, r.descripcion, r.stock_minimo, r.stock_actual, 
-                   r.precio, r.id_marca, r.id_medida,
+                   r.precio, r.id_marca, r.id_medida, r.imagen_path,
                    m.nombre as marca, me.medida_bicicleta as medida
             FROM repuesto r
             INNER JOIN marca m ON r.id_marca = m.id_marca
@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     // Solicitud GET normal (sin filtros) - mantiene compatibilidad
     $sql = "SELECT r.id_repuesto, r.codigo, r.nombre, r.descripcion, r.stock_minimo, r.stock_actual, 
-                   r.precio, r.id_marca, r.id_medida,
+                   r.precio, r.id_marca, r.id_medida, r.imagen_path,
                    m.nombre as marca, me.medida_bicicleta as medida
             FROM repuesto r
             INNER JOIN marca m ON r.id_marca = m.id_marca
