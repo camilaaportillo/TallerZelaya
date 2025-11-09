@@ -178,7 +178,7 @@ function mostrarRepuestosEnTabla() {
     if (repuestosData.length === 0) {
         cuerpoTablaRepuestos.innerHTML = `
             <tr>
-                <td colspan="8" style="text-align: center; padding: 40px; color: #666;">
+                <td colspan="9" style="text-align: center; padding: 40px; color: #666;">
                     <div style="font-size: 48px; margin-bottom: 10px;">🔍</div>
                     No se encontraron repuestos con los filtros aplicados
                 </td>
@@ -190,20 +190,17 @@ function mostrarRepuestosEnTabla() {
     repuestosData.forEach(repuesto => {
         const fila = document.createElement("tr");
         
-        // NUEVA LÓGICA: Determinar clase de stock
+        // Determinar clase de stock
         let stockClass = '';
         let badgeClass = 'badge-secondary';
         
         if (repuesto.stock_actual === 0) {
-            // Stock crítico: solo cuando es 0
             stockClass = 'stock-cero';
             badgeClass = 'badge-danger';
         } else if (repuesto.stock_actual <= repuesto.stock_minimo) {
-            // Stock bajo: cuando es igual o menor al mínimo
             stockClass = 'stock-bajo';
             badgeClass = 'badge-warning';
         } else {
-            // Stock normal: cuando es mayor al mínimo
             badgeClass = 'badge-success';
         }
 
@@ -215,7 +212,28 @@ function mostrarRepuestosEnTabla() {
         
         fila.className = `${stockClass} ${!tienePrecioValido ? 'precio-cero' : ''}`;
         
+        // Generar HTML para la imagen
+        let imagenHTML = '';
+        if (repuesto.imagen_path) {
+            imagenHTML = `
+                <img src="${repuesto.imagen_path}" 
+                     alt="${repuesto.nombre}" 
+                     class="imagen-repuesto"
+                     onclick="ampliarImagen('${repuesto.imagen_path}', '${repuesto.nombre}')"
+                     title="Haz clic para ver imagen completa">
+            `;
+        } else {
+            imagenHTML = `
+                <div class="sin-imagen" title="Sin imagen">
+                    📷<br>No disponible
+                </div>
+            `;
+        }
+        
         fila.innerHTML = `
+            <td style="text-align: center; padding: 5px;">
+                ${imagenHTML}
+            </td>
             <td><strong>${repuesto.codigo}</strong></td>
             <td style="text-align: left;">${repuesto.nombre}</td>
             <td>${repuesto.marca}</td>
@@ -244,6 +262,47 @@ function mostrarRepuestosEnTabla() {
 
         cuerpoTablaRepuestos.appendChild(fila);
     });
+}
+
+// Función para ampliar imagen
+function ampliarImagen(rutaImagen, nombreRepuesto) {
+    // Crear modal si no existe
+    let modalImagen = document.getElementById('modalImagen');
+    if (!modalImagen) {
+        modalImagen = document.createElement('div');
+        modalImagen.id = 'modalImagen';
+        modalImagen.className = 'modal-imagen';
+        modalImagen.innerHTML = `
+            <button class="cerrar-modal-imagen">&times;</button>
+            <img class="modal-imagen-contenido" id="imagenAmpliada">
+        `;
+        document.body.appendChild(modalImagen);
+        
+        // Event listeners para cerrar modal
+        modalImagen.querySelector('.cerrar-modal-imagen').addEventListener('click', () => {
+            modalImagen.style.display = 'none';
+        });
+        
+        modalImagen.addEventListener('click', (e) => {
+            if (e.target === modalImagen) {
+                modalImagen.style.display = 'none';
+            }
+        });
+        
+        // Cerrar con tecla ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modalImagen.style.display === 'flex') {
+                modalImagen.style.display = 'none';
+            }
+        });
+    }
+    
+    // Mostrar imagen
+    const imagenAmpliada = document.getElementById('imagenAmpliada');
+    imagenAmpliada.src = rutaImagen;
+    imagenAmpliada.alt = nombreRepuesto;
+    
+    modalImagen.style.display = 'flex';
 }
 
 async function abrirModalEditarPrecio(idRepuesto) {

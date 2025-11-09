@@ -1208,3 +1208,74 @@ main {
     background: #c82333;
     transform: translateY(-1px);
 }
+
+/* Estilos para imágenes en la tabla */
+.imagen-repuesto {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background-color: #f8f9fa;
+}
+
+.imagen-repuesto:hover {
+    transform: scale(1.8);
+    transition: transform 0.2s ease;
+    z-index: 1000;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.sin-imagen {
+    width: 50px;
+    height: 50px;
+    background-color: #f8f9fa;
+    border: 1px dashed #ddd;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 10px;
+    text-align: center;
+    padding: 2px;
+}
+
+/* Modal para vista ampliada de imagen */
+.modal-imagen {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.9);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-imagen-contenido {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.cerrar-modal-imagen {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    color: #fff;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    background: none;
+    border: none;
+    z-index: 10001;
+}
+
+.cerrar-modal-imagen:hover {
+    color: #ccc;
+}
