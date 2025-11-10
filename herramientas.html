@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="imgs/favicon.png" type="image/png">
+    <title>Herramientas</title>
+    <link rel="stylesheet" href="css/herramientasStyle.css">
+     <style>
+        body { visibility: hidden; } /* oculta el body si no se ha iniciado sesion */
+    </style>
+    <script src="js/sesion.js"></script> 
+</head>
+
+<body>
+
+     <!-- Encabezado -->
+    <header>
+        <button class="logo-btn" onclick="irInicio()">
+            <img src="imgs/bicicleta.png" alt="Logo bicicleta">
+            <span class="hover-text">Inicio</span>
+        </button>
+        <h1>Taller de bicicletas Zelaya</h1>
+        <div class="usuario">
+            <div class="info-usuario">
+                <span id="nombreUsuario" class="nombre-usuario">Usuario</span>
+                <span id="rolUsuario" class="rol-usuario"></span>
+            </div>
+            <button class="user-btn" onclick="toggleMenu()">
+                <img src="imgs/logo_user.png" alt="Usuario">
+            </button>
+            <div id="menuUsuario" class="menu-usuario">
+                <a href="#" onclick="cerrarSesion()">Cerrar sesión</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- Formulario -->
+        <section class="formulario">
+            <button class="btn-registrar">Agregar Herramienta</button>
+            <button class="btn-actualizar" style="display:none;">Editar Herramienta</button>
+            <button id="btnCancelarEdicion" class="btn-cancelar-edicion" style="display:none;">Cancelar edición</button>
+
+            <label>Nombre de la Herramienta</label>
+            <input type="text" id="inputNombreHerramienta" placeholder="Escriba aquí" autocomplete="off">
+            <small id="errorNombre" class="error-msg"></small>
+
+            <label>Descripción</label>
+            <input type="text" id="inputDescripcion" placeholder="Escriba aquí" autocomplete="off">
+            <small id="errorDescripcion" class="error-msg"></small>
+
+            <label>Stock Actual</label>
+            <input type="number" id="inputStock" placeholder="Escriba aquí" autocomplete="off" min="0">
+            <small id="errorStock" class="error-msg"></small>
+
+            <label>Marca</label>
+            <select id="selectMarca">
+                <option value="" disabled selected>Seleccionar Marca</option>
+            </select>
+
+            <label>Medida</label>
+            <select id="selectMedida">
+                <option value="" disabled selected>Seleccionar Medida</option>
+            </select>
+
+            <label>Imagen de la Herramienta</label>
+            <input type="file" id="inputImagen" accept="image/*">
+            <small id="errorImagen" class="error-msg"></small>
+
+        </section>
+
+        <!-- Tabla -->
+        <section class="tabla">
+
+            <div class="buscador">
+                <button id="btn-volver" class="btn-volver" style="display:none;">Volver</button>
+                <p></p>
+
+                <!-- Grupo de búsqueda -->
+                <div class="buscador-derecha">
+                    <input type="text" id="inputBuscar" placeholder="Buscar...">
+                    <button id="btnLimpiar" style="display:none;">❌</button>
+                </div>
+            </div>
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Stock</th>
+                            <th>Marca</th>
+                            <th>Medida</th>
+                            <th>Imagen</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTabla">
+                        <!-- Los datos se cargan dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+            <div style="display: flex; justify-content: right; margin-top: 10px;">
+                <p> </p>
+            </div>
+
+        </section>
+
+        <!-- Modal de acciones -->
+        <div id="modalAcciones" class="modal">
+            <div class="modal-contenido">
+                <h2>Acciones</h2>
+                <div class="modal-botones">
+                    <button id="btnEditarModal" class="btn-accion btn-azul">Editar</button>
+                    <button id="btnEliminarModal" class="btn-accion btn-rojo">Eliminar</button>
+                </div>
+                <button id="cerrarModal" class="btn-cerrar">X</button>
+            </div>
+        </div>
+
+        <!-- Modal de mensajes -->
+        <div id="modalMensaje" class="modal">
+            <div class="modal-mensaje-contenido">
+                <div class="modal-mensaje-icono" id="modalIcono"></div>
+                <div class="modal-mensaje-texto">
+                    <h2 id="modalTitulo"></h2>
+                    <p id="modalTexto"></p>
+                </div>
+                <button id="cerrarMensaje" class="btn-cerrar">X</button>
+            </div>
+        </div>
+
+        <!-- Modal de Confirmación -->
+        <div id="modalConfirmar" class="modal">
+            <div class="modal-content warning">
+                <span class="close" onclick="cerrarModalConfirmar()">&times;</span>
+                <h1>⚠</h1>
+                <p>¿Seguro que deseas eliminar esta herramienta?</p>
+                <div class="modal-actions">
+                    <button id="btnConfirmarEliminar" class="btn-confirmar">Sí, eliminar</button>
+                    <button onclick="cerrarModalConfirmar()" class="btn-cancelar">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para imagen ampliada -->
+        <div id="modalImagen" class="modal-imagen">
+            <button class="cerrar-modal-imagen">&times;</button>
+            <img class="modal-imagen-contenido" id="imagenAmpliada">
+        </div>
+
+    </main>
+
+    <script src="js/jsHerramientas.js"></script>
+  
+</body>
+
+</html>
