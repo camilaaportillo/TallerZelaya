@@ -1,6 +1,8 @@
 <?php
+session_start();
 header("Content-Type: application/json; charset=UTF-8");
 include "conexion.php";
+include "bitacora_helper.php";
 
 try {
     // ====== Validaciones iniciales ======
@@ -38,6 +40,8 @@ try {
 
     // Primero calculamos el total en base a los productos
     $precioTotal = 0;
+    $nombresProductos = [];
+    
     foreach ($productos as $i => $p) {
         if (!isset($p["producto"], $p["cantidad"], $p["precio"])) {
             throw new Exception("Formato de producto inválido.");
@@ -47,7 +51,28 @@ try {
         $precioUnitario = floatval($p["precio"]);
         $productos[$i]["subtotal"] = $cantidad * $precioUnitario;
         $precioTotal += $productos[$i]["subtotal"];
+        
+        // Obtener nombre del producto para la bitácora
+        $stmtNombre = $conn->prepare("SELECT nombre FROM repuesto WHERE id_repuesto = ?");
+        $stmtNombre->bind_param("i", $p["producto"]);
+        $stmtNombre->execute();
+        $result = $stmtNombre->get_result();
+        if ($row = $result->fetch_assoc()) {
+            $nombresProductos[] = $row['nombre'] . " (x" . $cantidad . ")";
+        }
+        $stmtNombre->close();
     }
+
+    // Obtener nombre del proveedor para la bitácora
+    $stmtProv = $conn->prepare("SELECT nombre FROM proveedor WHERE id_proveedor = ?");
+    $stmtProv->bind_param("i", $proveedor);
+    $stmtProv->execute();
+    $resultProv = $stmtProv->get_result();
+    $nombreProveedor = "Proveedor #" . $proveedor;
+    if ($rowProv = $resultProv->fetch_assoc()) {
+        $nombreProveedor = $rowProv['nombre'];
+    }
+    $stmtProv->close();
 
     // Insertar compra
     $stmt = $conn->prepare("INSERT INTO compra (precio, fecha, id_proveedor, id_usuario, facturaImagen) VALUES (?, ?, ?, ?, ?)");
@@ -63,10 +88,9 @@ try {
     );
     $stmtDetalle->bind_param("iiidd", $cantidad, $idCompra, $idRepuesto, $precioUnitario, $subTotal);
 
-    // ✅ CORREGIDO: Quitamos la columna ultima_compra que no existe
     $stmtStock = $conn->prepare(
         "UPDATE repuesto 
-         SET stock_actual = stock_actual + ?
+         SET stock_actual = COALESCE(stock_actual, 0) + ?
          WHERE id_repuesto = ?"
     );
     $stmtStock->bind_param("ii", $cantidadStock, $idRepuestoStock);
@@ -80,7 +104,7 @@ try {
         // Insertar detalle de compra
         $stmtDetalle->execute();
 
-        // ✅ ACTUALIZAR stock del repuesto (sin ultima_compra)
+        // ACTUALIZAR stock del repuesto
         $cantidadStock = $cantidad;
         $idRepuestoStock = $idRepuesto;
         $stmtStock->execute();
@@ -91,6 +115,41 @@ try {
 
     // Confirmar transacción
     $conn->commit();
+
+    // ====== REGISTRAR EN BITÁCORA ======
+    $descripcionCompra = "Compra registrada #{$idCompra} - Proveedor: {$nombreProveedor} - Total: $" . number_format($precioTotal, 2);
+    registrarEnBitacora(
+        'INSERT',
+        $descripcionCompra,
+        'compra',
+        $idCompra,
+        'Compras'
+    );
+
+    // Registrar actualizaciones de stock en bitácora
+    foreach ($productos as $p) {
+        $idRepuesto = intval($p["producto"]);
+        $cantidad = intval($p["cantidad"]);
+        
+        // Obtener nombre del repuesto
+        $stmtNombreRep = $conn->prepare("SELECT nombre FROM repuesto WHERE id_repuesto = ?");
+        $stmtNombreRep->bind_param("i", $idRepuesto);
+        $stmtNombreRep->execute();
+        $resultRep = $stmtNombreRep->get_result();
+        $nombreRepuesto = "Repuesto #" . $idRepuesto;
+        if ($rowRep = $resultRep->fetch_assoc()) {
+            $nombreRepuesto = $rowRep['nombre'];
+        }
+        $stmtNombreRep->close();
+        
+        registrarEnBitacora(
+            'UPDATE',
+            "Stock actualizado: {$nombreRepuesto} +{$cantidad} unidades (Compra #{$idCompra})",
+            'repuesto',
+            $idRepuesto,
+            'Inventario'
+        );
+    }
 
     echo json_encode([
         "status" => "success",
@@ -108,5 +167,10 @@ try {
         "status" => "error",
         "message" => $e->getMessage()
     ]);
+}
+
+// Cerrar conexión si existe
+if (isset($conn)) {
+    $conn->close();
 }
 ?>

@@ -11,13 +11,13 @@ let choicesProveedor = null;
 // Recuperar usuario de sessionStorage
 const usuarioData = JSON.parse(sessionStorage.getItem("usuario") || "{}");
 const ID_USUARIO = usuarioData.id || null;
+const NOMBRE_USUARIO = usuarioData.nombre || 'Invitado';
 
 /* ========== Referencias DOM ========== */
 const tablaBody = document.querySelector(".tabla tbody");
 const btnRegistrar = document.querySelector(".btn-registrar");
 const btnActualizar = document.querySelector(".btn-actualizar");
 const btnCancelarEdicion = document.getElementById("btnCancelarEdicion");
-
 
 const selectProducto = document.getElementById("selectProducto");
 const inputCantidad = document.getElementById("inputCantidad");
@@ -212,8 +212,6 @@ function validarPrecio() {
     return true;
 }
 
-
-
 function validarProveedor() {
     if (productosCompra.length === 0) {
         if (!selectProveedor || !selectProveedor.value || selectProveedor.value === "") {
@@ -250,7 +248,6 @@ function validarFecha() {
     return true;
 }
 
-
 function validarCompra() {
     const v1 = validarProducto();
     const v2 = validarCantidad();
@@ -278,7 +275,6 @@ function validarCompra() {
         fecha: inputFecha ? inputFecha.value : null
     };
 }
-
 
 /* ========== Agregar producto ========== */
 btnRegistrar.addEventListener("click", (e) => {
@@ -510,6 +506,7 @@ if (btnEnviar) {
             showModalMensaje("advertencia", "Datos invalidos", "Proveedor o fecha inválidos.");
             return;
         }
+        
         // Preparar datos para enviar
         const productosParaEnviar = productosCompra.map(p => ({
             producto: Number(p.id_repuesto),
@@ -517,21 +514,32 @@ if (btnEnviar) {
             precio: Number(p.precio)
         }));
 
-
         // Armamos el FormData
         let formData = new FormData();
         formData.append("proveedor", proveedor);
         formData.append("fecha", fecha);
         formData.append("usuario", ID_USUARIO);
         formData.append("productos", JSON.stringify(productosParaEnviar));
+        
+        // Agregar información del usuario para bitácora
+        formData.append("usuario_id", ID_USUARIO);
+        formData.append("usuario_nombre", NOMBRE_USUARIO);
 
         // agregar factura si se subió
         let factura = document.getElementById("fileFactura")?.files[0];
         if (factura) {
             formData.append("factura", factura);
         }
+        
         // Enviar datos al servidor
-        console.log("Enviando datos al servidor:", { proveedor, fecha, usuario: ID_USUARIO, productos: productosParaEnviar, factura });
+        console.log("Enviando datos al servidor:", { 
+            proveedor, 
+            fecha, 
+            usuario: ID_USUARIO, 
+            productos: productosParaEnviar, 
+            factura,
+            usuario_nombre: NOMBRE_USUARIO 
+        });
 
         fetch("php/compra.php", {
             method: "POST",

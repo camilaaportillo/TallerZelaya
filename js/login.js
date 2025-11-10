@@ -40,7 +40,7 @@ class SistemaLogin {
         this.verificarBloqueoTemporal();
     }
     inicializarEventos() {
-        
+
 
         // Evento para "Olvidé la contraseña"
         document.querySelector('.forgot-password').addEventListener('click', (e) => {
@@ -146,88 +146,101 @@ class SistemaLogin {
     }
 
     async validarLogin() {
-    // Verificar si el formulario está bloqueado temporalmente
-    if (this.esTemporizadorActivo) {
-        this.mostrarError(`El formulario está bloqueado. Espera ${Math.ceil(this.tiempoBloqueo / 1000)} segundos.`);
-        return;
-    }
-
-    const correo = this.correoInput.value.trim();
-    const contrasena = this.contrasenaInput.value.trim();
-
-    // Validaciones básicas
-    if (!this.validarCampos(correo, contrasena)) {
-        return;
-    }
-
-    // Mostrar loading en el botón
-    const botonLogin = this.loginForm.querySelector('.login-button');
-    const textoOriginal = botonLogin.innerHTML;
-    botonLogin.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Validando...';
-    botonLogin.disabled = true;
-
-    // ✅ DECLARAR resultado aquí para que esté disponible en el finally
-    let resultado = null;
-
-    try {
-        const formData = new FormData();
-        formData.append('correo', correo);
-        formData.append('contrasena', contrasena);
-
-        const response = await fetch('php/login.php', {
-            method: 'POST',
-            body: formData
-        });
-
-        // Verificar si la respuesta es JSON válido
-        const responseText = await response.text();
-        
-        try {
-            resultado = JSON.parse(responseText);
-        } catch (e) {
-            console.error('Respuesta del servidor:', responseText);
-            throw new Error('El servidor devolvió una respuesta inválida');
+        // Verificar si el formulario está bloqueado temporalmente
+        if (this.esTemporizadorActivo) {
+            this.mostrarError(`El formulario está bloqueado. Espera ${Math.ceil(this.tiempoBloqueo / 1000)} segundos.`);
+            return;
         }
 
-        if (resultado.exitoso) {
-            this.intentosFallidos = 0;
-            localStorage.removeItem('bloqueo_login');
-            this.loginExitoso(resultado);
-        } else {
-            // ✅ Manejar diferentes tipos de errores
-            if (resultado.bloqueado) {
-                // Bloqueo temporal (30 segundos)
-                this.iniciarBloqueoTemporal(30000);
-                this.mostrarError(resultado.mensaje);
-            } else if (resultado.cuenta_desactivada) {
-                // ✅ Cuenta desactivada permanentemente - NO bloquear formulario
-                this.mostrarError(resultado.mensaje);
-                // Opcional: deshabilitar solo los campos de este usuario
-                this.correoInput.disabled = true;
-                this.contrasenaInput.disabled = true;
-                botonLogin.disabled = true;
-                botonLogin.innerHTML = 'Cuenta Desactivada';
-                botonLogin.style.opacity = '0.6';
-                botonLogin.style.cursor = 'not-allowed';
+        const correo = this.correoInput.value.trim();
+        const contrasena = this.contrasenaInput.value.trim();
+
+        // Validaciones básicas
+        if (!this.validarCampos(correo, contrasena)) {
+            return;
+        }
+
+        // Mostrar loading en el botón
+        const botonLogin = this.loginForm.querySelector('.login-button');
+        const textoOriginal = botonLogin.innerHTML;
+        botonLogin.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Validando...';
+        botonLogin.disabled = true;
+
+        let resultado = null;
+
+        try {
+            const formData = new FormData();
+            formData.append('correo', correo);
+            formData.append('contrasena', contrasena);
+
+            const response = await fetch('php/login.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            const responseText = await response.text();
+            console.log('Respuesta cruda del servidor:', responseText);
+
+            // ✅ CORRECIÓN: Limpiar el texto de posibles notices/warnings de PHP
+            let jsonText = responseText;
+
+            // Si hay tags HTML en la respuesta, extraer solo el JSON
+            if (responseText.includes('{') && responseText.includes('}')) {
+                const jsonStart = responseText.indexOf('{');
+                const jsonEnd = responseText.lastIndexOf('}') + 1;
+
+                if (jsonStart !== -1 && jsonEnd !== 0) {
+                    jsonText = responseText.substring(jsonStart, jsonEnd);
+                }
+            }
+
+            try {
+                resultado = JSON.parse(jsonText);
+            } catch (e) {
+                console.error('Error parseando JSON:', e);
+                console.error('Texto que intentó parsear:', jsonText);
+                throw new Error('El servidor devolvió una respuesta inválida');
+            }
+
+            if (resultado.exitoso) {
+                this.intentosFallidos = 0;
+                localStorage.removeItem('bloqueo_login');
+                this.loginExitoso(resultado);
             } else {
-                // Error normal (contraseña incorrecta, etc.)
-                this.mostrarError(resultado.mensaje);
+                // ✅ Manejar diferentes tipos de errores
+                if (resultado.bloqueado) {
+                    // Bloqueo temporal (30 segundos)
+                    this.iniciarBloqueoTemporal(30000);
+                    this.mostrarError(resultado.mensaje);
+                } else if (resultado.cuenta_desactivada) {
+                    // ✅ Cuenta desactivada permanentemente - NO bloquear formulario
+                    this.mostrarError(resultado.mensaje);
+                    // Opcional: deshabilitar solo los campos de este usuario
+                    this.correoInput.disabled = true;
+                    this.contrasenaInput.disabled = true;
+                    botonLogin.disabled = true;
+                    botonLogin.innerHTML = 'Cuenta Desactivada';
+                    botonLogin.style.opacity = '0.6';
+                    botonLogin.style.cursor = 'not-allowed';
+                } else {
+                    // Error normal (contraseña incorrecta, etc.)
+                    this.mostrarError(resultado.mensaje);
+                }
+            }
+        } catch (error) {
+            this.mostrarError('Error de conexión. Intente nuevamente.');
+            console.error('Error en login:', error);
+        } finally {
+            // ✅ CORRECIÓN: Verificar si resultado existe antes de usarlo
+            const cuentaDesactivada = resultado ? resultado.cuenta_desactivada : false;
+
+            // Restaurar botón solo si no está en estado de cuenta desactivada y no está bloqueado
+            if (!this.esTemporizadorActivo && !cuentaDesactivada) {
+                botonLogin.innerHTML = textoOriginal;
+                botonLogin.disabled = false;
             }
         }
-    } catch (error) {
-        this.mostrarError('Error de conexión. Intente nuevamente.');
-        console.error('Error en login:', error);
-    } finally {
-        // ✅ CORRECIÓN: Verificar si resultado existe antes de usarlo
-        const cuentaDesactivada = resultado ? resultado.cuenta_desactivada : false;
-        
-        // Restaurar botón solo si no está en estado de cuenta desactivada y no está bloqueado
-        if (!this.esTemporizadorActivo && !cuentaDesactivada) {
-            botonLogin.innerHTML = textoOriginal;
-            botonLogin.disabled = false;
-        }
     }
-}
     iniciarBloqueoTemporal(duracion) {
         this.esTemporizadorActivo = true;
         this.tiempoBloqueo = duracion;
@@ -336,15 +349,15 @@ class SistemaLogin {
         }
 
         // Redirigir al dashboard
-       setTimeout(() => {
-    // ✅ VERIFICAR que los datos se guardaron antes de redirigir
-    console.log('🔍 Verificando sessionStorage antes de redirigir:');
-    console.log('usuario:', sessionStorage.getItem('usuario'));
-    console.log('loggedin:', sessionStorage.getItem('loggedin'));
-    console.log('usuario_rol:', sessionStorage.getItem('usuario_rol'));
-    
-    window.location.href = 'index.html';
-}, 500); // ⚡ Reducir a 500ms
+        setTimeout(() => {
+            // ✅ VERIFICAR que los datos se guardaron antes de redirigir
+            console.log('🔍 Verificando sessionStorage antes de redirigir:');
+            console.log('usuario:', sessionStorage.getItem('usuario'));
+            console.log('loggedin:', sessionStorage.getItem('loggedin'));
+            console.log('usuario_rol:', sessionStorage.getItem('usuario_rol'));
+
+            window.location.href = 'index.html';
+        }, 500); // ⚡ Reducir a 500ms
     }
     mostrarError(mensaje) {
         this.mensajeError.textContent = mensaje;

@@ -826,18 +826,27 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        // Obtener usuario de sessionStorage
+        const usuarioData = JSON.parse(sessionStorage.getItem("usuario") || "{}");
+        const ID_USUARIO = usuarioData.id || null;
+        const NOMBRE_USUARIO = usuarioData.nombre || 'Invitado';
+
         // Si no hay cliente seleccionado, usar cliente por defecto (id=1)
         const idClienteFinal = clienteSeleccionado || '1';
 
         const ventaData = {
             fecha: fechaVenta,
             total: articulosVenta.reduce((sum, articulo) => sum + articulo.subtotal, 0),
-            id_usuario: obtenerIdUsuario(),
+            id_usuario: ID_USUARIO,
             id_cliente: idClienteFinal,
             productos: articulosVenta.filter(articulo => articulo.tipo === 'producto'),
-            reparaciones: articulosVenta.filter(articulo => articulo.tipo === 'reparacion')
+            reparaciones: articulosVenta.filter(articulo => articulo.tipo === 'reparacion'),
+            // Agregar información del usuario para la bitácora
+            usuario_bitacora: {
+                id: ID_USUARIO,
+                nombre: NOMBRE_USUARIO
+            }
         };
-
 
         fetch('php/registrarVenta.php', {
             method: 'POST',
