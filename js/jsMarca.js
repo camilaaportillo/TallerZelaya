@@ -82,10 +82,17 @@ btnRegistrar.addEventListener("click", (e) => {
     const datos = validarMarca();
     if (!datos) return;
 
+    // Agregar información del usuario para bitácora
+    const usuarioSesion = JSON.parse(sessionStorage.getItem('usuario') || '{}');
+    const datosEnvio = new URLSearchParams();
+    datosEnvio.append('nombre', datos.nombre);
+    datosEnvio.append('usuario_bitacora_id', usuarioSesion.id || '');
+    datosEnvio.append('usuario_bitacora_nombre', usuarioSesion.nombre || 'Sistema');
+
     fetch("php/ingresarMarca.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `nombre=${encodeURIComponent(datos.nombre)}`
+        body: datosEnvio
     })
     .then(res => res.json())
     .then(data => {
@@ -107,14 +114,26 @@ btnRegistrar.addEventListener("click", (e) => {
 
 
 // Actualizar marca
-
 btnActualizar.addEventListener("click", () => {
     const nombre = inputNombre.value;
+
+    if (!nombre.trim()) {
+        showModalMensaje("advertencia", "Campo vacío", "El nombre no puede estar vacío.");
+        return;
+    }
+
+    // Agregar información del usuario para bitácora
+    const usuarioSesion = JSON.parse(sessionStorage.getItem('usuario') || '{}');
+    const datosEnvio = new URLSearchParams();
+    datosEnvio.append('id', idSeleccionado);
+    datosEnvio.append('nombre', nombre);
+    datosEnvio.append('usuario_bitacora_id', usuarioSesion.id || '');
+    datosEnvio.append('usuario_bitacora_nombre', usuarioSesion.nombre || 'Sistema');
 
     fetch("php/editarMarca.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `id=${idSeleccionado}&nombre=${nombre}`
+        body: datosEnvio
     })
         .then(res => res.json())
         .then(data => {
@@ -142,16 +161,25 @@ btnActualizar.addEventListener("click", () => {
 // Eliminar marca
 btnEliminarModal.addEventListener("click", () => {
     if (!idSeleccionado) {
-        alert("No se ha seleccionado ninguna marca.");
+        showModalMensaje("advertencia", "Selección requerida", "No se ha seleccionado ninguna marca.");
         return;
     }
+    
     abrirModalConfirmar();
     document.getElementById("btnConfirmarEliminar").addEventListener("click", () => {
         cerrarModalConfirmar();
+        
+        // Agregar información del usuario para bitácora
+        const usuarioSesion = JSON.parse(sessionStorage.getItem('usuario') || '{}');
+        const datosEnvio = new URLSearchParams();
+        datosEnvio.append('id', idSeleccionado);
+        datosEnvio.append('usuario_bitacora_id', usuarioSesion.id || '');
+        datosEnvio.append('usuario_bitacora_nombre', usuarioSesion.nombre || 'Sistema');
+
         fetch("php/eliminarMarca.php", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `id=${idSeleccionado}`
+            body: datosEnvio
         })
             .then(res => res.json())
             .then(data => {

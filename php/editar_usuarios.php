@@ -1,4 +1,5 @@
 <?php
+session_start();
 // Activar reporte de errores
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
@@ -10,6 +11,10 @@ error_log("Datos POST: " . print_r($_POST, true));
 
 header("Content-Type: application/json; charset=UTF-8");
 
+// Incluir conexión y bitácora
+include "conexion.php";
+include "bitacora_helper.php";
+
 // Verificar si es POST de manera más flexible
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     error_log("Error: Método no permitido. Método recibido: " . $_SERVER['REQUEST_METHOD']);
@@ -19,9 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     ]);
     exit;
 }
-
-// Incluir conexión
-include "conexion.php";
 
 // Verificar conexión
 if ($conn->connect_error) {
@@ -77,6 +79,15 @@ if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
     exit;
 }
 
+// Obtener datos anteriores para la bitácora
+$sql_anterior = "SELECT nombre, correo, id_rol, estado FROM usuario WHERE id_usuario = ?";
+$stmt_anterior = $conn->prepare($sql_anterior);
+$stmt_anterior->bind_param("i", $id);
+$stmt_anterior->execute();
+$result_anterior = $stmt_anterior->get_result();
+$usuario_anterior = $result_anterior->fetch_assoc();
+$stmt_anterior->close();
+
 // Preparar y ejecutar consulta
 try {
     $sql = "UPDATE usuario SET nombre=?, correo=?, id_rol=?, estado=? WHERE id_usuario=?";
@@ -95,6 +106,37 @@ try {
         error_log("Filas afectadas: $filasAfectadas");
         
         if ($filasAfectadas > 0) {
+            // ✅ REGISTRAR EN BITÁCORA - ACTUALIZACIÓN DE USUARIO
+            $cambios = [];
+            
+            if ($usuario_anterior['nombre'] !== $nombre) {
+                $cambios[] = "Nombre: {$usuario_anterior['nombre']} → $nombre";
+            }
+            if ($usuario_anterior['correo'] !== $correo) {
+                $cambios[] = "Correo: {$usuario_anterior['correo']} → $correo";
+            }
+            if ($usuario_anterior['id_rol'] != $rol) {
+                $rol_anterior = ($usuario_anterior['id_rol'] == 1) ? 'Administrador' : 'Empleado';
+                $rol_nuevo = ($rol == 1) ? 'Administrador' : 'Empleado';
+                $cambios[] = "Rol: $rol_anterior → $rol_nuevo";
+            }
+            if ($usuario_anterior['estado'] !== $estado) {
+                $cambios[] = "Estado: {$usuario_anterior['estado']} → $estado";
+            }
+            
+            $descripcion = "Usuario actualizado: $nombre";
+            if (!empty($cambios)) {
+                $descripcion .= " - Cambios: " . implode(", ", $cambios);
+            }
+            
+            registrarEnBitacora(
+                'UPDATE',
+                $descripcion,
+                'usuario',
+                $id,
+                'Usuarios'
+            );
+            
             echo json_encode([
                 "status" => "success",
                 "mensaje" => "Usuario actualizado correctamente"

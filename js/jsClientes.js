@@ -11,7 +11,7 @@ const tablaBody = document.querySelector(".tabla tbody");
 const btnRegistrar = document.querySelector(".btn-registrar");
 const btnActualizar = document.querySelector(".btn-actualizar");
 
-// Inputs del formulario de clientes
+//Inputs del formulario de clientes
 const inputNombre = document.getElementById("inputNombre");
 const inputApellido = document.getElementById("inputApellido");
 const inputTelefono = document.getElementById("inputTelefono");
@@ -174,7 +174,7 @@ function mostrarTabla(datos) {
     });
 }
 
-// Registrar cliente - CORREGIDO
+// Registrar cliente
 btnRegistrar.addEventListener("click", (e) => {
     e.preventDefault();
 
@@ -192,10 +192,19 @@ btnRegistrar.addEventListener("click", (e) => {
         return;
     }
 
+    // Agregar información del usuario para bitácora
+    const usuarioSesion = JSON.parse(sessionStorage.getItem('usuario') || '{}');
+    const datosEnvio = new URLSearchParams();
+    datosEnvio.append('nombre', datos.nombre);
+    datosEnvio.append('telefono', datos.telefono || '');
+    datosEnvio.append('correo', datos.correo || '');
+    datosEnvio.append('usuario_bitacora_id', usuarioSesion.id || '');
+    datosEnvio.append('usuario_bitacora_nombre', usuarioSesion.nombre || 'Sistema');
+
     fetch("php/ingresarClientes.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `nombre=${encodeURIComponent(datos.nombre)}&apellido=${encodeURIComponent(datos.apellido)}&telefono=${encodeURIComponent(datos.telefono)}&correo=${encodeURIComponent(datos.correo)}`
+        body: datosEnvio
     })
     .then(res => res.json())
     .then(data => {
@@ -217,7 +226,7 @@ btnRegistrar.addEventListener("click", (e) => {
     });
 });
 
-// Actualizar cliente - CORREGIDO
+// Actualizar cliente
 btnActualizar.addEventListener("click", () => {
     const datos = validarCliente();
     if (!datos) return;
@@ -234,10 +243,20 @@ btnActualizar.addEventListener("click", () => {
         return;
     }
 
+    // Agregar información del usuario para bitácora
+    const usuarioSesion = JSON.parse(sessionStorage.getItem('usuario') || '{}');
+    const datosEnvio = new URLSearchParams();
+    datosEnvio.append('id_cliente', idSeleccionado);
+    datosEnvio.append('nombre', datos.nombre);
+    datosEnvio.append('telefono', datos.telefono || '');
+    datosEnvio.append('correo', datos.correo || '');
+    datosEnvio.append('usuario_bitacora_id', usuarioSesion.id || '');
+    datosEnvio.append('usuario_bitacora_nombre', usuarioSesion.nombre || 'Sistema');
+
     fetch("php/editarClientes.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `id_cliente=${idSeleccionado}&nombre=${encodeURIComponent(datos.nombre)}&telefono=${encodeURIComponent(datos.telefono)}&correo=${encodeURIComponent(datos.correo)}`
+        body: datosEnvio
     })
     .then(res => res.json())
     .then(data => {
@@ -268,32 +287,41 @@ btnActualizar.addEventListener("click", () => {
 // Eliminar cliente
 btnEliminarModal.addEventListener("click", () => {
     if (!idSeleccionado) {
-        alert("No se ha seleccionado ningún cliente.");
+        showModalMensaje("advertencia", "Selección requerida", "No se ha seleccionado ningún cliente.");
         return;
     }
+    
     abrirModalConfirmar();
     document.getElementById("btnConfirmarEliminar").addEventListener("click", () => {
         cerrarModalConfirmar();
+        
+        // Agregar información del usuario para bitácora
+        const usuarioSesion = JSON.parse(sessionStorage.getItem('usuario') || '{}');
+        const datosEnvio = new URLSearchParams();
+        datosEnvio.append('id_cliente', idSeleccionado);
+        datosEnvio.append('usuario_bitacora_id', usuarioSesion.id || '');
+        datosEnvio.append('usuario_bitacora_nombre', usuarioSesion.nombre || 'Sistema');
+
         fetch("php/eliminarCliente.php", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `id_cliente=${idSeleccionado}`
+            body: datosEnvio
         })
-    .then(res => res.json())
-    .then(data => {
-        if (data.status === "exito") {
-            showModalMensaje("exito", "Éxito", data.mensaje);
-            cargarClientes();
-            modal.style.display = "none";
-            idSeleccionado = null;
-            datosOriginales = {};
-        } else {
-            showModalMensaje("error", "Error", data.mensaje);
-        }
-    })
-    .catch(() => {
-        showModalMensaje("error", "Error", "No se pudo dar de baja el cliente.");
-    });
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "exito") {
+                showModalMensaje("exito", "Éxito", data.mensaje);
+                cargarClientes();
+                modal.style.display = "none";
+                idSeleccionado = null;
+                datosOriginales = {};
+            } else {
+                showModalMensaje("error", "Error", data.mensaje);
+            }
+        })
+        .catch(() => {
+            showModalMensaje("error", "Error", "No se pudo dar de baja el cliente.");
+        });
     });
 });
 

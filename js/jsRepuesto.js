@@ -42,6 +42,11 @@ const inputImagen = document.getElementById("inputImagen");
 const errorImagen = document.getElementById("errorImagen");
 let imagenActual = null; // Para manejar la imagen durante edición
 
+// Obtener datos del usuario desde sessionStorage
+const usuarioData = JSON.parse(sessionStorage.getItem("usuario") || "{}");
+const ID_USUARIO = usuarioData.id || null;
+const NOMBRE_USUARIO = usuarioData.nombre || 'Invitado';
+
 // ========================= VALIDACIONES =========================
 inputNombre.addEventListener("input", () => {
     errorNombre.textContent = inputNombre.value.trim() === "" ? "El nombre no puede estar vacío." : "";
@@ -96,13 +101,13 @@ function validarRepuesto() {
         return false;
     }
 
-    return { 
-        nombre, 
-        descripcion, 
-        stock, 
-        marca, 
-        medida, 
-        imagen 
+    return {
+        nombre,
+        descripcion,
+        stock,
+        marca,
+        medida,
+        imagen
     };
 }
 
@@ -157,7 +162,7 @@ function renderTabla(datos) {
     tablaBody.innerHTML = "";
     datos.forEach(rep => {
         const fila = document.createElement("tr");
-        
+
         // Generar HTML para la imagen
         let imagenHTML = '';
         if (rep.imagen_path) {
@@ -175,7 +180,7 @@ function renderTabla(datos) {
                 </div>
             `;
         }
-        
+
         fila.innerHTML = `
             <td>${rep.codigo}</td>
             <td>${rep.nombre}</td>
@@ -207,14 +212,14 @@ btnRegistrar.addEventListener("click", (e) => {
     if (!datos) return;
 
     // Validar duplicado: nombre, marca Y medida deben ser iguales
-    const duplicado = repuestosData.find(r => 
+    const duplicado = repuestosData.find(r =>
         r.nombre.toLowerCase() === datos.nombre.toLowerCase() &&
         r.id_marca == datos.marca &&
         r.id_medida == datos.medida
     );
 
     if (duplicado) {
-        showModalMensaje("advertencia", "Duplicado", 
+        showModalMensaje("advertencia", "Duplicado",
             "Ya existe un repuesto con el mismo nombre, marca y medida.");
         return;
     }
@@ -243,28 +248,31 @@ btnRegistrar.addEventListener("click", (e) => {
     formData.append('stock', datos.stock);
     formData.append('id_marca', datos.marca);
     formData.append('id_medida', datos.medida);
-    
+    formData.append('id_usuario', ID_USUARIO);
+    formData.append('nombre_usuario', NOMBRE_USUARIO);
+
     if (datos.imagen) {
         formData.append('imagen', datos.imagen);
     }
 
     fetch("php/ingresarRepuesto.php", {
+
         method: "POST",
         body: formData
     })
-    .then(res => res.json())
-    .then(data => {
-        if (data.status === "exito") {
-            showModalMensaje("exito", "Éxito", data.mensaje);
-            cargarRepuestos();
-            limpiarFormulario();
-        } else {
-            showModalMensaje("error", "Error", data.mensaje || "No se pudo insertar el registro.");
-        }
-    })
-    .catch(err => {
-        showModalMensaje("error", "Error", "Error al enviar los datos.");
-    });
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "exito") {
+                showModalMensaje("exito", "Éxito", data.mensaje);
+                cargarRepuestos();
+                limpiarFormulario();
+            } else {
+                showModalMensaje("error", "Error", data.mensaje || "No se pudo insertar el registro.");
+            }
+        })
+        .catch(err => {
+            showModalMensaje("error", "Error", "Error al enviar los datos.");
+        });
 });
 
 btnCancelarEdicion.addEventListener("click", () => {
@@ -328,7 +336,7 @@ function limpiarFormulario() {
     filaSeleccionada = null;
     idSeleccionado = null;
     imagenActual = null;
-    
+
     // Remover vista previa si existe
     const vistaPrevia = document.querySelector('.vista-previa');
     if (vistaPrevia) {
@@ -414,7 +422,7 @@ function mostrarVistaPreviaExistente(rutaImagen) {
     inputImagen.parentNode.insertBefore(contenedor, inputImagen.nextSibling);
 
     // Evento para eliminar imagen
-    contenedor.querySelector('.btn-eliminar-imagen').addEventListener('click', function() {
+    contenedor.querySelector('.btn-eliminar-imagen').addEventListener('click', function () {
         imagenActual = 'eliminar';
         contenedor.remove();
     });
@@ -427,7 +435,7 @@ btnActualizar.addEventListener("click", () => {
     if (!datos) return;
 
     // Validar duplicado al editar (excluyendo el registro actual)
-    const duplicado = repuestosData.find(r => 
+    const duplicado = repuestosData.find(r =>
         r.id_repuesto != idSeleccionado && // Excluir el registro actual
         r.nombre.toLowerCase() === datos.nombre.toLowerCase() &&
         r.id_marca == datos.marca &&
@@ -435,7 +443,7 @@ btnActualizar.addEventListener("click", () => {
     );
 
     if (duplicado) {
-        showModalMensaje("advertencia", "Duplicado", 
+        showModalMensaje("advertencia", "Duplicado",
             "Ya existe otro repuesto con el mismo nombre, marca y medida.");
         return;
     }
@@ -448,7 +456,9 @@ btnActualizar.addEventListener("click", () => {
     formData.append('stock', datos.stock);
     formData.append('id_marca', datos.marca);
     formData.append('id_medida', datos.medida);
-    
+    formData.append('id_usuario', ID_USUARIO);
+    formData.append('nombre_usuario', NOMBRE_USUARIO);
+
     if (datos.imagen) {
         formData.append('imagen', datos.imagen);
     }
@@ -460,26 +470,26 @@ btnActualizar.addEventListener("click", () => {
         method: "POST",
         body: formData
     })
-    .then(res => res.json())
-    .then(data => {
-        modal.style.display = "none";
-        btnActualizar.style.display = "none";
-        btnRegistrar.style.display = "inline-block";
-        btnCancelarEdicion.style.display = "none";
-        limpiarFormulario();
-        inputNombre.focus();
-        document.querySelector(".tabla-contenedor").classList.remove("bloqueada");
+        .then(res => res.json())
+        .then(data => {
+            modal.style.display = "none";
+            btnActualizar.style.display = "none";
+            btnRegistrar.style.display = "inline-block";
+            btnCancelarEdicion.style.display = "none";
+            limpiarFormulario();
+            inputNombre.focus();
+            document.querySelector(".tabla-contenedor").classList.remove("bloqueada");
 
-        if (data.status === "exito") {
-            showModalMensaje("exito", "Éxito", data.mensaje);
-            cargarRepuestos();
-        } else {
-            showModalMensaje("error", "Error", data.mensaje);
-        }
-    })
-    .catch(err => {
-        showModalMensaje("error", "Error", "No se pudo editar el registro.");
-    });
+            if (data.status === "exito") {
+                showModalMensaje("exito", "Éxito", data.mensaje);
+                cargarRepuestos();
+            } else {
+                showModalMensaje("error", "Error", data.mensaje);
+            }
+        })
+        .catch(err => {
+            showModalMensaje("error", "Error", "No se pudo editar el registro.");
+        });
 });
 
 btnEliminar.addEventListener("click", () => {
@@ -615,7 +625,7 @@ document.getElementById("btnConfirmarEliminar").addEventListener("click", () => 
     fetch("php/eliminarRepuesto.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `id=${idSeleccionado}`
+        body: `id=${idSeleccionado}&id_usuario=${ID_USUARIO}&nombre_usuario=${encodeURIComponent(NOMBRE_USUARIO)}`
     })
         .then(res => res.json())
         .then(data => {
@@ -638,7 +648,7 @@ document.getElementById("btnCancelarEliminar").addEventListener("click", () => {
 });
 
 // Vista previa de imagen seleccionada
-inputImagen.addEventListener('change', function(e) {
+inputImagen.addEventListener('change', function (e) {
     const file = e.target.files[0];
     if (file) {
         // Validar tipo de archivo
@@ -667,7 +677,7 @@ function mostrarVistaPreviaNueva(file) {
     }
 
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         const contenedor = document.createElement('div');
         contenedor.className = 'vista-previa';
         contenedor.innerHTML = `
@@ -681,7 +691,7 @@ function mostrarVistaPreviaNueva(file) {
         inputImagen.parentNode.insertBefore(contenedor, inputImagen.nextSibling);
 
         // Evento para eliminar imagen
-        contenedor.querySelector('.btn-eliminar-imagen').addEventListener('click', function() {
+        contenedor.querySelector('.btn-eliminar-imagen').addEventListener('click', function () {
             inputImagen.value = '';
             contenedor.remove();
         });
@@ -702,18 +712,18 @@ function ampliarImagen(rutaImagen, nombreRepuesto) {
             <img class="modal-imagen-contenido" id="imagenAmpliada">
         `;
         document.body.appendChild(modalImagen);
-        
+
         // Event listeners para cerrar modal
         modalImagen.querySelector('.cerrar-modal-imagen').addEventListener('click', () => {
             modalImagen.style.display = 'none';
         });
-        
+
         modalImagen.addEventListener('click', (e) => {
             if (e.target === modalImagen) {
                 modalImagen.style.display = 'none';
             }
         });
-        
+
         // Cerrar con tecla ESC
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && modalImagen.style.display === 'flex') {
@@ -721,12 +731,12 @@ function ampliarImagen(rutaImagen, nombreRepuesto) {
             }
         });
     }
-    
+
     // Mostrar imagen
     const imagenAmpliada = document.getElementById('imagenAmpliada');
     imagenAmpliada.src = rutaImagen;
     imagenAmpliada.alt = nombreRepuesto;
-    
+
     modalImagen.style.display = 'flex';
 }
 

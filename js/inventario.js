@@ -5,8 +5,6 @@ let filtrosActivos = {};
 let ultimoPrecioCompra = null;
 let precioCompraFecha = null;
 
-
-
 // Elementos del DOM
 const modalEditarPrecio = document.getElementById("modalEditarPrecio");
 const formEditarPrecio = document.getElementById("formEditarPrecio");
@@ -397,10 +395,17 @@ async function guardarPrecio(e) {
     const idRepuesto = document.getElementById('precio_id_repuesto').value;
     const nuevoPrecio = parseFloat(document.getElementById('nuevo_precio_venta').value);
 
+    // Obtener datos del usuario desde sessionStorage
+    const usuarioData = JSON.parse(sessionStorage.getItem("usuario") || "{}");
+    const ID_USUARIO = usuarioData.id || null;
+    const NOMBRE_USUARIO = usuarioData.nombre || 'Invitado';
+    console.log('EEL Usuario actual:', { id: ID_USUARIO, nombre: NOMBRE_USUARIO });
+
     console.log('🔄 Intentando guardar precio:', { 
         idRepuesto: idRepuesto, 
         nuevoPrecio: nuevoPrecio,
-        ultimoPrecioCompra: ultimoPrecioCompra
+        ultimoPrecioCompra: ultimoPrecioCompra,
+        usuario: { id: ID_USUARIO, nombre: NOMBRE_USUARIO }
     });
 
     // Validaciones básicas
@@ -439,7 +444,9 @@ async function guardarPrecio(e) {
     try {
         const datos = {
             id_repuesto: parseInt(idRepuesto),
-            nuevo_precio: nuevoPrecio
+            nuevo_precio: nuevoPrecio,
+            id_usuario: ID_USUARIO,
+            nombre_usuario: NOMBRE_USUARIO
         };
 
         console.log('📤 Enviando datos al servidor:', datos);

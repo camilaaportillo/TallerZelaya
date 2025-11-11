@@ -18,6 +18,7 @@ session_start();
 
 // Incluir archivo de conexión
 require_once 'conexion.php';
+require_once 'bitacora_helper.php';
 
 // Configuración
 $backup_dir = 'C:/xampp/htdocs/TallerZelaya/backups/';
@@ -267,6 +268,9 @@ function createBackup() {
             // Limpiar backups antiguos si excedemos el límite
             cleanupOldBackups();
             
+            // REGISTRAR EN BITÁCORA
+            registrarAccionBackup('CREAR_BACKUP', "Backup creado manualmente: $filename", $filename);
+            
             echo json_encode([
                 'success' => true, 
                 'message' => 'Backup creado correctamente',
@@ -377,6 +381,9 @@ function restoreBackup() {
         // Reactivar comprobación de claves foráneas
         $conn->query('SET FOREIGN_KEY_CHECKS=1');
         
+        // Registrar en bitácora la acción de restauración
+        registrarAccionBackup('RESTAURAR_BACKUP', "Backup restaurado: $filename - Base de datos completa restaurada", $filename);
+        
         echo json_encode(['success' => true, 'message' => 'Backup restaurado correctamente']);
         
     } catch (Exception $e) {
@@ -409,6 +416,9 @@ function deleteBackup() {
     }
     
     if (unlink($filepath)) {
+        // REGISTRAR EN BITÁCORA
+        registrarAccionBackup('ELIMINAR_BACKUP', "Backup eliminado: $filename", $filename);
+        
         echo json_encode(['success' => true, 'message' => 'Backup eliminado correctamente']);
     } else {
         echo json_encode(['success' => false, 'message' => 'Error al eliminar el backup']);
@@ -447,6 +457,9 @@ function uploadBackup() {
     $filepath = $backup_dir . $filename;
     
     if (move_uploaded_file($uploaded_file['tmp_name'], $filepath)) {
+        // REGISTRAR EN BITÁCORA
+        registrarAccionBackup('SUBIR_BACKUP', "Backup subido: $filename", $filename);
+        
         echo json_encode(['success' => true, 'message' => 'Backup subido correctamente']);
     } else {
         echo json_encode(['success' => false, 'message' => 'Error al guardar el archivo']);
@@ -610,6 +623,9 @@ function saveSchedule() {
     $schedules['schedules'][] = $new_schedule;
     
     if (file_put_contents($schedule_file, json_encode($schedules, JSON_PRETTY_PRINT))) {
+        // REGISTRAR EN BITÁCORA
+        registrarAccionBackup('PROGRAMAR_BACKUP', "Programación de backup creada: $type a las $time", $id);
+        
         echo json_encode(['success' => true, 'message' => 'Programación guardada correctamente']);
     } else {
         echo json_encode(['success' => false, 'message' => 'Error al guardar la programación']);
@@ -669,12 +685,15 @@ function deleteSchedule() {
     $schedules['schedules'] = array_values($schedules['schedules']);
     
     if (file_put_contents($schedule_file, json_encode($schedules, JSON_PRETTY_PRINT))) {
+        // REGISTRAR EN BITÁCORA
+        registrarAccionBackup('ELIMINAR_PROGRAMACION', "Programación de backup eliminada: $id", $id);
+        
         echo json_encode(['success' => true, 'message' => 'Programación eliminada correctamente']);
     } else {
         echo json_encode(['success' => false, 'message' => 'Error al eliminar la programación']);
     }
 }
-// Función para verificar y ejecutar backups programados
+
 // Función para verificar y ejecutar backups programados
 function checkScheduledBackups() {
     global $schedule_file, $backup_dir;
@@ -848,6 +867,7 @@ function checkScheduledBackups() {
         ];
     }
 }
+
 // Función para crear backup programado
 function createScheduledBackup($schedule_id) {
     global $conn, $backup_dir, $max_backups;
@@ -918,6 +938,9 @@ function createScheduledBackup($schedule_id) {
             // Limpiar backups antiguos si excedemos el límite
             cleanupOldBackups();
             
+            // REGISTRAR EN BITÁCORA
+            registrarAccionBackup('BACKUP_AUTOMATICO', "Backup automático ejecutado: $filename (Programación: $schedule_id)", $filename);
+            
             error_log("✅ Backup automático creado exitosamente: " . $filename);
             return true;
         } else {
@@ -956,7 +979,11 @@ function cleanupOldBackups() {
     if (count($files) > $max_backups) {
         $to_delete = count($files) - $max_backups;
         for ($i = 0; $i < $to_delete; $i++) {
-            unlink($backup_dir . $files[$i]['filename']);
+            $deleted_file = $files[$i]['filename'];
+            unlink($backup_dir . $deleted_file);
+            
+            // Registrar eliminación automática en bitácora
+            registrarAccionBackup('LIMPIAR_BACKUPS', "Backup antiguo eliminado automáticamente: $deleted_file", $deleted_file);
         }
     }
 }
@@ -972,5 +999,29 @@ function formatSize($bytes) {
     }
     
     return round($bytes, 2) . ' ' . $units[$index];
+}
+
+// =============================================
+// FUNCIONES DE BITÁCORA PARA BACKUPS
+// =============================================
+
+// Función para registrar acciones de backup en bitácora
+function registrarAccionBackup($accion, $descripcion, $archivo = null) {
+    // Establecer sesión temporal para la bitácora
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
+    // Usar el usuario actual de la sesión
+    $id_usuario = $_SESSION['usuario_id'] ?? null;
+    $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Sistema';
+    
+    if ($id_usuario && $nombre_usuario) {
+        $_SESSION['usuario_id'] = $id_usuario;
+        $_SESSION['usuario_nombre'] = $nombre_usuario;
+    }
+    
+    // Registrar en bitácora
+    registrarEnBitacora($accion, $descripcion, 'sistema', null, 'Backups');
 }
 ?>

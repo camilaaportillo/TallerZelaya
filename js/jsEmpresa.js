@@ -143,8 +143,7 @@ function cargarEmpresas() {
         .catch(err => console.error("Error cargando empresas:", err));
 }
 
-
-
+// Función para registrar empresa
 btnRegistrar.addEventListener("click", (e) => {
     e.preventDefault();
     const datos = validarEmpresa();
@@ -175,11 +174,15 @@ btnRegistrar.addEventListener("click", (e) => {
         }
     }
 
+    // Agregar información del usuario para bitácora
+    const usuarioSesion = JSON.parse(sessionStorage.getItem('usuario') || '{}');
+    datos.usuario_bitacora_id = usuarioSesion.id || '';
+    datos.usuario_bitacora_nombre = usuarioSesion.nombre || 'Sistema';
 
     fetch("php/ingresarEmpresa.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams(datos) // serializa seguro
+        body: new URLSearchParams(datos)
     })
         .then(res => res.json())
         .then(data => {
@@ -200,9 +203,9 @@ btnRegistrar.addEventListener("click", (e) => {
         });
 });
 
-
 const btnActualizar = document.querySelector(".btn-actualizar");
 
+// Función para actualizar empresa
 btnActualizar.addEventListener("click", () => {
     const nombre = inputs[0].value;
     const correo = inputs[1].value;
@@ -228,10 +231,20 @@ btnActualizar.addEventListener("click", () => {
         return;
     }
 
+    // Agregar información del usuario para bitácora
+    const usuarioSesion = JSON.parse(sessionStorage.getItem('usuario') || '{}');
+    const datos = new URLSearchParams();
+    datos.append('id', idSeleccionado);
+    datos.append('nombre', nombre);
+    datos.append('correo', correo);
+    datos.append('telefono', telefono);
+    datos.append('usuario_bitacora_id', usuarioSesion.id || '');
+    datos.append('usuario_bitacora_nombre', usuarioSesion.nombre || 'Sistema');
+
     fetch("php/editarEmpresa.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `id=${idSeleccionado}&nombre=${nombre}&correo=${correo}&telefono=${telefono}`
+        body: datos
     })
         .then(res => res.json())
         .then(data => {
@@ -310,6 +323,7 @@ btnCancelarEdicion.addEventListener("click", () => {
 
 const btnEliminar = document.getElementById("btnEliminarModal");
 
+// Función para eliminar empresa
 btnEliminar.addEventListener("click", () => {
     if (!idSeleccionado) {
         showModalMensaje("advertencia", "Falta nombre", "No se ha seleccionado ninguna empresa.");
@@ -320,18 +334,26 @@ btnEliminar.addEventListener("click", () => {
     abrirModalConfirmar();
     document.getElementById("btnConfirmarEliminar").addEventListener("click", () => {
         cerrarModalConfirmar();
+        
+        // Agregar información del usuario para bitácora
+        const usuarioSesion = JSON.parse(sessionStorage.getItem('usuario') || '{}');
+        const datos = new URLSearchParams();
+        datos.append('id', idSeleccionado);
+        datos.append('usuario_bitacora_id', usuarioSesion.id || '');
+        datos.append('usuario_bitacora_nombre', usuarioSesion.nombre || 'Sistema');
+
         fetch("php/eliminarEmpresa.php", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `id=${idSeleccionado}`
+            body: datos
         })
             .then(res => res.json())
             .then(data => {
                 if (data.status === "exito") {
                     showModalMensaje("exito", "Éxito", data.mensaje);
-                    cargarEmpresas(); // recarga la tabla
-                    modal.style.display = "none"; // cerrar modal
-                    idSeleccionado = null; // limpiar selección
+                    cargarEmpresas();
+                    modal.style.display = "none";
+                    idSeleccionado = null;
                     [inputNombre, inputCorreo, inputTelefono].forEach(i => i.value = "");
                     inputNombre.focus();
                 } else {
@@ -538,12 +560,19 @@ function renderTablaInactivos(datos) {
     });
 }
 
-// Función para habilitar proveedor
+// Función para habilitar empresa
 function habilitarProveedor(id) {
+    // Agregar información del usuario para bitácora
+    const usuarioSesion = JSON.parse(sessionStorage.getItem('usuario') || '{}');
+    const datos = new URLSearchParams();
+    datos.append('id', id);
+    datos.append('usuario_bitacora_id', usuarioSesion.id || '');
+    datos.append('usuario_bitacora_nombre', usuarioSesion.nombre || 'Sistema');
+
     fetch("php/habilitarEmpresa.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `id=${id}`
+        body: datos
     })
         .then(res => res.json())
         .then(data => {

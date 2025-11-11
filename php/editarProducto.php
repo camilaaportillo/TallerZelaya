@@ -1,5 +1,10 @@
 <?php
 include "conexion.php";
+include "bitacora_helper.php";
+
+// Obtener datos del usuario desde el POST
+$id_usuario = $_POST['id_usuario'] ?? null;
+$nombre_usuario = $_POST['nombre_usuario'] ?? 'Sistema';
 
 // Configuración para subida de archivos
 $directorio_imagenes = "../imgs-repuestos/";
@@ -17,6 +22,11 @@ $descripcion = mysqli_real_escape_string($conn, $_POST['descripcion']);
 $stock = intval($_POST['stock']);
 $id_marca = intval($_POST['id_marca']);
 $id_medida = intval($_POST['id_medida']);
+
+// Obtener datos antiguos para la bitácora
+$sql_old = "SELECT codigo, nombre, descripcion, stock_minimo, id_marca, id_medida, imagen_path FROM repuesto WHERE id_repuesto = $id_repuesto";
+$result_old = $conn->query($sql_old);
+$repuesto_old = $result_old->fetch_assoc();
 
 // Obtener el código del repuesto para nombrar la imagen
 $sql_codigo = "SELECT codigo FROM repuesto WHERE id_repuesto = $id_repuesto";
@@ -121,6 +131,19 @@ if (isset($_POST['eliminar_imagen']) && $_POST['eliminar_imagen'] == '1') {
 header('Content-Type: application/json');
 
 if (mysqli_query($conn, $sql)) {
+    // REGISTRAR EN BITÁCORA - Establecer sesión temporal
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
+    if ($id_usuario && $nombre_usuario) {
+        $_SESSION['usuario_id'] = $id_usuario;
+        $_SESSION['usuario_nombre'] = $nombre_usuario;
+    }
+    
+    $descripcion = "Repuesto actualizado: $codigo - $nombre - Stock mínimo: $stock";
+    registrarEnBitacora('ACTUALIZAR', $descripcion, 'repuesto', $id_repuesto, 'Repuestos');
+    
     echo json_encode(["status" => "exito", "mensaje" => "Repuesto actualizado correctamente."]);
 } else {
     // Si hay error, eliminar la nueva imagen subida

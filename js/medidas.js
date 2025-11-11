@@ -1,4 +1,4 @@
-// Variables globales
+//Variables globales
 let medidas = [];
 let medidaEditando = null;
 let modalMensaje = document.getElementById('modalMensaje');
@@ -117,7 +117,6 @@ function configurarEventListeners() {
     }
 }
 
-// Función para confirmar eliminación
 // Función para confirmar eliminación - VERSIÓN MEJORADA
 function confirmarEliminacion() {
     if (!medidaAEliminar) {

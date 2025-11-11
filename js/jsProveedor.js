@@ -45,6 +45,12 @@ inputTelefono.addEventListener("input", () => {
     inputTelefono.value = inputTelefono.value.replace(/\D/g, "").slice(0, 8);
 });
 
+
+// Obtener datos del usuario desde sessionStorage
+const usuarioData = JSON.parse(sessionStorage.getItem("usuario") || "{}");
+const ID_USUARIO = usuarioData.id || null;
+const NOMBRE_USUARIO = usuarioData.nombre || 'Invitado';
+
 // Regex
 const regexCorreo = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
 const regexTelefono = /^\d{8}$/;
@@ -200,13 +206,11 @@ btnRegistrar.addEventListener("click", (e) => {
         }
     }
 
+    
     fetch("php/ingresarProveedor.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `nombre=${datos.nombre}` +
-            `&correo=${datos.correo}` +
-            `&telefono=${datos.telefono}` +
-            `&id_empresa=${datos.empresa}`
+        body: `nombre=${datos.nombre}&correo=${datos.correo}&telefono=${datos.telefono}&id_empresa=${datos.empresa}&id_usuario=${ID_USUARIO}&nombre_usuario=${encodeURIComponent(NOMBRE_USUARIO)}`
     })
         .then(res => res.json())
         .then(data => {
@@ -265,7 +269,7 @@ btnActualizar.addEventListener("click", () => {
     fetch("php/editarProveedor.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `id=${idSeleccionado}&nombre=${nombre}&correo=${correo}&telefono=${telefono}&id_empresa=${empresa}`
+        body: `id=${idSeleccionado}&nombre=${nombre}&correo=${correo}&telefono=${telefono}&id_empresa=${empresa}&id_usuario=${ID_USUARIO}&nombre_usuario=${encodeURIComponent(NOMBRE_USUARIO)}`
     })
         .then(res => res.json())
         .then(data => {
@@ -494,7 +498,7 @@ document.getElementById("btnConfirmarEliminar").addEventListener("click", () => 
     fetch("php/eliminarProveedor.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `id=${idSeleccionado}`
+        body: `id=${idSeleccionado}&id_usuario=${ID_USUARIO}&nombre_usuario=${encodeURIComponent(NOMBRE_USUARIO)}`
     })
         .then(res => res.json())
         .then(data => {
@@ -584,7 +588,7 @@ function habilitarProveedor(id) {
     fetch("php/habilitarProveedor.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `id=${id}`
+        body: `id=${id}&id_usuario=${ID_USUARIO}&nombre_usuario=${encodeURIComponent(NOMBRE_USUARIO)}`
     })
         .then(res => res.json())
         .then(data => {

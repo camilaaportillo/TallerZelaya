@@ -1,5 +1,6 @@
 <?php
 include 'conexion.php';
+include 'bitacora_helper.php';
 
 // ✅ AGREGAR MANEJO DE ERRORES
 header('Content-Type: application/json');
@@ -91,6 +92,14 @@ switch ($method) {
         
         // Si se envía estado, es una activación/desactivación
         if (isset($data['id_medida']) && isset($data['estado'])) {
+            // Obtener datos actuales para la bitácora
+            $stmt_select = $conn->prepare("SELECT * FROM medida WHERE id_medida = ?");
+            $stmt_select->bind_param("i", $data['id_medida']);
+            $stmt_select->execute();
+            $result = $stmt_select->get_result();
+            $medida_actual = $result->fetch_assoc();
+            $stmt_select->close();
+            
             $stmt = $conn->prepare("UPDATE medida SET estado = ? WHERE id_medida = ?");
             
             if (!$stmt) {
@@ -101,6 +110,14 @@ switch ($method) {
             $stmt->bind_param("si", $data['estado'], $data['id_medida']);
             
             if ($stmt->execute()) {
+                // Registrar en bitácora
+                $accion = $data['estado'] == 'Activo' ? 'ACTIVAR' : 'DESACTIVAR';
+                $descripcion = $data['estado'] == 'Activo' ? 
+                    "Medida activada: {$medida_actual['medida_bicicleta']}" : 
+                    "Medida desactivada: {$medida_actual['medida_bicicleta']}";
+                
+                registrarEnBitacora($accion, $descripcion, 'medida', $data['id_medida'], 'Medidas');
+                
                 echo json_encode(["success" => true, "message" => "Estado de medida actualizado correctamente"]);
             } else {
                 echo json_encode(["success" => false, "message" => "Error al actualizar estado de medida: " . $stmt->error]);
@@ -109,6 +126,14 @@ switch ($method) {
         }
         // Actualizar medida existente (nombre)
         else if (isset($data['id_medida'])) {
+            // Obtener datos actuales para la bitácora
+            $stmt_select = $conn->prepare("SELECT * FROM medida WHERE id_medida = ?");
+            $stmt_select->bind_param("i", $data['id_medida']);
+            $stmt_select->execute();
+            $result = $stmt_select->get_result();
+            $medida_actual = $result->fetch_assoc();
+            $stmt_select->close();
+            
             $stmt = $conn->prepare("UPDATE medida SET medida_bicicleta = ? WHERE id_medida = ?");
             
             if (!$stmt) {
@@ -119,6 +144,10 @@ switch ($method) {
             $stmt->bind_param("si", $data['medida_bicicleta'], $data['id_medida']);
             
             if ($stmt->execute()) {
+                // Registrar en bitácora
+                $descripcion = "Medida actualizada: {$medida_actual['medida_bicicleta']} → {$data['medida_bicicleta']}";
+                registrarEnBitacora('ACTUALIZAR', $descripcion, 'medida', $data['id_medida'], 'Medidas');
+                
                 echo json_encode(["success" => true, "message" => "Medida actualizada correctamente"]);
             } else {
                 echo json_encode(["success" => false, "message" => "Error al actualizar medida: " . $stmt->error]);
@@ -137,7 +166,13 @@ switch ($method) {
             $stmt->bind_param("s", $data['medida_bicicleta']);
             
             if ($stmt->execute()) {
-                echo json_encode(["success" => true, "message" => "Medida creada correctamente", "id" => $stmt->insert_id]);
+                $nuevo_id = $stmt->insert_id;
+                
+                // Registrar en bitácora
+                $descripcion = "Nueva medida creada: {$data['medida_bicicleta']}";
+                registrarEnBitacora('INSERTAR', $descripcion, 'medida', $nuevo_id, 'Medidas');
+                
+                echo json_encode(["success" => true, "message" => "Medida creada correctamente", "id" => $nuevo_id]);
             } else {
                 echo json_encode(["success" => false, "message" => "Error al crear medida: " . $stmt->error]);
             }
@@ -149,6 +184,14 @@ switch ($method) {
         parse_str(file_get_contents("php://input"), $data);
         $id = $data['id'];
         
+        // Obtener datos actuales para la bitácora
+        $stmt_select = $conn->prepare("SELECT * FROM medida WHERE id_medida = ?");
+        $stmt_select->bind_param("i", $id);
+        $stmt_select->execute();
+        $result = $stmt_select->get_result();
+        $medida_actual = $result->fetch_assoc();
+        $stmt_select->close();
+        
         $stmt = $conn->prepare("UPDATE medida SET estado = 'Inactivo' WHERE id_medida = ?");
         
         if (!$stmt) {
@@ -159,6 +202,10 @@ switch ($method) {
         $stmt->bind_param("i", $id);
         
         if ($stmt->execute()) {
+            // Registrar en bitácora
+            $descripcion = "Medida desactivada: {$medida_actual['medida_bicicleta']}";
+            registrarEnBitacora('ELIMINAR', $descripcion, 'medida', $id, 'Medidas');
+            
             echo json_encode(["success" => true, "message" => "Medida desactivada correctamente"]);
         } else {
             echo json_encode(["success" => false, "message" => "Error al desactivar medida: " . $stmt->error]);

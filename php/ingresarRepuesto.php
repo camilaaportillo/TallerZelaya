@@ -1,5 +1,10 @@
 <?php
 include "conexion.php";
+include "bitacora_helper.php";
+
+// Obtener datos del usuario desde el POST
+$id_usuario = $_POST['id_usuario'] ?? null;
+$nombre_usuario = $_POST['nombre_usuario'] ?? 'Sistema';
 
 // Configuración para subida de archivos
 $directorio_imagenes = "../imgs-repuestos/";
@@ -73,6 +78,21 @@ if ($ruta_imagen) {
 }
 
 if (mysqli_query($conn, $sql)) {
+    $nuevo_id = mysqli_insert_id($conn);
+    
+    // REGISTRAR EN BITÁCORA - Establecer sesión temporal
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
+    if ($id_usuario && $nombre_usuario) {
+        $_SESSION['usuario_id'] = $id_usuario;
+        $_SESSION['usuario_nombre'] = $nombre_usuario;
+    }
+    
+    $descripcion = "Repuesto creado: $codigo - $nombre - Stock mínimo: $stock";
+    registrarEnBitacora('INSERTAR', $descripcion, 'repuesto', $nuevo_id, 'Repuestos');
+    
     echo json_encode(["status" => "exito", "mensaje" => "Repuesto registrado correctamente."]);
 } else {
     // Si hay error, eliminar la imagen subida

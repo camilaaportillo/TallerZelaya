@@ -1,5 +1,10 @@
 <?php
 include "conexion.php";
+include "bitacora_helper.php";
+
+// Obtener datos del usuario desde el POST
+$id_usuario = $_POST['id_usuario'] ?? null;
+$nombre_usuario = $_POST['nombre_usuario'] ?? 'Sistema';
 
 // Configuración para subida de archivos
 $directorio_imagenes = "../imgs-herramientas/";
@@ -17,6 +22,11 @@ $descripcion = mysqli_real_escape_string($conn, $_POST['descripcion']);
 $stock = intval($_POST['stock']);
 $id_marca = intval($_POST['id_marca']);
 $id_medida = intval($_POST['id_medida']);
+
+// Obtener datos antiguos para la bitácora
+$sql_old = "SELECT nombre, descripcion, stock_actual, id_marca, id_medida FROM herramienta WHERE id_herramienta = $id_herramienta";
+$result_old = $conn->query($sql_old);
+$herramienta_old = $result_old->fetch_assoc();
 
 // Validar duplicado al editar
 $sql_duplicado = "SELECT COUNT(*) as total FROM herramienta 
@@ -113,6 +123,19 @@ if (isset($_POST['eliminar_imagen']) && $_POST['eliminar_imagen'] == '1') {
 }
 
 if (mysqli_query($conn, $sql)) {
+    // REGISTRAR EN BITÁCORA - Establecer sesión temporal
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
+    if ($id_usuario && $nombre_usuario) {
+        $_SESSION['usuario_id'] = $id_usuario;
+        $_SESSION['usuario_nombre'] = $nombre_usuario;
+    }
+    
+    $descripcion = "Herramienta actualizada: $nombre - Stock: $stock";
+    registrarEnBitacora('ACTUALIZAR', $descripcion, 'herramienta', $id_herramienta, 'Herramientas');
+    
     echo json_encode(["status" => "exito", "mensaje" => "Herramienta actualizada correctamente."]);
 } else {
     // Si hay error, eliminar la nueva imagen subida

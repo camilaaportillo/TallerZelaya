@@ -38,6 +38,11 @@ const errorDescripcion = document.getElementById("errorDescripcion");
 const errorStock = document.getElementById("errorStock");
 const errorImagen = document.getElementById("errorImagen");
 
+// Obtener datos del usuario desde sessionStorage
+const usuarioData = JSON.parse(sessionStorage.getItem("usuario") || "{}");
+const ID_USUARIO = usuarioData.id || null;
+const NOMBRE_USUARIO = usuarioData.nombre || 'Invitado';
+
 // ========================= VALIDACIONES =========================
 inputNombre.addEventListener("input", () => {
     errorNombre.textContent = inputNombre.value.trim() === "" ? "El nombre no puede estar vacío." : "";
@@ -104,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function configurarEventos() {
     // Vista previa de imagen
-    inputImagen.addEventListener('change', function(e) {
+    inputImagen.addEventListener('change', function (e) {
         const file = e.target.files[0];
         if (file) {
             if (!file.type.startsWith('image/')) {
@@ -152,7 +157,7 @@ function cargarMedidas() {
 
 function cargarHerramientas() {
     console.log('🔧 Cargando herramientas...');
-    
+
     fetch("php/obtenerHerramientas.php")
         .then(res => {
             console.log('📥 Estado de respuesta:', res.status);
@@ -163,7 +168,7 @@ function cargarHerramientas() {
         })
         .then(text => {
             console.log('📄 Respuesta cruda:', text);
-            
+
             // Intentar parsear como JSON
             try {
                 const data = JSON.parse(text);
@@ -187,7 +192,7 @@ function renderTabla(datos) {
     tablaBody.innerHTML = "";
     datos.forEach(herramienta => {
         const fila = document.createElement("tr");
-        
+
         // Generar HTML para la imagen
         let imagenHTML = '';
         if (herramienta.imagen_path) {
@@ -205,7 +210,7 @@ function renderTabla(datos) {
                 </div>
             `;
         }
-        
+
         fila.innerHTML = `
             <td>${herramienta.nombre}</td>
             <td>${herramienta.descripcion}</td>
@@ -221,13 +226,13 @@ function renderTabla(datos) {
                 </button>
             </td>
         `;
-        
+
         fila.querySelector(".btn-editar").addEventListener("click", (e) => {
             filaSeleccionada = e.target.closest("tr");
             idSeleccionado = e.target.closest("button").dataset.id;
             modal.style.display = "flex";
         });
-        
+
         tablaBody.appendChild(fila);
     });
 }
@@ -236,23 +241,23 @@ function renderTabla(datos) {
 function ampliarImagen(rutaImagen, nombreHerramienta) {
     const modalImagen = document.getElementById('modalImagen');
     const imagenAmpliada = document.getElementById('imagenAmpliada');
-    
+
     imagenAmpliada.src = rutaImagen;
     imagenAmpliada.alt = nombreHerramienta;
     modalImagen.style.display = 'flex';
 }
 
 // Event listeners para cerrar modal de imagen
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const modalImagen = document.getElementById('modalImagen');
     const cerrarModalImagen = document.querySelector('.cerrar-modal-imagen');
-    
+
     if (cerrarModalImagen) {
         cerrarModalImagen.addEventListener('click', () => {
             modalImagen.style.display = 'none';
         });
     }
-    
+
     if (modalImagen) {
         modalImagen.addEventListener('click', (e) => {
             if (e.target === modalImagen) {
@@ -260,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && modalImagen.style.display === 'flex') {
             modalImagen.style.display = 'none';
@@ -275,7 +280,7 @@ btnRegistrar.addEventListener("click", (e) => {
     if (!datos) return;
 
     // Validar duplicado
-    const duplicado = herramientasData.find(h => 
+    const duplicado = herramientasData.find(h =>
         h.nombre.toLowerCase() === datos.nombre.toLowerCase() &&
         h.id_marca == datos.marca &&
         h.id_medida == datos.medida
@@ -292,7 +297,9 @@ btnRegistrar.addEventListener("click", (e) => {
     formData.append('stock', datos.stock);
     formData.append('id_marca', datos.marca);
     formData.append('id_medida', datos.medida);
-    
+    formData.append('id_usuario', ID_USUARIO);
+    formData.append('nombre_usuario', NOMBRE_USUARIO);
+
     if (datos.imagen) {
         formData.append('imagen', datos.imagen);
     }
@@ -301,19 +308,19 @@ btnRegistrar.addEventListener("click", (e) => {
         method: "POST",
         body: formData
     })
-    .then(res => res.json())
-    .then(data => {
-        if (data.status === "exito") {
-            showModalMensaje("exito", "Éxito", data.mensaje);
-            cargarHerramientas();
-            limpiarFormulario();
-        } else {
-            showModalMensaje("error", "Error", data.mensaje || "No se pudo insertar el registro.");
-        }
-    })
-    .catch(err => {
-        showModalMensaje("error", "Error", "Error al enviar los datos.");
-    });
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "exito") {
+                showModalMensaje("exito", "Éxito", data.mensaje);
+                cargarHerramientas();
+                limpiarFormulario();
+            } else {
+                showModalMensaje("error", "Error", data.mensaje || "No se pudo insertar el registro.");
+            }
+        })
+        .catch(err => {
+            showModalMensaje("error", "Error", "Error al enviar los datos.");
+        });
 });
 
 // ========================= EDITAR HERRAMIENTA =========================
@@ -339,7 +346,7 @@ btnEditarModal.addEventListener("click", () => {
                 break;
             }
         }
-        
+
         // Establecer medida
         const medida = celdas[4].innerText;
         for (let option of selectMedida.options) {
@@ -364,7 +371,7 @@ btnActualizar.addEventListener("click", () => {
     if (!datos) return;
 
     // Validar duplicado al editar
-    const duplicado = herramientasData.find(h => 
+    const duplicado = herramientasData.find(h =>
         h.id_herramienta != idSeleccionado &&
         h.nombre.toLowerCase() === datos.nombre.toLowerCase() &&
         h.id_marca == datos.marca &&
@@ -383,7 +390,9 @@ btnActualizar.addEventListener("click", () => {
     formData.append('stock', datos.stock);
     formData.append('id_marca', datos.marca);
     formData.append('id_medida', datos.medida);
-    
+    formData.append('id_usuario', ID_USUARIO);
+    formData.append('nombre_usuario', NOMBRE_USUARIO);
+
     if (datos.imagen) {
         formData.append('imagen', datos.imagen);
     }
@@ -395,26 +404,26 @@ btnActualizar.addEventListener("click", () => {
         method: "POST",
         body: formData
     })
-    .then(res => res.json())
-    .then(data => {
-        modal.style.display = "none";
-        btnActualizar.style.display = "none";
-        btnRegistrar.style.display = "inline-block";
-        btnCancelarEdicion.style.display = "none";
-        limpiarFormulario();
-        inputNombre.focus();
-        document.querySelector(".tabla-contenedor").classList.remove("bloqueada");
+        .then(res => res.json())
+        .then(data => {
+            modal.style.display = "none";
+            btnActualizar.style.display = "none";
+            btnRegistrar.style.display = "inline-block";
+            btnCancelarEdicion.style.display = "none";
+            limpiarFormulario();
+            inputNombre.focus();
+            document.querySelector(".tabla-contenedor").classList.remove("bloqueada");
 
-        if (data.status === "exito") {
-            showModalMensaje("exito", "Éxito", data.mensaje);
-            cargarHerramientas();
-        } else {
-            showModalMensaje("error", "Error", data.mensaje);
-        }
-    })
-    .catch(err => {
-        showModalMensaje("error", "Error", "No se pudo editar el registro.");
-    });
+            if (data.status === "exito") {
+                showModalMensaje("exito", "Éxito", data.mensaje);
+                cargarHerramientas();
+            } else {
+                showModalMensaje("error", "Error", data.mensaje);
+            }
+        })
+        .catch(err => {
+            showModalMensaje("error", "Error", "No se pudo editar el registro.");
+        });
 });
 
 // ========================= ELIMINAR HERRAMIENTA =========================
@@ -433,22 +442,22 @@ document.getElementById("btnConfirmarEliminar").addEventListener("click", () => 
     fetch("php/eliminarHerramienta.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `id=${idSeleccionado}`
+        body: `id=${idSeleccionado}&id_usuario=${ID_USUARIO}&nombre_usuario=${encodeURIComponent(NOMBRE_USUARIO)}`
     })
-    .then(res => res.json())
-    .then(data => {
-        if (data.status === "exito") {
-            showModalMensaje("exito", "Éxito", data.mensaje);
-            cargarHerramientas();
-            modal.style.display = "none";
-            idSeleccionado = null;
-        } else {
-            showModalMensaje("error", "Error", data.mensaje);
-        }
-    })
-    .catch(err => {
-        showModalMensaje("error", "Error", "No se pudo eliminar el registro.");
-    });
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "exito") {
+                showModalMensaje("exito", "Éxito", data.mensaje);
+                cargarHerramientas();
+                modal.style.display = "none";
+                idSeleccionado = null;
+            } else {
+                showModalMensaje("error", "Error", data.mensaje);
+            }
+        })
+        .catch(err => {
+            showModalMensaje("error", "Error", "No se pudo eliminar el registro.");
+        });
 });
 
 // ========================= VISTA PREVIA IMAGEN =========================
@@ -459,7 +468,7 @@ function mostrarVistaPreviaNueva(file) {
     }
 
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         const contenedor = document.createElement('div');
         contenedor.className = 'vista-previa';
         contenedor.innerHTML = `
@@ -471,7 +480,7 @@ function mostrarVistaPreviaNueva(file) {
 
         inputImagen.parentNode.insertBefore(contenedor, inputImagen.nextSibling);
 
-        contenedor.querySelector('.btn-eliminar-imagen').addEventListener('click', function() {
+        contenedor.querySelector('.btn-eliminar-imagen').addEventListener('click', function () {
             inputImagen.value = '';
             contenedor.remove();
         });
@@ -496,7 +505,7 @@ function mostrarVistaPreviaExistente(rutaImagen) {
 
     inputImagen.parentNode.insertBefore(contenedor, inputImagen.nextSibling);
 
-    contenedor.querySelector('.btn-eliminar-imagen').addEventListener('click', function() {
+    contenedor.querySelector('.btn-eliminar-imagen').addEventListener('click', function () {
         imagenActual = 'eliminar';
         contenedor.remove();
     });
@@ -532,7 +541,7 @@ function limpiarFormulario() {
     filaSeleccionada = null;
     idSeleccionado = null;
     imagenActual = null;
-    
+
     const vistaPrevia = document.querySelector('.vista-previa');
     if (vistaPrevia) {
         vistaPrevia.remove();

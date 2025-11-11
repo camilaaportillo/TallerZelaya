@@ -1,6 +1,8 @@
 <?php
+session_start();
 // ✅ SOLO incluir conexión al inicio
 include "conexion.php";
+include "bitacora_helper.php";
 
 // ✅ Manejar validación INMEDIATAMENTE (sin login.php)
 if (isset($_GET['accion']) && $_GET['accion'] === 'validar') {
@@ -38,6 +40,15 @@ function reactivarUsuario() {
         $loginSystem = new LoginSystem();
         $loginSystem->resetearIntentosPorCorreo($correo);
         
+        // Registrar en bitácora
+        registrarEnBitacora(
+            'UPDATE',
+            "Usuario reactivado: $correo",
+            'usuario',
+            $id_usuario,
+            'Usuarios'
+        );
+        
         echo json_encode([
             "status" => "success", 
             "mensaje" => "Usuario reactivado correctamente e intentos reseteados"
@@ -50,6 +61,7 @@ function reactivarUsuario() {
         ]);
     }
 }
+
 // ✅ NUEVA FUNCIÓN: Contar administradores activos
 if (isset($_GET['accion']) && $_GET['accion'] === 'contar_administradores') {
     contarAdministradores();
@@ -167,8 +179,7 @@ function puedeCrearAdministrador() {
 // ✅ NUEVA FUNCIÓN: Obtener ID del usuario en sesión (simulado)
 function obtenerUsuarioSesion() {
     // En un sistema real, esto vendría de la sesión
-    // Por ahora, simulamos que el usuario con ID 1 está en sesión
-    return 1; // Cambiar por el ID real de la sesión
+    return $_SESSION['usuario_id'] ?? 1;
 }
 
 // ✅ Para POST, NO incluir login.php (no lo necesitas para crear usuario)
@@ -189,7 +200,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if ($nombre && $correo && $usuario && $password && $rol) {
-        //ENCRIPTA LA CONTRASEÑA ANTES DE GUARDAR
+        // ENCRIPTA LA CONTRASEÑA ANTES DE GUARDAR
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
         
         $sql = "INSERT INTO usuario (nombre, correo, usuario, contrasena, id_rol) 
@@ -199,6 +210,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_param("sssss", $nombre, $correo, $usuario, $passwordHash, $rol);
 
         if ($stmt->execute()) {
+            $nuevo_id = $stmt->insert_id;
+            
+            // ✅ REGISTRAR EN BITÁCORA - CREACIÓN DE USUARIO
+            $rol_nombre = ($rol == 1) ? 'Administrador' : 'Empleado';
+            registrarEnBitacora(
+                'INSERT',
+                "Usuario creado: $nombre - Correo: $correo - Rol: $rol_nombre",
+                'usuario',
+                $nuevo_id,
+                'Usuarios'
+            );
+            
             echo json_encode([
                 "status" => "success",
                 "mensaje" => "Usuario creado correctamente"

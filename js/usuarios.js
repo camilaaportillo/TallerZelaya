@@ -334,7 +334,11 @@ document.addEventListener("DOMContentLoaded", () => {
         datos.append("correo", usuario.correo);
         datos.append("rol", usuario.id_rol);  // Asegúrate de usar id_rol, no rol
         datos.append("estado", "Activo"); // Cambiar estado a Activo
-        datos.append("estado", "Activo"); // Cambiar estado a Activo
+
+        // Agregar información del usuario para bitácora
+        const usuarioSesion = JSON.parse(sessionStorage.getItem('usuario') || '{}');
+        datos.append("usuario_bitacora_id", usuarioSesion.id || '');
+        datos.append("usuario_bitacora_nombre", usuarioSesion.nombre || 'Sistema');
 
         fetch("php/editar_usuarios.php", {
             method: "POST",
@@ -378,7 +382,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("mensaje-usuario-contrasena").style.display = "block";
         document.getElementById("campo-estado").style.display = "flex";
         document.getElementById("btnInactivos").style.display = "none";
-       
+
 
         btnRegistrar.style.display = "none";
         btnActualizar.style.display = "inline-block";
@@ -444,7 +448,7 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("mensaje-usuario-contrasena").style.display = "none";
             document.getElementById("campo-estado").style.display = "none";
             document.getElementById("btnInactivos").style.display = "flex";
-       
+
 
             btnRegistrar.style.display = "inline-block";
             btnActualizar.style.display = "none";
@@ -468,150 +472,163 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Función para registrar usuario
-async function registrarUsuario() {
-    if (!await validarFormularioCompleto()) return;
-
-    const nombre = document.getElementById("nombre").value.trim();
-    const correo = document.getElementById("correo").value.trim();
-    const usuario = document.getElementById("usuario").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const rol = document.getElementById("rol").value;
-
-    if (!nombre || !correo || !usuario || !password || !rol) {
-        showModalMensaje("advertencia", "Campos incompletos", "Por favor completa todos los campos.");
-        return;
-    }
-
-    // ✅ VALIDACIÓN: Límite de administradores al crear
-    if (rol === '1') {
-        const limiteAdministradores = await verificarLimiteAdministradores();
-        if (!limiteAdministradores.puedeCrear) {
-            showModalMensaje("error", "Límite alcanzado", `No se pueden crear más de ${limiteAdministradores.maximo} administradores en el sistema`);
-            return;
-        }
-    }
-
-    const datos = new FormData();
-    datos.append("nombre", nombre);
-    datos.append("correo", correo);
-    datos.append("usuario", usuario);
-    datos.append("password", password);
-    datos.append("rol", rol);
-
-    fetch("php/usuarios.php", {
-        method: "POST",
-        body: datos
-    })
-        .then(res => res.json())
-        .then(data => {
-            showModalMensaje("exito", "Éxito", data.mensaje);
-            cargarUsuarios();
-            resetFormulario();
-        });
-}
-
-    // Función para actualizar usuario
-  async function actualizarUsuario() {
-    // Deshabilitar el botón inmediatamente
-    btnActualizar.disabled = true;
-    btnActualizar.textContent = "Actualizando...";
-
-    try {
-        // SOLO validar si estamos en vista completa (edición normal)
-        if (vistaActual === "completa" && !await validarFormularioCompleto()) {
-            throw new Error("Información no válida");
-        }
-
-        const id = tbody.dataset.idSeleccionado;
-        const nuevoEstado = document.getElementById("estado").value;
-
-        if (!id) {
-            throw new Error("No se ha seleccionado ningún usuario para editar");
-        }
-
-        // ✅ VALIDACIÓN 1: No permitir desactivarse a sí mismo
-        const usuarioSesion = JSON.parse(sessionStorage.getItem('usuario') || '{}');
-        if (parseInt(id) === parseInt(usuarioSesion.id) && nuevoEstado === 'Inactivo') {
-            throw new Error("No puedes desactivar tu propia cuenta");
-        }
+    async function registrarUsuario() {
+        if (!await validarFormularioCompleto()) return;
 
         const nombre = document.getElementById("nombre").value.trim();
         const correo = document.getElementById("correo").value.trim();
+        const usuario = document.getElementById("usuario").value.trim();
+        const password = document.getElementById("password").value.trim();
         const rol = document.getElementById("rol").value;
-        const estado = nuevoEstado;
 
-        // ✅ VALIDACIÓN 2: Verificar límite de administradores (solo si está cambiando a administrador activo)
-        if (rol === '1' && estado === 'Activo') {
-            const limiteAdministradores = await verificarLimiteAdministradores(id);
+        if (!nombre || !correo || !usuario || !password || !rol) {
+            showModalMensaje("advertencia", "Campos incompletos", "Por favor completa todos los campos.");
+            return;
+        }
+
+        // ✅ VALIDACIÓN: Límite de administradores al crear
+        if (rol === '1') {
+            const limiteAdministradores = await verificarLimiteAdministradores();
             if (!limiteAdministradores.puedeCrear) {
-                throw new Error(`No se pueden tener más de ${limiteAdministradores.maximo} administradores activos en el sistema`);
+                showModalMensaje("error", "Límite alcanzado", `No se pueden crear más de ${limiteAdministradores.maximo} administradores en el sistema`);
+                return;
             }
         }
 
         const datos = new FormData();
-        datos.append("id_usuario", id);
         datos.append("nombre", nombre);
         datos.append("correo", correo);
+        datos.append("usuario", usuario);
+        datos.append("password", password);
         datos.append("rol", rol);
-        datos.append("estado", estado);
 
-        const response = await fetch("php/editar_usuarios.php", {
+        // Agregar información del usuario para bitácora
+        const usuarioSesion = JSON.parse(sessionStorage.getItem('usuario') || '{}');
+        datos.append("usuario_bitacora_id", usuarioSesion.id || '');
+        datos.append("usuario_bitacora_nombre", usuarioSesion.nombre || 'Sistema');
+
+        fetch("php/usuarios.php", {
             method: "POST",
             body: datos
-        });
-
-        // Verificar si la respuesta es JSON
-        const contentType = response.headers.get("content-type");
-        let data;
-
-        if (contentType && contentType.includes("application/json")) {
-            data = await response.json();
-        } else {
-            const text = await response.text();
-            console.error("❌ Respuesta no JSON:", text);
-            throw new Error("Respuesta no válida del servidor");
-        }
-
-        if (data.status === "success") {
-            showModalMensaje("exito", "Éxito", data.mensaje);
-
-            // Recargar la vista actual después de editar
-            setTimeout(() => {
-                if (vistaActual === "soloInactivos") {
-                    cargarUsuarios("Inactivo");
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    showModalMensaje("exito", "Éxito", data.mensaje);
+                    cargarUsuarios();
+                    resetFormulario();
                 } else {
-                    cargarUsuarios("Activo");
+                    showModalMensaje("error", "Error", data.mensaje);
                 }
+            })
+            .catch(error => {
+                console.error("Error registrando usuario:", error);
+                showModalMensaje("error", "Error", "Error al registrar usuario");
+            });
+    }
 
-                if (vistaActual === "completa") resetFormulario();
-            }, 1500);
+    // Función para actualizar usuario
+    async function actualizarUsuario() {
+        // Deshabilitar el botón inmediatamente
+        btnActualizar.disabled = true;
+        btnActualizar.textContent = "Actualizando...";
 
-        } else {
-            throw new Error(data.mensaje || "Error desconocido del servidor");
+        try {
+            // SOLO validar si estamos en vista completa (edición normal)
+            if (vistaActual === "completa" && !await validarFormularioCompleto()) {
+                throw new Error("Información no válida");
+            }
+
+            const id = tbody.dataset.idSeleccionado;
+            const nuevoEstado = document.getElementById("estado").value;
+
+            if (!id) {
+                throw new Error("No se ha seleccionado ningún usuario para editar");
+            }
+
+            // ✅ VALIDACIÓN 1: No permitir desactivarse a sí mismo
+            const usuarioSesion = JSON.parse(sessionStorage.getItem('usuario') || '{}');
+            if (parseInt(id) === parseInt(usuarioSesion.id) && nuevoEstado === 'Inactivo') {
+                throw new Error("No puedes desactivar tu propia cuenta");
+            }
+
+            const nombre = document.getElementById("nombre").value.trim();
+            const correo = document.getElementById("correo").value.trim();
+            const rol = document.getElementById("rol").value;
+            const estado = nuevoEstado;
+
+            // ✅ VALIDACIÓN 2: Verificar límite de administradores (solo si está cambiando a administrador activo)
+            if (rol === '1' && estado === 'Activo') {
+                const limiteAdministradores = await verificarLimiteAdministradores(id);
+                if (!limiteAdministradores.puedeCrear) {
+                    throw new Error(`No se pueden tener más de ${limiteAdministradores.maximo} administradores activos en el sistema`);
+                }
+            }
+
+            const datos = new FormData();
+            datos.append("id_usuario", id);
+            datos.append("nombre", nombre);
+            datos.append("correo", correo);
+            datos.append("rol", rol);
+            datos.append("estado", estado);
+
+            const response = await fetch("php/editar_usuarios.php", {
+                method: "POST",
+                body: datos
+            });
+
+            // Verificar si la respuesta es JSON
+            const contentType = response.headers.get("content-type");
+            let data;
+
+            if (contentType && contentType.includes("application/json")) {
+                data = await response.json();
+            } else {
+                const text = await response.text();
+                console.error("❌ Respuesta no JSON:", text);
+                throw new Error("Respuesta no válida del servidor");
+            }
+
+            if (data.status === "success") {
+                showModalMensaje("exito", "Éxito", data.mensaje);
+
+                // Recargar la vista actual después de editar
+                setTimeout(() => {
+                    if (vistaActual === "soloInactivos") {
+                        cargarUsuarios("Inactivo");
+                    } else {
+                        cargarUsuarios("Activo");
+                    }
+
+                    if (vistaActual === "completa") resetFormulario();
+                }, 1500);
+
+            } else {
+                throw new Error(data.mensaje || "Error desconocido del servidor");
+            }
+
+        } catch (error) {
+            console.error("🔥 Error en la actualización:", error);
+            showModalMensaje("error", "Error", "Ocurrió un error: " + error.message);
+
+        } finally {
+            // Siempre restablecer el botón
+            btnActualizar.disabled = false;
+            btnActualizar.textContent = "Actualizar Usuario";
         }
-
-    } catch (error) {
-        console.error("🔥 Error en la actualización:", error);
-        showModalMensaje("error", "Error", "Ocurrió un error: " + error.message);
-
-    } finally {
-        // Siempre restablecer el botón
-        btnActualizar.disabled = false;
-        btnActualizar.textContent = "Actualizar Usuario";
     }
-}
 
-// ✅ NUEVA FUNCIÓN: Verificar límite de administradores
-async function verificarLimiteAdministradores(idUsuarioExcluir = 0) {
-    try {
-        const response = await fetch(`php/usuarios.php?accion=contar_administradores&id_excluir=${idUsuarioExcluir}`);
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error verificando límite de administradores:', error);
-        return { puedeCrear: true, maximo: 2 }; // Por defecto permitir si hay error
+    // ✅ NUEVA FUNCIÓN: Verificar límite de administradores
+    async function verificarLimiteAdministradores(idUsuarioExcluir = 0) {
+        try {
+            const response = await fetch(`php/usuarios.php?accion=contar_administradores&id_excluir=${idUsuarioExcluir}`);
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error verificando límite de administradores:', error);
+            return { puedeCrear: true, maximo: 2 }; // Por defecto permitir si hay error
+        }
     }
-}
 
     // Función para validar formulario completo
     async function validarFormularioCompleto() {
@@ -699,31 +716,31 @@ async function verificarLimiteAdministradores(idUsuarioExcluir = 0) {
 
     // Función para validar campo existente en el servidor
     // Función para validar campo existente en el servidor
-async function validarCampoExistente(tipo, valor, idExcluir = 0) {
-    try {
-        const url = `php/usuarios.php?accion=validar&tipo=${tipo}&valor=${encodeURIComponent(valor)}&id_excluir=${idExcluir}`;
-        console.log('🔍 DEBUG Validación - URL:', url);
-        
-        const response = await fetch(url);
-        console.log('📊 DEBUG - Status:', response.status);
-        console.log('📋 DEBUG - OK:', response.ok);
-        
-        const text = await response.text();
-        console.log('📨 DEBUG - Respuesta cruda:', text);
-        
+    async function validarCampoExistente(tipo, valor, idExcluir = 0) {
         try {
-            const data = JSON.parse(text);
-            console.log('✅ DEBUG - JSON parseado:', data);
-            return data;
-        } catch (e) {
-            console.error('❌ DEBUG - Error parseando JSON:', e);
-            return { valido: false, mensaje: "Error en la respuesta del servidor" };
+            const url = `php/usuarios.php?accion=validar&tipo=${tipo}&valor=${encodeURIComponent(valor)}&id_excluir=${idExcluir}`;
+            console.log('🔍 DEBUG Validación - URL:', url);
+
+            const response = await fetch(url);
+            console.log('📊 DEBUG - Status:', response.status);
+            console.log('📋 DEBUG - OK:', response.ok);
+
+            const text = await response.text();
+            console.log('📨 DEBUG - Respuesta cruda:', text);
+
+            try {
+                const data = JSON.parse(text);
+                console.log('✅ DEBUG - JSON parseado:', data);
+                return data;
+            } catch (e) {
+                console.error('❌ DEBUG - Error parseando JSON:', e);
+                return { valido: false, mensaje: "Error en la respuesta del servidor" };
+            }
+        } catch (error) {
+            console.error('💥 DEBUG - Error fetch:', error);
+            return { valido: false, mensaje: `Error al validar ${tipo}` };
         }
-    } catch (error) {
-        console.error('💥 DEBUG - Error fetch:', error);
-        return { valido: false, mensaje: `Error al validar ${tipo}` };
     }
-}
 
     // Función para validar input
     function validarInput(input, regex, mensajeError) {
