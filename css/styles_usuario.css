@@ -776,6 +776,7 @@ body *:not(input):not(textarea):not(select) {
     font-size: 14px;
 }
 
+
 /* Botón CONFIRMAR (Verde) */
 .botones-confirmacion .btn-primary {
     background: #2E7D32;
