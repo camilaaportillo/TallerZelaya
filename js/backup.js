@@ -329,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const usuario = JSON.parse(sessionStorage.getItem('usuario') || '{}');
         const rol = usuario.rol || sessionStorage.getItem('usuario_rol') || '';
 
-        document.getElementById('rol-actual').textContent = rol;
+       
 
         if (rol !== 'Administrador' && rol !== '1') {
             document.getElementById('permisos-mensaje').textContent =
@@ -1311,4 +1311,23 @@ document.addEventListener('DOMContentLoaded', function () {
     window.closeNotification = closeNotification;
     window.fadeOutNotification = fadeOutNotification;
     window.showSystemNotification = showSystemNotification;
+    // Función irInicio
+    window.irInicio = function () {
+        window.location.href = "index.html";
+    };
+
+    // Función toggleMenu
+    window.toggleMenu = function () {
+        const menu = document.getElementById("menuUsuario");
+        if (menu) menu.classList.toggle("mostrar");
+    };
+
+    // Click fuera del menú usuario
+    window.addEventListener("click", (e) => {
+        const menu = document.getElementById("menuUsuario");
+        if (menu && !e.target.closest('.usuario')) {
+            menu.classList.remove("mostrar");
+        }
+    });
+    
 }); 

@@ -1,23 +1,36 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="imgs/favicon.png" type="image/png">
     <title>Reporte de Inventario - Taller de Bicicletas Zelaya</title>
     <link rel="stylesheet" href="css/inventario.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { visibility: hidden; } /* Ocultar body hasta validar sesión */
+        body {
+            visibility: hidden;
+        }
+
+        /* Ocultar body hasta validar sesión */
     </style>
 </head>
+
 <body>
     <!-- Encabezado -->
-    <header>
-        <button class="logo-btn" onclick="irInicio()">
-            <img src="imgs/bicicleta.png" alt="Logo bicicleta">
-            <span class="hover-text">Ir al Inicio</span>
+   <header>
+    <button class="logo-btn" onclick="irInicio()">
+        <img src="imgs/bicicleta.png" alt="Logo bicicleta">
+        <span class="hover-text">Inicio</span>
+    </button>
+    <h1>Taller de bicicletas Zelaya</h1>
+
+    <div class="header-derecha">
+        <button class="help-btn" onclick="mostrarAyuda('inventario')" title="Ayuda del Sistema">
+            <i class="fas fa-question-circle"></i>
+            <span class="hover-text">Ayuda</span>
         </button>
-        <h1>Taller de bicicletas Zelaya</h1>
         <div class="usuario">
             <div class="info-usuario">
                 <span id="nombreUsuario" class="nombre-usuario">Usuario</span>
@@ -27,10 +40,13 @@
                 <img src="imgs/logo_user.png" alt="Usuario">
             </button>
             <div id="menuUsuario" class="menu-usuario">
+                <a href="#" onclick="irPerfil()">Perfil</a>
                 <a href="#" onclick="cerrarSesion()">Cerrar sesión</a>
             </div>
         </div>
-    </header>
+    </div>
+</header>
+
 
     <!-- Contenido principal -->
     <main>
@@ -40,11 +56,11 @@
                 <h2>📊 Inventario</h2>
                 <div class="buscador">
                     <input type="text" id="buscarRepuesto" placeholder="🔍 Buscar por código, nombre o descripción...">
-                
+
                     <select id="filtroMarca">
                         <option value="">Todas las marcas</option>
                     </select>
-                  
+
                     <select id="filtroStock">
                         <option value="">Todo el stock</option>
                         <option value="bajo">Stock Bajo</option>
@@ -64,37 +80,37 @@
                 <!-- Las alertas se cargan dinámicamente -->
             </div>
 
-           <!-- Estadísticas rápidas -->
-<div class="estadisticas-inventario">
-    <div class="estadistica-card">
-        <div class="estadistica-icono">📦</div>
-        <div class="estadistica-info">
-            <span class="estadistica-valor" id="totalRepuestos">0</span>
-            <span class="estadistica-label">Total Repuestos</span>
-        </div>
-    </div>
-    <div class="estadistica-card">
-        <div class="estadistica-icono">⚠️</div>
-        <div class="estadistica-info">
-            <span class="estadistica-valor" id="stockBajo">0</span>
-            <span class="estadistica-label">Stock Bajo</span>
-        </div>
-    </div>
-    <div class="estadistica-card">
-        <div class="estadistica-icono">💰</div>
-        <div class="estadistica-info">
-            <span class="estadistica-valor" id="sinPrecio">0</span>
-            <span class="estadistica-label">Sin Precio</span>
-        </div>
-    </div>
-    <div class="estadistica-card">
-        <div class="estadistica-icono">📈</div>
-        <div class="estadistica-info">
-            <span class="estadistica-valor" id="valorInventario">$0</span>
-            <span class="estadistica-label">Valor Inventario</span>
-        </div>
-    </div>
-</div>
+            <!-- Estadísticas rápidas -->
+            <div class="estadisticas-inventario">
+                <div class="estadistica-card">
+                    <div class="estadistica-icono">📦</div>
+                    <div class="estadistica-info">
+                        <span class="estadistica-valor" id="totalRepuestos">0</span>
+                        <span class="estadistica-label">Total Repuestos</span>
+                    </div>
+                </div>
+                <div class="estadistica-card">
+                    <div class="estadistica-icono">⚠️</div>
+                    <div class="estadistica-info">
+                        <span class="estadistica-valor" id="stockBajo">0</span>
+                        <span class="estadistica-label">Stock Bajo</span>
+                    </div>
+                </div>
+                <div class="estadistica-card">
+                    <div class="estadistica-icono">💰</div>
+                    <div class="estadistica-info">
+                        <span class="estadistica-valor" id="sinPrecio">0</span>
+                        <span class="estadistica-label">Sin Precio</span>
+                    </div>
+                </div>
+                <div class="estadistica-card">
+                    <div class="estadistica-icono">📈</div>
+                    <div class="estadistica-info">
+                        <span class="estadistica-valor" id="valorInventario">$0</span>
+                        <span class="estadistica-label">Valor Inventario</span>
+                    </div>
+                </div>
+            </div>
             <!-- Contenedor de la tabla -->
             <div class="tabla-contenedor">
                 <table id="tablaRepuestos">
@@ -116,58 +132,69 @@
 </thead>
     </tr>
 </thead>
+                        <tr>
+                            <th style="width: 100px;">Código</th>
+                            <th style="width: 200px;">Nombre</th>
+                            <th style="width: 120px;">Marca</th>
+                            <th style="width: 100px;">Medida</th>
+                            <th style="width: 80px;">Stock</th>
+                            <th style="width: 80px;">Mínimo</th>
+                            <th style="width: 120px;">Precio Venta</th>
+                            <th style="width: 100px;">Acciones</th>
+                        </tr>
+                    </thead>
                     <tbody id="cuerpoTablaRepuestos">
                         <!-- Los datos se cargan dinámicamente -->
                     </tbody>
                 </table>
             </div>
-            
+
             <div class="tabla-footer">
                 <p class="nota">💡 Haz clic en el botón 💰 para editar el precio de venta de un repuesto</p>
                 <div class="exportar-acciones">
-                   <button class="btn-exportar" onclick="generarPDFStockBajo()">📄 Generar PDF Stock Bajo</button>
+                    <button class="btn-exportar" onclick="generarPDFStockBajo()">📄 Generar PDF Stock Bajo</button>
                 </div>
             </div>
         </section>
     </main>
 
-   <!-- Modal para Editar Precio -->
-<div id="modalEditarPrecio" class="modal" style="display:none;">
-    <div class="modal-contenido">
-        <h2>💰 Editar Precio de Venta</h2>
-        <form id="formEditarPrecio">
-            <input type="hidden" id="precio_id_repuesto">
-            
-            <div class="info-repuesto">
-                <p><strong>Repuesto:</strong> <span id="precio_nombre_repuesto"></span></p>
-                <p><strong>Código:</strong> <span id="precio_codigo_repuesto"></span></p>
-                <p><strong>Precio Actual:</strong> <span id="precio_actual_repuesto"></span></p>
-                <!-- NUEVO: Mostrar último precio de compra -->
-                <p><strong>Último Precio de Compra:</strong> <span id="precio_ultima_compra">$0.00</span></p>
-            </div>
+    <!-- Modal para Editar Precio -->
+    <div id="modalEditarPrecio" class="modal" style="display:none;">
+        <div class="modal-contenido">
+            <h2>💰 Editar Precio de Venta</h2>
+            <form id="formEditarPrecio">
+                <input type="hidden" id="precio_id_repuesto">
 
-            <label for="nuevo_precio_venta">Nuevo Precio de Venta *</label>
-            <input type="number" id="nuevo_precio_venta" name="nuevo_precio_venta" 
-                   step="0.01" min="0.01" required placeholder="0.00">
+                <div class="info-repuesto">
+                    <p><strong>Repuesto:</strong> <span id="precio_nombre_repuesto"></span></p>
+                    <p><strong>Código:</strong> <span id="precio_codigo_repuesto"></span></p>
+                    <p><strong>Precio Actual:</strong> <span id="precio_actual_repuesto"></span></p>
+                    <!-- NUEVO: Mostrar último precio de compra -->
+                    <p><strong>Último Precio de Compra:</strong> <span id="precio_ultima_compra">$0.00</span></p>
+                </div>
 
-            <div class="precio-alerta" id="alertaPrecioCero" style="display: none;">
-                ⚠️ El precio no puede ser $0.00
-            </div>
-            
-            <!-- NUEVO: Alerta para precio inferior al de compra -->
-            <div class="precio-alerta precio-advertencia" id="alertaPrecioInferior" style="display: none;">
-                ⚠️ El precio de venta es inferior al último precio de compra. 
-                Esto podría generar pérdidas. ¿Estás seguro de continuar?
-            </div>
+                <label for="nuevo_precio_venta">Nuevo Precio de Venta *</label>
+                <input type="number" id="nuevo_precio_venta" name="nuevo_precio_venta" step="0.01" min="0.01" required
+                    placeholder="0.00">
 
-            <div class="modal-botones">
-                <button type="submit" class="btn-azul">💾 Guardar Precio</button>
-                <button type="button" class="btn-cancelar" onclick="cerrarModalEditarPrecio()">Cancelar</button>
-            </div>
-        </form>
-        <button class="btn-cerrar-otro" onclick="cerrarModalEditarPrecio()">X</button>
+                <div class="precio-alerta" id="alertaPrecioCero" style="display: none;">
+                    ⚠️ El precio no puede ser $0.00
+                </div>
+
+                <!-- NUEVO: Alerta para precio inferior al de compra -->
+                <div class="precio-alerta precio-advertencia" id="alertaPrecioInferior" style="display: none;">
+                    ⚠️ El precio de venta es inferior al último precio de compra.
+                    Esto podría generar pérdidas. ¿Estás seguro de continuar?
+                </div>
+
+                <div class="modal-botones">
+                    <button type="submit" class="btn-azul">💾 Guardar Precio</button>
+                    <button type="button" class="btn-cancelar" onclick="cerrarModalEditarPrecio()">Cancelar</button>
+                </div>
+            </form>
+            <button class="btn-cerrar-otro" onclick="cerrarModalEditarPrecio()">X</button>
+        </div>
     </div>
-</div>
 
     <!-- Modal de Mensajes Global -->
     <div id="modalMensaje" class="modal-mensaje">
@@ -181,14 +208,51 @@
         </div>
     </div>
 
-    
+<!-- Modal de Ayuda PDF -->
+<div id="modalAyuda" class="modal-ayuda">
+    <div class="modal-ayuda-contenido">
+        <div class="modal-header">
+            <h2><i class="fas fa-question-circle"></i> Ayuda del Sistema</h2>
+            <div class="modal-controls">
+                <button class="btn-descargar" onclick="descargarPDFActual()" title="Descargar Manual">
+                    <i class="fas fa-download"></i> Descargar
+                </button>
+                <button class="btn-cerrar-ayuda" onclick="ocultarAyuda()" title="Cerrar Ayuda">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div class="pdf-container">
+                <object id="pdfObject" data="" type="application/pdf" width="100%" height="100%">
+                    <div class="pdf-fallback">
+                        <p>No se puede mostrar el PDF. <a href="#" onclick="descargarPDFActual()">Descarga el manual aquí</a>.</p>
+                    </div>
+                </object>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+// Cerrar modal con ESC y clic fuera
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') ocultarAyuda();
+});
+
+document.getElementById('modalAyuda').addEventListener('click', function(event) {
+    if (event.target === this) ocultarAyuda();
+});
+</script>
+<!-- Incluir el sistema de ayuda -->
+<script src="js/ayuda-sistema.js"></script>
 
     <script src="js/sesion.js"></script>
     <script src="js/inventario.js"></script>
     <!-- Bibliotecas para generar PDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
 
 </body>
+
 </html>

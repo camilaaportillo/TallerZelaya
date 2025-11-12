@@ -7,19 +7,30 @@
     <title>Perfil de Usuario</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/perfilStyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { visibility: hidden; } /* Ocultar body hasta validar sesión */
+        body {
+            visibility: hidden;
+        }
+
+        /* Ocultar body hasta validar sesión */
     </style>
 </head>
 
 <body>
     <!-- Encabezado -->
-    <header>
-        <button class="logo-btn" onclick="irInicio()">
-            <img src="imgs/bicicleta.png" alt="Logo bicicleta">
-            <span class="hover-text">Inicio</span>
+ <header>
+    <button class="logo-btn" onclick="irInicio()">
+        <img src="imgs/bicicleta.png" alt="Logo bicicleta">
+        <span class="hover-text">Inicio</span>
+    </button>
+    <h1>Taller de bicicletas Zelaya</h1>
+
+    <div class="header-derecha">
+        <button class="help-btn" onclick="mostrarAyuda('perfil')" title="Ayuda del Sistema">
+            <i class="fas fa-question-circle"></i>
+            <span class="hover-text">Ayuda</span>
         </button>
-        <h1>Taller de bicicletas Zelaya</h1>
         <div class="usuario">
             <div class="info-usuario">
                 <span id="nombreUsuario" class="nombre-usuario">Usuario</span>
@@ -32,7 +43,9 @@
                 <a href="#" onclick="cerrarSesion()">Cerrar sesión</a>
             </div>
         </div>
-    </header>
+    </div>
+</header>
+
 
     <!-- Contenido principal -->
     <main>
@@ -45,10 +58,10 @@
             <!-- Datos del usuario -->
             <div class="perfil-datos">
                 <h2 id="nombrePerfil">Juan Pérez</h2>
-                
+
                 <p><strong>Correo:</strong> <span id="correoPerfil"></span></p>
                 <p><strong>Usuario:</strong> <span id="usuarioPerfil"></span></p>
-              
+
                 <!-- Acciones -->
                 <div class="perfil-acciones">
                     <button onclick="editarPerfil()">Editar Usuario</button>
@@ -60,14 +73,14 @@
 
     <!-- Modal Cambiar Contraseña -->
     <div id="modalContrasena" class="modal" style="display:none;">
-    <div class="modal-contenido">
-        <h2>Cambiar Contraseña</h2>
-        <form id="formContrasena">
+        <div class="modal-contenido">
+            <h2>Cambiar Contraseña</h2>
+            <form id="formContrasena">
                 <div class="form-group">
                     <label for="actualContrasena">Contraseña Actual:</label>
                     <div class="password-container">
-                        <input type="password" id="actualContrasena" name="actualContrasena" 
-                               placeholder="Ingresa tu contraseña actual" required>
+                        <input type="password" id="actualContrasena" name="actualContrasena"
+                            placeholder="Ingresa tu contraseña actual" required>
                         <button type="button" class="password-toggle" id="toggleActualContrasena">
                             <i class="far fa-eye"></i>
                         </button>
@@ -79,7 +92,7 @@
                     <label for="nuevaContrasena">Nueva Contraseña:</label>
                     <div class="password-container">
                         <input type="password" id="nuevaContrasena" name="nuevaContrasena"
-                               placeholder="Ingresa tu nueva contraseña" required>
+                            placeholder="Ingresa tu nueva contraseña" required>
                         <button type="button" class="password-toggle" id="toggleNuevaContrasena">
                             <i class="far fa-eye"></i>
                         </button>
@@ -90,8 +103,8 @@
                 <div class="form-group">
                     <label for="confirmarContrasena">Confirmar Nueva Contraseña:</label>
                     <div class="password-container">
-                        <input type="password" id="confirmarContrasena" name="confirmarContrasena" 
-                               placeholder="Repite tu nueva contraseña" required>
+                        <input type="password" id="confirmarContrasena" name="confirmarContrasena"
+                            placeholder="Repite tu nueva contraseña" required>
                         <button type="button" class="password-toggle" id="toggleConfirmarContrasena">
                             <i class="far fa-eye"></i>
                         </button>
@@ -109,20 +122,20 @@
                     <button type="button" onclick="cerrarModalContrasena()">Cancelar</button>
                 </div>
             </form>
-        <button class="btn-cerrar" onclick="cerrarModalContrasena()">X</button>
+            <button class="btn-cerrar" onclick="cerrarModalContrasena()">X</button>
+        </div>
     </div>
-</div>
 
-<!-- Modal Editar Usuario -->
-<div id="modalEditarUsuario" class="modal" style="display:none;">
-    <div class="modal-contenido">
-        <h2>Editar Usuario</h2>
-        <form id="formEditarUsuario">
+    <!-- Modal Editar Usuario -->
+    <div id="modalEditarUsuario" class="modal" style="display:none;">
+        <div class="modal-contenido">
+            <h2>Editar Usuario</h2>
+            <form id="formEditarUsuario">
                 <label for="nuevoUsuario">Nuevo Usuario:</label>
-                <input type="text" id="nuevoUsuario" name="nuevoUsuario" autocomplete="off" 
-                       placeholder="Escribe el nuevo usuario" required>
+                <input type="text" id="nuevoUsuario" name="nuevoUsuario" autocomplete="off"
+                    placeholder="Escribe el nuevo usuario" required>
                 <p style="font-size: 0.9em; color: #c00;">
-                     Si cambias tu alias, el sistema cerrará la sesión automáticamente.
+                    Si cambias tu alias, el sistema cerrará la sesión automáticamente.
                 </p>
 
                 <div class="modal-botones">
@@ -130,21 +143,58 @@
                     <button type="button" id="btnCancelarUsuario">Cancelar</button>
                 </div>
             </form>
-        <button id="cerrarModal" class="btn-cerrar">X</button>
+            <button id="cerrarModal" class="btn-cerrar">X</button>
+        </div>
+    </div>
+
+    <!-- Modal de Mensajes Global -->
+    <div id="modalMensaje" class="modal-mensaje">
+        <div class="modal-mensaje-contenido">
+            <span id="modalIcono" class="modal-mensaje-icono"></span>
+            <h3 id="modalTitulo"></h3>
+            <p id="modalTexto"></p>
+            <button id="cerrarMensaje" class="btn-cerrar">X</button>
+        </div>
+    </div>
+<!-- Modal de Ayuda PDF -->
+<div id="modalAyuda" class="modal-ayuda">
+    <div class="modal-ayuda-contenido">
+        <div class="modal-header">
+            <h2><i class="fas fa-question-circle"></i> Ayuda del Sistema</h2>
+            <div class="modal-controls">
+                <button class="btn-descargar" onclick="descargarPDFActual()" title="Descargar Manual">
+                    <i class="fas fa-download"></i> Descargar
+                </button>
+                <button class="btn-cerrar-ayuda" onclick="ocultarAyuda()" title="Cerrar Ayuda">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div class="pdf-container">
+                <object id="pdfObject" data="" type="application/pdf" width="100%" height="100%">
+                    <div class="pdf-fallback">
+                        <p>No se puede mostrar el PDF. <a href="#" onclick="descargarPDFActual()">Descarga el manual aquí</a>.</p>
+                    </div>
+                </object>
+            </div>
+        </div>
     </div>
 </div>
+<script>
+// Cerrar modal con ESC y clic fuera
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') ocultarAyuda();
+});
 
-   <!-- Modal de Mensajes Global -->
-<div id="modalMensaje" class="modal-mensaje">
-  <div class="modal-mensaje-contenido">
-    <span id="modalIcono" class="modal-mensaje-icono"></span>
-    <h3 id="modalTitulo"></h3>
-    <p id="modalTexto"></p>
-    <button id="cerrarMensaje" class="btn-cerrar">X</button>
-  </div>
-</div>
-
+document.getElementById('modalAyuda').addEventListener('click', function(event) {
+    if (event.target === this) ocultarAyuda();
+});
+</script>
+<!-- Incluir el sistema de ayuda -->
+<script src="js/ayuda-sistema.js"></script>
     <script src="js/sesion.js"></script>
     <script src="js/jsPerfil.js"></script>
 </body>
+
 </html>
