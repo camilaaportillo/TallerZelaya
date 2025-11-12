@@ -407,7 +407,7 @@ table tbody tr:hover {
 
 
 .btn-volver {
-    background-color: #00f; 
+    background-color: #0026ff; 
     color: white;
     padding: 8px 15px;
     border-radius: 8px;
@@ -419,7 +419,8 @@ table tbody tr:hover {
 }
 
 .btn-volver:hover {
-    background-color: #3b4fff; 
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 38, 255, 0.6);
 }
 
 
