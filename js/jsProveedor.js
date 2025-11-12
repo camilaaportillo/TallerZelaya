@@ -569,7 +569,7 @@ function renderTablaInactivos(datos) {
             <td>${prov.empresa}</td>
             <td>
                 <button class="btn-habilitar" data-id="${prov.id_proveedor}">
-                    HABILITAR
+                    Habilitar
                 </button>
             </td>
         `;

@@ -651,43 +651,43 @@ header {
      box-shadow: 0 4px 12px rgba(106, 17, 203, 0.3);
  }
 
- .btn-volver {
-     background: #6c757d;
+.btn-volver {
+    background-color: #00f; 
     color: white;
-    border: none;
-    border-radius: 25px;
-    padding: 12px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-bottom: 20px;
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 14px;
     font-weight: bold;
-    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
- }
+    width: 200px;
+    border: none; /* ← Esta línea quita el borde negro */
+    cursor: pointer; /* ← Opcional: para mejorar la experiencia del usuario */
+}
 
- .btn-volver:hover {
-     transform: translateY(-2px);
-     box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
- }
+.btn-volver:hover {
+    background-color: #3b4fff; 
+}
 
  /* Botón de activar en la tabla */
  .btn-activar-medida {
-     background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
-     color: white;
-     border: none;
-     padding: 8px 15px;
-     border-radius: 5px;
-     cursor: pointer;
-     font-weight: 600;
-     transition: all 0.3s ease;
+     justify-content: space-between;
+    margin-top: auto;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 20px; 
+    cursor: pointer;
+    font-size: 14px;
+    padding: 5px 10px;
+    height: 36px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    width: 200px;
  }
 
  .btn-activar-medida:hover {
-     transform: translateY(-2px);
-     box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+   background-color: #218838;
  }
  .tabla-bloqueada {
     pointer-events: none;   /* bloquea clics */

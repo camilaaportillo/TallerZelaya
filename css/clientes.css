@@ -636,16 +636,22 @@ select {
     margin: 10px 20px 10px 0; /* arriba - derecha - abajo - izquierda */
 }
 
-/* Estilo del botón */
-.btn-habilitar-registro {
-    padding: 8px 16px;
-    font-size: 14px;
-    border-radius: 8px;
+ .btn-habilitar-registro {
+    justify-content: space-between;
+    margin-top: auto;
     background-color: #28a745;
     color: white;
     border: none;
+    border-radius: 20px; 
     cursor: pointer;
-    transition: background 0.3s ease;
+    font-size: 14px;
+    padding: 5px 10px;
+    height: 36px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    width: 200px;
 }
 
 .btn-habilitar-registro:hover {
