@@ -1,4 +1,3 @@
-/* Reset */
 * {
     margin: 0;
     padding: 0;
@@ -14,19 +13,48 @@ body {
     flex-direction: column;
     user-select: none;
 }
+
 .logo-btn img {
     width: 70px;
     height: 40px;
     object-fit: contain;
 }
+
+/* Header */
 /* Header */
 header {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: auto 1fr auto; /* 3 columnas: logo | título | botones */
     align-items: center;
     padding: 15px;
     border-bottom: 2px solid black;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
+.header-derecha {
+    display: flex;
+    align-items: center;
+    gap: 25px; /* Más espacio entre elementos */
+    justify-self: end;
+    margin-left: auto;
+}
+header > .logo-btn {
+    justify-self: start;
+}
+
+/* Columna central - Título (siempre centrado) */
+header > h1 {
+    justify-self: center;
+    text-align: center;
+    margin: 0;
+    grid-column: 2;
+}
+
 
 .usuario {
     position: relative;
@@ -112,28 +140,65 @@ header {
 
 /* Layout principal */
 main {
+
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 10px;
+     margin-top: 90px; /* Ajusta según la altura real de tu header */
+    min-height: calc(100vh - 90px);
 }
 
-/* Grid menú - ESTILOS UNIFICADOS */
+/* NUEVO CSS PARA LA CUADRÍCULA OPTIMIZADA */
+
+/* Contenedor principal con categorías */
+.categorias-container {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+}
+
+.categoria {
+    margin-bottom: 10px;
+}
+
+.categoria-titulo {
+    font-size: 1.4rem;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #000000;
+    font-weight: bold;
+}
+
+/* Grid con elementos de diferentes tamaños */
 .grid-menu {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 30px;
+    gap: 25px;
     padding: 10px;
     width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
+}
+
+/* Elementos de diferentes tamaños */
+.item-doble {
+    grid-column: span 1;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.item-doble p {
+    color: white;
 }
 
 /* ESTILOS PARA LOS ENLACES - CORREGIDO */
 .grid-menu a {
     text-decoration: none;
-    color: black;  /* Esto hará que el texto sea negro */
+    color: black;
+    /* Esto hará que el texto sea negro */
     font-weight: bold;
 }
 
@@ -169,7 +234,8 @@ main {
     font-size: 16px;
     margin: 0;
     font-weight: 600;
-    color: black; /* Asegurar que el texto sea negro */
+    color: black;
+    /* Asegurar que el texto sea negro */
 }
 
 /* Ajustes específicos para modo empleado (menos elementos) */
@@ -191,7 +257,11 @@ main {
         grid-template-columns: repeat(3, 1fr);
         gap: 25px;
     }
-    
+
+    .item-doble {
+        grid-column: span 1;
+    }
+
     .grid-menu.modo-empleado {
         grid-template-columns: repeat(2, 1fr);
         max-width: 700px;
@@ -203,12 +273,12 @@ main {
         grid-template-columns: repeat(2, 1fr);
         gap: 20px;
     }
-    
+
     .item img {
         width: 70px;
         height: 70px;
     }
-    
+
     .grid-menu.modo-empleado,
     .grid-menu.modo-empleado-4-elementos {
         grid-template-columns: repeat(2, 1fr);
@@ -222,22 +292,23 @@ main {
         gap: 15px;
         padding: 15px;
     }
-    
+
     .item {
         padding: 20px 10px;
         min-height: 140px;
         gap: 10px;
+
     }
-    
+
     .item img {
         width: 60px;
         height: 60px;
     }
-    
+
     .item p {
         font-size: 14px;
     }
-    
+
     .grid-menu.modo-empleado,
     .grid-menu.modo-empleado-4-elementos {
         grid-template-columns: 1fr;
@@ -250,30 +321,31 @@ main {
         grid-template-columns: 1fr;
         gap: 15px;
     }
-    
+
     .item {
         min-height: 120px;
         padding: 15px 10px;
+
     }
-    
+
     .item img {
         width: 50px;
         height: 50px;
     }
-    
+
     header {
         padding: 10px;
     }
-    
+
     .user-btn img {
         width: 50px;
         height: 50px;
     }
-    
+
     .logo-btn img {
         width: 60px;
         height: 35px;
-        
+
     }
 }
 
@@ -284,7 +356,7 @@ main {
     background: none;
     border: none;
     cursor: pointer;
-    
+
 }
 
 .hover-text {
@@ -297,9 +369,237 @@ main {
     opacity: 0;
     transition: opacity 0.3s;
     white-space: nowrap;
-    
+
 }
 
 .logo-btn:hover .hover-text {
     opacity: 1;
+}
+
+/* Estilos para el botón de ayuda */
+.help-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-right: 15px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.help-btn:hover {
+    background: #218838;
+    transform: translateY(-2px);
+}
+
+/* Modal de Ayuda - Estilo Integrado */
+.modal-ayuda {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-ayuda-contenido {
+    background: white;
+    border-radius: 12px;
+    width: 50%; /* Más pequeño */
+    height: 75%; /* Más pequeño */
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    border: 2px solid #2c3e50;
+    animation: modalSlideIn 0.3s ease;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #2c3e50, #3498db);
+    color: white;
+    padding: 18px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 10px 10px 0 0;
+    border-bottom: 3px solid #2980b9;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.btn-descargar {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.btn-descargar:hover {
+    background: #219653;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.btn-cerrar-ayuda {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.btn-cerrar-ayuda:hover {
+    background: #c0392b;
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.modal-body {
+    flex: 1;
+    padding: 0;
+    border-radius: 0 0 10px 10px;
+    overflow: hidden;
+    background: #f8f9fa;
+}
+
+.pdf-container {
+    width: 100%;
+    height: 100%;
+    background: white;
+}
+
+.pdf-container object {
+    border: none;
+    width: 100%;
+    height: 100%;
+    border-radius: 0 0 10px 10px;
+}
+
+.pdf-fallback {
+    padding: 40px;
+    text-align: center;
+    color: #666;
+}
+
+.pdf-fallback a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.pdf-fallback a:hover {
+    text-decoration: underline;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes modalSlideIn {
+    from { 
+        opacity: 0;
+        transform: scale(0.8) translateY(-30px);
+    }
+    to { 
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .modal-contenido {
+        width: 95%;
+        height: 90%;
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-contenido {
+        width: 98%;
+        height: 95%;
+        border-radius: 8px;
+    }
+    
+    .modal-header {
+        padding: 15px 20px;
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+    
+    .modal-header h2 {
+        font-size: 1.3em;
+    }
+    
+    .modal-controls {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .btn-descargar {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    
+    .btn-cerrar-ayuda {
+        width: 38px;
+        height: 38px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-header h2 {
+        font-size: 1.1em;
+    }
+    
+    .btn-descargar {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    
+    .modal-contenido {
+        height: 98%;
+    }
 }

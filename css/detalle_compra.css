@@ -1,5 +1,6 @@
 /* Estilo limpio, tipo factura */
 body {
+    padding-top: 90px; 
     font-family: Inter, Arial, sans-serif;
     margin: 20px;
     color: #222;

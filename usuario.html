@@ -7,6 +7,7 @@
     <link rel="icon" href="imgs/favicon.png" type="image/png">
     <title>Usuarios</title>
     <link rel="stylesheet" href="css/styles_usuario.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         /* Estilos específicos para el checkbox de mostrar contraseña */
         .mostrar-contrasena {
@@ -35,39 +36,38 @@
             visibility: hidden;
         }
     </style>
-    
-    <!-- ✅ SCRIPTS EN ORDEN CORRECTO -->
-   <script src="js/sesion.js"></script>
-   <script>
-    // ✅ DEBUG TEMPORAL - Agrega esto en usuario.html
-function debugValidacionCorreo() {
-    const correo = document.getElementById('correo').value;
-    console.log('🔍 Debug validación correo:', correo);
-    
-    const params = new URLSearchParams({
-        accion: 'validar',
-        tipo: 'correo', 
-        valor: correo
-    });
-    
-    console.log('📡 URL de validación:', `usuarios.php?${params}`);
-    
-    fetch(`usuarios.php?${params}`)
-        .then(response => {
-            console.log('📊 Status response:', response.status);
-            return response.json();
-        })
-        .then(data => {
-            console.log('📨 Respuesta servidor:', data);
-        })
-        .catch(error => {
-            console.error('💥 Error fetch:', error);
-        });
-}
 
-// Ejecuta en consola: debugValidacionCorreo()
-   </script>
-    
+    <script src="js/sesion.js"></script>
+    <script>
+
+        function debugValidacionCorreo() {
+            const correo = document.getElementById('correo').value;
+            console.log('🔍 Debug validación correo:', correo);
+
+            const params = new URLSearchParams({
+                accion: 'validar',
+                tipo: 'correo',
+                valor: correo
+            });
+
+            console.log('📡 URL de validación:', `usuarios.php?${params}`);
+
+            fetch(`usuarios.php?${params}`)
+                .then(response => {
+                    console.log('📊 Status response:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('📨 Respuesta servidor:', data);
+                })
+                .catch(error => {
+                    console.error('💥 Error fetch:', error);
+                });
+        }
+
+        // Ejecuta en consola: debugValidacionCorreo()
+    </script>
+
     <!-- DEBUG TEMPORAL -->
     <script>
         console.log('🐛 DEBUG usuario.html - INICIO');
@@ -76,7 +76,7 @@ function debugValidacionCorreo() {
         console.log('  loggedin:', sessionStorage.getItem('loggedin'));
         console.log('  usuario:', sessionStorage.getItem('usuario'));
         console.log('  usuario_rol:', sessionStorage.getItem('usuario_rol'));
-        
+
         // Verificación inmediata
         if (sessionStorage.getItem('loggedin') !== 'true') {
             console.error('❌ PROBLEMA: No hay sesión en usuario.html');
@@ -88,20 +88,30 @@ function debugValidacionCorreo() {
             console.log('🎭 Rol del usuario:', usuario.rol);
         }
     </script>
-    
 
-   
 </head>
 
 <body>
 
-    <!-- Encabezado -->
-    <header>
-        <button class="logo-btn" onclick="irInicio()">
-            <img src="imgs/bicicleta.png" alt="Logo bicicleta">
-            <span class="hover-text">Inicio</span>
+<header>
+    <!-- Columna izquierda - Logo -->
+    <button class="logo-btn" onclick="irInicio()">
+        <img src="imgs/bicicleta.png" alt="Logo bicicleta">
+        <span class="hover-text">Inicio</span>
+    </button>
+    
+    <!-- Columna central - Título (SIEMPRE centrado) -->
+    <h1>Taller de bicicletas Zelaya</h1>
+    
+    <!-- Columna derecha - Botón ayuda + usuario -->
+    <div class="header-derecha">
+        <!-- Botón de Ayuda -->
+        <button class="help-btn" onclick="mostrarAyuda('usuarios')" title="Ayuda del Sistema">
+            <i class="fas fa-question-circle"></i>
+            <span class="hover-text">Ayuda</span>
         </button>
-        <h1>Taller de bicicletas Zelaya</h1>
+        
+        <!-- Usuario -->
         <div class="usuario">
             <div class="info-usuario">
                 <span id="nombreUsuario" class="nombre-usuario">Usuario</span>
@@ -111,10 +121,12 @@ function debugValidacionCorreo() {
                 <img src="imgs/logo_user.png" alt="Usuario">
             </button>
             <div id="menuUsuario" class="menu-usuario">
+                <a href="#" onclick="irPerfil()">Perfil</a>
                 <a href="#" onclick="cerrarSesion()">Cerrar sesión</a>
             </div>
         </div>
-    </header>
+    </div>
+</header>
 
     <main>
 
@@ -247,6 +259,43 @@ function debugValidacionCorreo() {
             </div>
         </div>
     </main>
+    <!-- Modal de Ayuda PDF -->
+<div id="modalAyuda" class="modal-ayuda">
+    <div class="modal-ayuda-contenido">
+        <div class="modal-header">
+            <h2><i class="fas fa-question-circle"></i> Ayuda del Sistema</h2>
+            <div class="modal-controls">
+                <button class="btn-descargar" onclick="descargarPDFActual()" title="Descargar Manual">
+                    <i class="fas fa-download"></i> Descargar
+                </button>
+                <button class="btn-cerrar-ayuda" onclick="ocultarAyuda()" title="Cerrar Ayuda">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div class="pdf-container">
+                <object id="pdfObject" data="" type="application/pdf" width="100%" height="100%">
+                    <div class="pdf-fallback">
+                        <p>No se puede mostrar el PDF. <a href="#" onclick="descargarPDFActual()">Descarga el manual aquí</a>.</p>
+                    </div>
+                </object>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+// Cerrar modal con ESC y clic fuera
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') ocultarAyuda();
+});
+
+document.getElementById('modalAyuda').addEventListener('click', function(event) {
+    if (event.target === this) ocultarAyuda();
+});
+</script>
+<!-- Incluir el sistema de ayuda -->
+<script src="js/ayuda-sistema.js"></script>
     <script src="js/usuarios.js"></script>
     <!-- Incluir SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -268,7 +317,7 @@ function debugValidacionCorreo() {
             }
         });
     </script>
-   
+
 
 
 </body>
