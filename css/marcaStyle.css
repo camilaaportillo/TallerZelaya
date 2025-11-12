@@ -6,7 +6,7 @@
 }
 
 body {
-    padding-top: 90px; 
+    padding-top: 90px;
     background: white;
     color: black;
     height: 100vh;
@@ -19,7 +19,8 @@ body {
 
 header {
     display: grid;
-    grid-template-columns: auto 1fr auto; /* 3 columnas: logo | título | botones */
+    grid-template-columns: auto 1fr auto;
+    /* 3 columnas: logo | título | botones */
     align-items: center;
     padding: 15px;
     border-bottom: 2px solid black;
@@ -35,18 +36,20 @@ header {
 .header-derecha {
     display: flex;
     align-items: center;
-    gap: 25px; /* Más espacio entre elementos */
+    gap: 25px;
+    /* Más espacio entre elementos */
     justify-self: end;
     margin-left: auto;
 }
 
 /* Columna central - Título (siempre centrado) */
-header > h1 {
+header>h1 {
     justify-self: center;
     text-align: center;
     margin: 0;
     grid-column: 2;
 }
+
 /* Estilos para el botón de ayuda */
 .help-btn {
     background: #28a745;
@@ -118,7 +121,7 @@ header > h1 {
     align-items: center;
     background: none;
     border: none;
-    cursor: pointer; 
+    cursor: pointer;
 }
 
 .logo-btn img {
@@ -236,6 +239,7 @@ main {
     box-shadow: 0 5px 15px rgba(0, 38, 255, 0.4);
     transition: all 0.3s ease;
 }
+
 .btn-registrar:hover,
 .btn-actualizar:hover {
     transform: translateY(-3px) scale(1.05);
@@ -294,10 +298,12 @@ main {
 table {
     width: 100%;
     border: 2px solid #aaa;
-    border-collapse: collapse; /* cambio aquí */
+    border-collapse: collapse;
+    /* cambio aquí */
     font-size: 15px;
     min-width: 600px;
-    table-layout: fixed; /* para que respete el ancho */
+    table-layout: fixed;
+    /* para que respete el ancho */
 }
 
 table th {
@@ -403,7 +409,7 @@ table tbody tr:hover {
 }
 
 .btn-rojo:hover {
-     transform: translateY(-2px) scale(1.03);
+    transform: translateY(-2px) scale(1.03);
     box-shadow: 0 6px 16px rgba(255, 59, 59, 0.6);
 }
 
@@ -436,32 +442,35 @@ table tbody tr:hover {
 
 
 .close {
-  position: absolute;
-  right: 10px; top: 10px;
-  font-size: 22px;
-  cursor: pointer;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 22px;
+    cursor: pointer;
 }
 
 /* Botones */
 .modal-actions {
-  margin-top: 20px;
-  display: flex;
-  justify-content: space-around;
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
 }
 
 
 
 
 .btn-volver {
-    background-color: #0026ff; 
+    background-color: #0026ff;
     color: white;
     padding: 8px 15px;
     border-radius: 8px;
     font-size: 14px;
     font-weight: bold;
     width: 200px;
-    border: none; /* ← Esta línea quita el borde negro */
-    cursor: pointer; /* ← Opcional: para mejorar la experiencia del usuario */
+    border: none;
+    /* ← Esta línea quita el borde negro */
+    cursor: pointer;
+    /* ← Opcional: para mejorar la experiencia del usuario */
 }
 
 .btn-volver:hover {
@@ -473,7 +482,8 @@ table tbody tr:hover {
 
 /* Botón Habilitar en la tabla */
 .btn-habilitar {
-    background-color: #28a745; /* verde */
+    background-color: #28a745;
+    /* verde */
     color: white;
     border: none;
     padding: 6px 12px;
@@ -484,7 +494,8 @@ table tbody tr:hover {
 }
 
 .btn-habilitar:hover {
-    background-color: #218838; /* verde más oscuro */
+    background-color: #218838;
+    /* verde más oscuro */
     transform: scale(1.05);
 }
 
@@ -516,25 +527,25 @@ table tbody tr:hover {
 }
 
 .btn-confirmar {
- 
-  color: #fff;
-  padding: 10px 18px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
+
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
 }
 
 .btn-cancelar {
- 
-  color: #fff;
-  padding: 10px 18px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
+
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
 }
 
 .btn-cancelar {
-  background: #860505;
+    background: #860505;
     color: white;
     box-shadow: 0 2px 8px rgba(129, 2, 2, 0.3);
     border: 1px solid #830808;
@@ -542,7 +553,7 @@ table tbody tr:hover {
 
 
 .btn-cancelar:hover {
-  transform: translateY(-2px) scale(1.03);
+    transform: translateY(-2px) scale(1.03);
     box-shadow: 0 6px 16px rgba(255, 59, 59, 0.6);
 }
 
@@ -574,16 +585,19 @@ table tbody tr:hover {
 /* ===== Tabla exclusiva para Marcas Inactivas ===== */
 .tabla-inactivas {
     width: 100%;
-    margin-top: 10px; /* pequeño margen debajo del botón Volver */
+    margin-top: 10px;
+    /* pequeño margen debajo del botón Volver */
 }
 
 .tabla-contenedor-inactivas {
     width: 100%;
-    overflow-x: auto; /* scroll horizontal si es necesario */
+    overflow-x: auto;
+    /* scroll horizontal si es necesario */
 }
 
 .tabla-inactivas-table {
-    width: 100%; /* que ocupe todo el ancho */
+    width: 100%;
+    /* que ocupe todo el ancho */
     border-collapse: collapse;
 }
 
@@ -601,28 +615,32 @@ table tbody tr:hover {
 
 
 .tabla-bloqueada {
-    pointer-events: none;   /* bloquea clics */
-    opacity: 0.6;           /* opcional: se ve más apagada */
+    pointer-events: none;
+    /* bloquea clics */
+    opacity: 0.6;
+    /* opcional: se ve más apagada */
 }
 
 /* Contenedor para alinear el botón a la derecha */
 .contenedor-boton-habilitar {
     display: flex;
-    justify-content: flex-end; /* alineado a la derecha */
-    margin: 10px 20px 10px 0; /* arriba - derecha - abajo - izquierda */
+    justify-content: flex-end;
+    /* alineado a la derecha */
+    margin: 10px 20px 10px 0;
+    /* arriba - derecha - abajo - izquierda */
 }
 
- .btn-habilitar-registro {
+.btn-habilitar-registro {
     justify-content: space-between;
     margin-top: auto;
     background-color: #28a745;
     color: white;
     border: none;
-    border-radius: 20px; 
+    border-radius: 20px;
     cursor: pointer;
     font-size: 14px;
     padding: 5px 10px;
-    height: 36px; 
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -644,12 +662,13 @@ table tbody tr:hover {
     opacity: 0;
     transition: opacity 0.3s;
     white-space: nowrap;
-    
+
 }
 
 .logo-btn:hover .hover-text {
     opacity: 1;
 }
+
 /* Heredamos todos los estilos base y añadimos específicos para inventario */
 * {
     margin: 0;
@@ -715,7 +734,7 @@ body {
     align-items: center;
     background: none;
     border: none;
-    cursor: pointer; 
+    cursor: pointer;
 }
 
 .logo-btn img {
@@ -741,8 +760,6 @@ body {
     background: none
 }
 
-<<<<<<< HEAD
-
 
 /* Modal de mensajes */
 .modal-mensaje-contenido {
@@ -754,7 +771,7 @@ body {
     align-items: center;
     gap: 15px;
     position: relative;
-    box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .modal-mensaje-icono {
@@ -781,15 +798,21 @@ body {
 }
 
 .modal-mensaje {
-=======
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
 /* Modal de Ayuda - Estilo Integrado */
 .modal-ayuda {
->>>>>>> 15a4472 (ayuda y diseño del sistema-falta)
     display: none;
     position: fixed;
     top: 0;
     left: 0;
-<<<<<<< HEAD
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
@@ -810,12 +833,12 @@ body {
     align-items: center;
     gap: 15px;
     position: relative;
-    box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .modal-mensaje-icono2 {
     flex-shrink: 0;
- 
+
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -852,46 +875,42 @@ body {
 
 /* Estilos base del modal */
 .modal {
-  display: none;
-  position: fixed;
-  z-index: 999;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
 }
 
 .modal-content {
-  background: #fff;
-  margin: 15% auto;
-  padding: 20px;
-  border-radius: 12px;
-  max-width: 400px;
-  text-align: center;
-  position: relative;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    background: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 12px;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .modal-content h1 {
     font-size: 60px;
-  margin-top: 0;
-  color: #ff2f00;
+    margin-top: 0;
+    color: #ff2f00;
 }
 
-=======
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    z-index: 2000;
-    justify-content: center;
-    align-items: center;
-    animation: fadeIn 0.3s ease;
-}
+
 
 .modal-ayuda-contenido {
     background: white;
     border-radius: 12px;
-    width: 50%; /* Más pequeño */
-    height: 75%; /* Más pequeño */
+    width: 50%;
+    /* Más pequeño */
+    height: 75%;
+    /* Más pequeño */
     display: flex;
     flex-direction: column;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
@@ -938,13 +957,13 @@ body {
     font-size: 14px;
     font-weight: 600;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .btn-descargar:hover {
     background: #219653;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .btn-cerrar-ayuda {
@@ -959,13 +978,13 @@ body {
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .btn-cerrar-ayuda:hover {
     background: #c0392b;
     transform: scale(1.1);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .modal-body {
@@ -1007,16 +1026,22 @@ body {
 
 /* Animaciones */
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes modalSlideIn {
-    from { 
+    from {
         opacity: 0;
         transform: scale(0.8) translateY(-30px);
     }
-    to { 
+
+    to {
         opacity: 1;
         transform: scale(1) translateY(0);
     }
@@ -1036,28 +1061,28 @@ body {
         height: 95%;
         border-radius: 8px;
     }
-    
+
     .modal-header {
         padding: 15px 20px;
         flex-direction: column;
         gap: 12px;
         text-align: center;
     }
-    
+
     .modal-header h2 {
         font-size: 1.3em;
     }
-    
+
     .modal-controls {
         width: 100%;
         justify-content: center;
     }
-    
+
     .btn-descargar {
         padding: 8px 12px;
         font-size: 13px;
     }
-    
+
     .btn-cerrar-ayuda {
         width: 38px;
         height: 38px;
@@ -1068,14 +1093,13 @@ body {
     .modal-header h2 {
         font-size: 1.1em;
     }
-    
+
     .btn-descargar {
         padding: 6px 10px;
         font-size: 12px;
     }
-    
+
     .modal-contenido {
         height: 98%;
     }
 }
->>>>>>> 15a4472 (ayuda y diseño del sistema-falta)

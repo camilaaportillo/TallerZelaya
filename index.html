@@ -14,33 +14,33 @@
 <body>
 
     <!-- Encabezado -->
-  <header>
-    <button class="logo-btn" onclick="irInicio()">
-        <img src="imgs/bicicleta.png" alt="Logo bicicleta">
-        <span class="hover-text">Inicio</span>
-    </button>
-    <h1>Taller de bicicletas Zelaya</h1>
-
-    <div class="header-derecha">
-        <button class="help-btn" onclick="mostrarAyuda('inicio')" title="Ayuda del Sistema">
-            <i class="fas fa-question-circle"></i>
-            <span class="hover-text">Ayuda</span>
+    <header>
+        <button class="logo-btn" onclick="irInicio()">
+            <img src="imgs/bicicleta.png" alt="Logo bicicleta">
+            <span class="hover-text">Inicio</span>
         </button>
-        <div class="usuario">
-            <div class="info-usuario">
-                <span id="nombreUsuario" class="nombre-usuario">Usuario</span>
-                <span id="rolUsuario" class="rol-usuario"></span>
-            </div>
-            <button class="user-btn" onclick="toggleMenu()">
-                <img src="imgs/logo_user.png" alt="Usuario">
+        <h1>Taller de bicicletas Zelaya</h1>
+
+        <div class="header-derecha">
+            <button class="help-btn" onclick="mostrarAyuda('inicio')" title="Ayuda del Sistema">
+                <i class="fas fa-question-circle"></i>
+                <span class="hover-text">Ayuda</span>
             </button>
-            <div id="menuUsuario" class="menu-usuario">
-                <a href="#" onclick="irPerfil()">Perfil</a>
-                <a href="#" onclick="cerrarSesion()">Cerrar sesión</a>
+            <div class="usuario">
+                <div class="info-usuario">
+                    <span id="nombreUsuario" class="nombre-usuario">Usuario</span>
+                    <span id="rolUsuario" class="rol-usuario"></span>
+                </div>
+                <button class="user-btn" onclick="toggleMenu()">
+                    <img src="imgs/logo_user.png" alt="Usuario">
+                </button>
+                <div id="menuUsuario" class="menu-usuario">
+                    <a href="#" onclick="irPerfil()">Perfil</a>
+                    <a href="#" onclick="cerrarSesion()">Cerrar sesión</a>
+                </div>
             </div>
         </div>
-    </div>
-</header>
+    </header>
 
 
     <!-- Contenido principal -->
@@ -58,6 +58,11 @@
                         <img src="imgs/Inventario.png" alt="Inventario">
                         <p>Inventario</p>
                     </a>
+                    <a class="item admin-only" href="herramientas.html">
+                       
+                        <img src="imgs/inventarioHerramientas.png" alt="Herramientas">
+                        <p>Inventario de herramientas</p>
+                    </a>
                     <a class="item" href="clientes.html">
                         <img src="imgs/Clientes.png" alt="Clientes">
                         <p>Clientes</p>
@@ -73,18 +78,6 @@
                         <img src="imgs/Compra.png" alt="Compras">
                         <p>Compras</p>
                     </a>
-
-            <a class="item admin-only" href="herramientas.html">
-                <i class="fas fa-database"></i>
-                <img src="imgs/inventarioHerramientas.png" alt="Ventas">
-                <p>Inventario de herramientas</p>
-            </a>
-
-            <a class="item admin-only" href="bitacora.php">
-                <i class="fas fa-database"></i>
-                <img src="imgs/bitacora.png" alt="Ventas">
-                <p>Bitacora</p>
-            </a>
                     <a class="item admin-only" href="repuestos.html">
                         <img src="imgs/Repuestos.png" alt="Repuestos">
                         <p>Repuestos</p>
@@ -116,7 +109,10 @@
                         <img src="imgs/Empresas.png" alt="Empresas">
                         <p>Empresas</p>
                     </a>
-
+                    <a class="item admin-only" href="bitacora.php">
+                        <img src="imgs/bitacora.png" alt="Ventas">
+                        <p>Bitacora</p>
+                    </a>
                     <a class="item admin-only item-doble" href="backup.html">
                         <img src="imgs/backup.png" alt="Copias de Seguridad">
                         <p>Copias de Seguridad</p>
@@ -125,32 +121,33 @@
             </div>
         </div>
     </main>
- <!-- Modal de Ayuda PDF -->
-<div id="modalAyuda" class="modal-ayuda">
-    <div class="modal-ayuda-contenido">
-        <div class="modal-header">
-            <h2><i class="fas fa-question-circle"></i> Ayuda del Sistema</h2>
-            <div class="modal-controls">
-                <button class="btn-descargar" onclick="descargarPDFActual()" title="Descargar Manual">
-                    <i class="fas fa-download"></i> Descargar
-                </button>
-                <button class="btn-cerrar-ayuda" onclick="ocultarAyuda()" title="Cerrar Ayuda">
-                    <i class="fas fa-times"></i>
-                </button>
+    <!-- Modal de Ayuda PDF -->
+    <div id="modalAyuda" class="modal-ayuda">
+        <div class="modal-ayuda-contenido">
+            <div class="modal-header">
+                <h2><i class="fas fa-question-circle"></i> Ayuda del Sistema</h2>
+                <div class="modal-controls">
+                    <button class="btn-descargar" onclick="descargarPDFActual()" title="Descargar Manual">
+                        <i class="fas fa-download"></i> Descargar
+                    </button>
+                    <button class="btn-cerrar-ayuda" onclick="ocultarAyuda()" title="Cerrar Ayuda">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
-        </div>
-        <div class="modal-body">
-            <div class="pdf-container">
-                <object id="pdfObject" data="" type="application/pdf" width="100%" height="100%">
-                    <div class="pdf-fallback">
-                        <p>No se puede mostrar el PDF. <a href="#" onclick="descargarPDFActual()">Descarga el manual aquí</a>.</p>
-                    </div>
-                </object>
+            <div class="modal-body">
+                <div class="pdf-container">
+                    <object id="pdfObject" data="" type="application/pdf" width="100%" height="100%">
+                        <div class="pdf-fallback">
+                            <p>No se puede mostrar el PDF. <a href="#" onclick="descargarPDFActual()">Descarga el manual
+                                    aquí</a>.</p>
+                        </div>
+                    </object>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<script src="js/ayuda-sistema.js"></script>
+    <script src="js/ayuda-sistema.js"></script>
 
     <script src="js/script.js"></script>
 
@@ -159,16 +156,16 @@
             window.location.href = "perfil.html";
         }
     </script>
-   <script>
-// Cerrar modal con ESC y clic fuera
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') ocultarAyuda();
-});
+    <script>
+        // Cerrar modal con ESC y clic fuera
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') ocultarAyuda();
+        });
 
-document.getElementById('modalAyuda').addEventListener('click', function(event) {
-    if (event.target === this) ocultarAyuda();
-});
-</script>
+        document.getElementById('modalAyuda').addEventListener('click', function (event) {
+            if (event.target === this) ocultarAyuda();
+        });
+    </script>
 
 </body>
 

@@ -6,7 +6,7 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_id_rol'] != 1) {
     exit;
 }
 
-require_once '../conexion.php';
+require_once 'conexion.php';
 
 header('Content-Type: application/json');
 
@@ -60,7 +60,7 @@ function getUsuarios() {
     try {
         $sql = "SELECT id_usuario as id, nombre 
                 FROM usuario 
-                WHERE activo = 1 
+                WHERE estado = 'Activo'
                 ORDER BY nombre";
         
         $result = $conn->query($sql);
