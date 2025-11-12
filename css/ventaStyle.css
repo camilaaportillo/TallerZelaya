@@ -164,6 +164,14 @@ main {
     margin-bottom: 8px;
     font-weight: bold;
     width: 100%;
+     box-shadow: 0 5px 15px rgba(0, 38, 255, 0.4);
+    transition: all 0.3s ease;
+}
+
+.btn-registrar:hover,
+.btn-actualizar:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 38, 255, 0.6);
 }
 
 .formulario .btn-actualizar, .formulario2 .btn-actualizar {

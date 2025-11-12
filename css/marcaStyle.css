@@ -182,16 +182,20 @@ main {
     color: white;
     border: none;
     border-radius: 25px;
-    padding: 18px;
+    padding: 18px 30px;
     font-size: 18px;
     cursor: pointer;
     margin-bottom: 15px;
     font-weight: bold;
+    box-shadow: 0 5px 15px rgba(0, 38, 255, 0.4);
+    transition: all 0.3s ease;
+}
+.btn-registrar:hover,
+.btn-actualizar:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 38, 255, 0.6);
 }
 
-.btn-actualizar {
-    display: none;
-}
 
 /* Tabla */
 .tabla {
@@ -343,16 +347,18 @@ table tbody tr:hover {
 }
 
 .btn-azul:hover {
-    background: #3b4fff;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 38, 255, 0.6);
 }
 
 .btn-rojo {
-    background: red;
+    background: #860505;
     color: white;
 }
 
 .btn-rojo:hover {
-    background: darkred;
+     transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 16px rgba(255, 59, 59, 0.6);
 }
 
 .btn-cerrar {
@@ -445,6 +451,10 @@ table tbody tr:hover {
     border-left: 6px solid #28a745;
 }
 
+.modal-content.warning {
+    border-left: 6px solid #ff2f00;
+}
+
 .btn-confirmar {
     background: #2E7D32;
     color: white;
@@ -485,13 +495,12 @@ table tbody tr:hover {
 
 
 .btn-cancelar:hover {
-  background-color: #7c0505;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(151, 5, 5, 0.822);
+  transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 16px rgba(255, 59, 59, 0.6);
 }
 
 .btn-cancelarEdicionn {
-    background: #a10404;
+    background: #860505;
     color: white;
     border: none;
     border-radius: 20px;
@@ -796,7 +805,6 @@ header {
     z-index: 1000;
 }
 
-modal-content
 
 /* Estilos base del modal */
 .modal {
@@ -824,3 +832,4 @@ modal-content
   margin-top: 0;
   color: #ff2f00;
 }
+
