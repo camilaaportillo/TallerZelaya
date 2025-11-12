@@ -30,7 +30,7 @@ $sql = "UPDATE cliente SET estado = 1 WHERE id_cliente = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id);
 
-if (mysqli_query($conn, $sql)) {
+if ($stmt->execute()) {
     // ✅ REGISTRAR EN BITÁCORA
     $descripcion = "Cliente habilitado: {$cliente_info['nombre']}";
     if ($cliente_info['telefono']) $descripcion .= " - Tel: {$cliente_info['telefono']}";
@@ -51,7 +51,7 @@ if (mysqli_query($conn, $sql)) {
 } else {
     echo json_encode([
         "status" => "error",
-        "mensaje" => "No se pudo habilitar el cliente: " . $conn->error
+        "mensaje" => "No se pudo habilitar el cliente: " . $stmt->error
     ]);
 }
 
