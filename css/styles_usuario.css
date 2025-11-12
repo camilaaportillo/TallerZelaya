@@ -1196,3 +1196,4 @@ input[type="text"]:not(:placeholder-shown)~.toggle-password {
         transform: none;
     }
 }
+
