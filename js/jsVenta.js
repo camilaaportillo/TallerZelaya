@@ -307,14 +307,13 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('Fecha de venta:', fechaFormateada);
     }
 
-    // Función para formatear fechas a dd/mm/aaaa
     function formatearFecha(fechaISO) {
         if (!fechaISO) return '';
 
         const fecha = new Date(fechaISO);
-        const dia = String(fecha.getDate()).padStart(2, '0');
-        const mes = String(fecha.getMonth() + 1).padStart(2, '0');
-        const anio = fecha.getFullYear();
+        const dia = String(fecha.getUTCDate()).padStart(2, '0');
+        const mes = String(fecha.getUTCMonth() + 1).padStart(2, '0');
+        const anio = fecha.getUTCFullYear();
 
         return `${dia}/${mes}/${anio}`;
     }
