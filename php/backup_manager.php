@@ -382,7 +382,7 @@ function restoreBackup() {
         $conn->query('SET FOREIGN_KEY_CHECKS=1');
         
         // Registrar en bitácora la acción de restauración
-        registrarAccionBackup('RESTAURAR_BACKUP', "Backup restaurado: $filename - Base de datos completa restaurada", $filename);
+        registrarAccionBackup('BACKUP', "Backup restaurado: $filename - Base de datos completa restaurada", $filename);
         
         echo json_encode(['success' => true, 'message' => 'Backup restaurado correctamente']);
         
@@ -417,7 +417,7 @@ function deleteBackup() {
     
     if (unlink($filepath)) {
         // REGISTRAR EN BITÁCORA
-        registrarAccionBackup('ELIMINAR_BACKUP', "Backup eliminado: $filename", $filename);
+        registrarAccionBackup('ELIMINAR', "Backup eliminado: $filename", $filename);
         
         echo json_encode(['success' => true, 'message' => 'Backup eliminado correctamente']);
     } else {

@@ -60,7 +60,7 @@ if($stmt->execute()){
     if ($correo) $descripcion .= " - Correo: $correo";
     
     registrarEnBitacora(
-        'INSERT',
+        'CREAR',
         $descripcion,
         'cliente',
         $nuevo_id,

@@ -42,7 +42,7 @@ function reactivarUsuario() {
         
         // Registrar en bitácora
         registrarEnBitacora(
-            'UPDATE',
+            'EDITAR',
             "Usuario reactivado: $correo",
             'usuario',
             $id_usuario,
@@ -215,7 +215,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // ✅ REGISTRAR EN BITÁCORA - CREACIÓN DE USUARIO
             $rol_nombre = ($rol == 1) ? 'Administrador' : 'Empleado';
             registrarEnBitacora(
-                'INSERT',
+                'CREAR',
                 "Usuario creado: $nombre - Correo: $correo - Rol: $rol_nombre",
                 'usuario',
                 $nuevo_id,

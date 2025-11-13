@@ -37,7 +37,7 @@ if ($stmt->execute()) {
     if ($cliente_info['correo']) $descripcion .= " - Correo: {$cliente_info['correo']}";
     
     registrarEnBitacora(
-        'UPDATE',
+        'ELIMINAR',
         $descripcion,
         'cliente',
         $id,

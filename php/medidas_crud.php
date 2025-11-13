@@ -116,7 +116,7 @@ switch ($method) {
                     "Medida activada: {$medida_actual['medida_bicicleta']}" : 
                     "Medida desactivada: {$medida_actual['medida_bicicleta']}";
                 
-                registrarEnBitacora($accion, $descripcion, 'medida', $data['id_medida'], 'Medidas');
+                registrarEnBitacora('EDITAR', $descripcion, 'medida', $data['id_medida'], 'Medidas');
                 
                 echo json_encode(["success" => true, "message" => "Estado de medida actualizado correctamente"]);
             } else {
@@ -146,7 +146,7 @@ switch ($method) {
             if ($stmt->execute()) {
                 // Registrar en bitácora
                 $descripcion = "Medida actualizada: {$medida_actual['medida_bicicleta']} → {$data['medida_bicicleta']}";
-                registrarEnBitacora('ACTUALIZAR', $descripcion, 'medida', $data['id_medida'], 'Medidas');
+                registrarEnBitacora('EDITAR', $descripcion, 'medida', $data['id_medida'], 'Medidas');
                 
                 echo json_encode(["success" => true, "message" => "Medida actualizada correctamente"]);
             } else {
@@ -170,7 +170,7 @@ switch ($method) {
                 
                 // Registrar en bitácora
                 $descripcion = "Nueva medida creada: {$data['medida_bicicleta']}";
-                registrarEnBitacora('INSERTAR', $descripcion, 'medida', $nuevo_id, 'Medidas');
+                registrarEnBitacora('CREAR', $descripcion, 'medida', $nuevo_id, 'Medidas');
                 
                 echo json_encode(["success" => true, "message" => "Medida creada correctamente", "id" => $nuevo_id]);
             } else {

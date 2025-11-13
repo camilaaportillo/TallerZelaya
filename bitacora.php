@@ -21,7 +21,8 @@ require_once 'conexion.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bitácora del Sistema - Taller Zelaya</title>
     <link rel="icon" href="imgs/favicon.png" type="image/png">
-    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/bitacora.css">
 </head>
 <body>
@@ -29,7 +30,7 @@ require_once 'conexion.php';
     <header>
         <button class="logo-btn" onclick="irInicio()">
             <img src="imgs/bicicleta.png" alt="Logo bicicleta">
-            <span class="hover-text">Ir al Inicio</span>
+            
         </button>
         <h1>Taller de bicicletas Zelaya</h1>
         <div class="usuario">
@@ -49,7 +50,7 @@ require_once 'conexion.php';
     <!-- Contenido principal -->
     <main class="main-content">
         <div class="container">
-            <div class="page-header">
+            <div class="page">
                 <h2>Bitácora del Sistema</h2>
                 <p>Registro de todas las actividades realizadas en el sistema</p>
             </div>
@@ -57,6 +58,11 @@ require_once 'conexion.php';
             <!-- Filtros -->
             <div class="filters-card">
                 <div class="filters-header">
+
+                <h2>Bitácora del Sistema</h2>
+                
+                <br>
+
                     <h3>Filtros</h3>
                     <button class="btn btn-secondary" onclick="resetFilters()">
                         <i class="fas fa-refresh"></i> Limpiar
@@ -115,8 +121,8 @@ require_once 'conexion.php';
                         <button class="btn btn-primary" onclick="cargarBitacora()">
                             <i class="fas fa-search"></i> Aplicar Filtros
                         </button>
-                        <button class="btn btn-outline" onclick="exportarBitacora()">
-                            <i class="fas fa-download"></i> Exportar
+                       <!-- <button class="btn btn-outline" onclick="exportarBitacora()">
+                            <i class="fas fa-download"></i> Exportar -->
                         </button>
                     </div>
                 </div>

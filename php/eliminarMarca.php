@@ -32,7 +32,7 @@ $stmt->bind_param("i", $id);
 if ($stmt->execute()) {
     // ✅ REGISTRAR EN BITÁCORA
     registrarEnBitacora(
-        'UPDATE',
+        'ELIMINAR',
         "Marca deshabilitada: {$marca_info['nombre']}",
         'marca',
         $id,

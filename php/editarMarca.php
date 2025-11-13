@@ -57,7 +57,7 @@ if ($stmt->execute()) {
     $descripcion = "Marca actualizada: {$marca_anterior['nombre']} → $nombre";
     
     registrarEnBitacora(
-        'UPDATE',
+        'EDITAR',
         $descripcion,
         'marca',
         $id,

@@ -28,7 +28,7 @@ if (mysqli_query($conn, $sql)) {
     }
     
     $descripcion = "Proveedor creado: $nombre - Tel: $telefono - Correo: $correo";
-    registrarEnBitacora('INSERTAR', $descripcion, 'proveedor', $nuevo_id, 'Proveedores');
+    registrarEnBitacora('CREAR', $descripcion, 'proveedor', $nuevo_id, 'Proveedores');
     
     echo json_encode(["status" => "exito", "mensaje" => "Proveedor registrado correctamente."]);
 } else {

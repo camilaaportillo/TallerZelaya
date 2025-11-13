@@ -142,7 +142,7 @@ if (mysqli_query($conn, $sql)) {
     }
     
     $descripcion = "Repuesto actualizado: $codigo - $nombre - Stock mínimo: $stock";
-    registrarEnBitacora('ACTUALIZAR', $descripcion, 'repuesto', $id_repuesto, 'Repuestos');
+    registrarEnBitacora('EDITAR', $descripcion, 'repuesto', $id_repuesto, 'Repuestos');
     
     echo json_encode(["status" => "exito", "mensaje" => "Repuesto actualizado correctamente."]);
 } else {

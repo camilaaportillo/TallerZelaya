@@ -31,7 +31,7 @@ if (mysqli_query($conn, $sql)) {
     }
     
     $descripcion = "Proveedor habilitado: {$proveedor['nombre']} - Tel: {$proveedor['telefono']} - Correo: {$proveedor['correo']}";
-    registrarEnBitacora('ACTIVAR', $descripcion, 'proveedor', $id, 'Proveedores');
+    registrarEnBitacora('EDITAR', $descripcion, 'proveedor', $id, 'Proveedores');
     
     echo json_encode(["status" => "exito", "mensaje" => "Proveedor habilitado correctamente"]);
 } else {

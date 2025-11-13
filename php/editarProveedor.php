@@ -38,7 +38,7 @@ if (mysqli_query($conn, $sql)) {
     }
     
     $descripcion = "Proveedor actualizado: $nombre - Tel: $telefono - Correo: $correo";
-    registrarEnBitacora('ACTUALIZAR', $descripcion, 'proveedor', $id, 'Proveedores');
+    registrarEnBitacora('EDITAR', $descripcion, 'proveedor', $id, 'Proveedores');
     
     echo json_encode(["status" => "exito", "mensaje" => "Proveedor actualizado correctamente."]);
 } else {

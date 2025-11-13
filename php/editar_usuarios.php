@@ -130,7 +130,7 @@ try {
             }
             
             registrarEnBitacora(
-                'UPDATE',
+                'EDITAR',
                 $descripcion,
                 'usuario',
                 $id,

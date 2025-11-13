@@ -194,7 +194,7 @@
     font-weight: 500;
 }
 
-.badge.CREAR { background: #d4edda; color: #155724; }
+.badge.CREAR { background: #ffffff; color: #155724; }
 .badge.EDITAR { background: #fff3cd; color: #856404; }
 .badge.ELIMINAR { background: #f8d7da; color: #721c24; }
 .badge.RESTAURAR { background: #cce7ff; color: #004085; }
@@ -382,4 +382,126 @@
     .detail-grid {
         grid-template-columns: 1fr;
     }
+}
+
+.logo-btn img {
+    width: 70px;
+    height: 40px;
+    object-fit: contain;
+}
+
+/* Header */
+header {
+    display: grid;
+    grid-template-columns: auto 1fr auto; /* 3 columnas: logo | título | botones */
+    align-items: center;
+    padding: 15px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.header-derecha {
+    display: flex;
+    align-items: center;
+    gap: 25px; /* Más espacio entre elementos */
+    justify-self: end;
+    margin-left: auto;
+}
+header > .logo-btn {
+    justify-self: start;
+}
+
+/* Columna central - Título (siempre centrado) */
+header > h1 {
+    justify-self: center;
+    text-align: center;
+    margin: 0;
+    grid-column: 2;
+}
+
+
+.usuario {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.info-usuario {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    margin-right: 10px;
+}
+
+.nombre-usuario {
+    font-weight: bold;
+    font-size: 16px;
+    color: black;
+    cursor: pointer;
+}
+
+.rol-usuario {
+    font-size: 13px;
+    color: #000000;
+    font-style: normal;
+    margin-top: 3px;
+    line-height: 1;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: bold;
+}
+
+.rol-administrador {
+    background-color: #667eea;
+    color: white;
+}
+
+.rol-empleado {
+    background-color: #48bb78;
+    color: white;
+}
+
+.user-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.user-btn img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+}
+
+/* Menú usuario */
+.menu-usuario {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 65px;
+    background: white;
+    border: 2px solid #0026ff;
+    border-radius: 8px;
+    padding: 10px;
+    min-width: 150px;
+    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+.menu-usuario a {
+    text-decoration: none;
+    color: #0026ff;
+    display: block;
+    padding: 5px 0;
+    font-weight: bold;
+}
+
+.menu-usuario.mostrar {
+    display: block;
 }

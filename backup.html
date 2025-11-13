@@ -13,33 +13,33 @@
 </head>
 
 <body>
-   <header>
-    <button class="logo-btn" onclick="irInicio()">
-        <img src="imgs/bicicleta.png" alt="Logo bicicleta">
-        <span class="hover-text">Inicio</span>
-    </button>
-    <h1>Taller de bicicletas Zelaya</h1>
-
-    <div class="header-derecha">
-        <button class="help-btn" onclick="mostrarAyuda('backup')" title="Ayuda del Sistema">
-            <i class="fas fa-question-circle"></i>
-            <span class="hover-text">Ayuda</span>
+    <header>
+        <button class="logo-btn" onclick="irInicio()">
+            <img src="imgs/bicicleta.png" alt="Logo bicicleta">
+            <span class="hover-text">Inicio</span>
         </button>
-        <div class="usuario">
-            <div class="info-usuario">
-                <span id="nombreUsuario" class="nombre-usuario">Usuario</span>
-                <span id="rolUsuario" class="rol-usuario"></span>
-            </div>
-            <button class="user-btn" onclick="toggleMenu()">
-                <img src="imgs/logo_user.png" alt="Usuario">
+        <h1>Taller de bicicletas Zelaya</h1>
+
+        <div class="header-derecha">
+            <button class="help-btn" onclick="mostrarAyuda('backup')" title="Ayuda del Sistema">
+                <i class="fas fa-question-circle"></i>
+                <span class="hover-text">Ayuda</span>
             </button>
-            <div id="menuUsuario" class="menu-usuario">
-                <a href="#" onclick="irPerfil()">Perfil</a>
-                <a href="#" onclick="cerrarSesion()">Cerrar sesión</a>
+            <div class="usuario">
+                <div class="info-usuario">
+                    <span id="nombreUsuario" class="nombre-usuario">Usuario</span>
+                    <span id="rolUsuario" class="rol-usuario"></span>
+                </div>
+                <button class="user-btn" onclick="toggleMenu()">
+                    <img src="imgs/logo_user.png" alt="Usuario">
+                </button>
+                <div id="menuUsuario" class="menu-usuario">
+                    <a href="#" onclick="irPerfil()">Perfil</a>
+                    <a href="#" onclick="cerrarSesion()">Cerrar sesión</a>
+                </div>
             </div>
         </div>
-    </div>
-</header>
+    </header>
 
     <div class="container">
         <!-- Verificación de permisos -->
@@ -58,7 +58,7 @@
             <div class="text-center flex-grow-1 mx-3">
                 <h1 class="mb-1"><i class="fas fa-database me-2"></i>Módulo de Backup</h1>
                 <p class="text-muted mb-0">Gestión de copias de seguridad</p>
-              
+
             </div>
 
             <!-- Espaciador derecho -->
@@ -175,8 +175,8 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover" >
-                            <thead class="table-custom-header" >
+                        <table class="table table-hover">
+                            <thead class="table-custom-header">
                                 <tr>
                                     <th>Nombre del Archivo</th>
                                     <th>Fecha</th>
@@ -369,42 +369,43 @@
     </div>
 
     <!-- Modal de Ayuda PDF -->
-<div id="modalAyuda" class="modal-ayuda">
-    <div class="modal-ayuda-contenido">
-        <div class="modal-header">
-            <h2><i class="fas fa-question-circle"></i> Ayuda del Sistema</h2>
-            <div class="modal-controls">
-                <button class="btn-descargar" onclick="descargarPDFActual()" title="Descargar Manual">
-                    <i class="fas fa-download"></i> Descargar
-                </button>
-                <button class="btn-cerrar" onclick="ocultarAyuda()" title="Cerrar Ayuda">
-                    <i class="fas fa-times"></i>
-                </button>
+    <div id="modalAyuda" class="modal-ayuda">
+        <div class="modal-ayuda-contenido">
+            <div class="modal-header">
+                <h2><i class="fas fa-question-circle"></i> Ayuda del Sistema</h2>
+                <div class="modal-controls">
+                    <button class="btn-descargar" onclick="descargarPDFActual()" title="Descargar Manual">
+                        <i class="fas fa-download"></i> Descargar
+                    </button>
+                    <button class="btn-cerrar" onclick="ocultarAyuda()" title="Cerrar Ayuda">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
-        </div>
-        <div class="modal-body">
-            <div class="pdf-container">
-                <object id="pdfObject" data="" type="application/pdf" width="100%" height="100%">
-                    <div class="pdf-fallback">
-                        <p>No se puede mostrar el PDF. <a href="#" onclick="descargarPDFActual()">Descarga el manual aquí</a>.</p>
-                    </div>
-                </object>
+            <div class="modal-body">
+                <div class="pdf-container">
+                    <object id="pdfObject" data="" type="application/pdf" width="100%" height="100%">
+                        <div class="pdf-fallback">
+                            <p>No se puede mostrar el PDF. <a href="#" onclick="descargarPDFActual()">Descarga el manual
+                                    aquí</a>.</p>
+                        </div>
+                    </object>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<script>
-// Cerrar modal con ESC y clic fuera
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') ocultarAyuda();
-});
+    <script>
+        // Cerrar modal con ESC y clic fuera
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') ocultarAyuda();
+        });
 
-document.getElementById('modalAyuda').addEventListener('click', function(event) {
-    if (event.target === this) ocultarAyuda();
-});
-</script>
-<!-- Incluir el sistema de ayuda -->
-<script src="js/ayuda-sistema.js"></script>
+        document.getElementById('modalAyuda').addEventListener('click', function (event) {
+            if (event.target === this) ocultarAyuda();
+        });
+    </script>
+    <!-- Incluir el sistema de ayuda -->
+    <script src="js/ayuda-sistema.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/backup.js"></script>
     <script>

@@ -47,7 +47,7 @@ if ($stmt->execute()) {
     
     // ✅ REGISTRAR EN BITÁCORA
     registrarEnBitacora(
-        'INSERT',
+        'CREAR',
         "Empresa creada: $nombre - Correo: $correo - Tel: $telefono",
         'empresa',
         $nuevo_id,
