@@ -91,7 +91,7 @@ if (mysqli_query($conn, $sql)) {
     }
     
     $descripcion = "Herramienta creada: $nombre - Stock: $stock";
-    registrarEnBitacora('INSERTAR', $descripcion, 'herramienta', $nuevo_id, 'Herramientas');
+    registrarEnBitacora('CREAR', $descripcion, 'herramienta', $nuevo_id, 'Herramientas');
     
     echo json_encode(["status" => "exito", "mensaje" => "Herramienta registrada correctamente."]);
 } else {

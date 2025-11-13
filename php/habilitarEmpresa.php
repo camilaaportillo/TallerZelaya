@@ -31,7 +31,7 @@ $stmt->bind_param("i", $id);
 if ($stmt->execute()) {
     // ✅ REGISTRAR EN BITÁCORA
     registrarEnBitacora(
-        'UPDATE',
+        'EDITAR',
         "Empresa habilitada: {$empresa_info['nombre']} - Correo: {$empresa_info['correo']} - Tel: {$empresa_info['telefono']}",
         'empresa',
         $id,

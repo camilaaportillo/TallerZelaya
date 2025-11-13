@@ -134,7 +134,7 @@ if (mysqli_query($conn, $sql)) {
     }
     
     $descripcion = "Herramienta actualizada: $nombre - Stock: $stock";
-    registrarEnBitacora('ACTUALIZAR', $descripcion, 'herramienta', $id_herramienta, 'Herramientas');
+    registrarEnBitacora('EDITAR', $descripcion, 'herramienta', $id_herramienta, 'Herramientas');
     
     echo json_encode(["status" => "exito", "mensaje" => "Herramienta actualizada correctamente."]);
 } else {

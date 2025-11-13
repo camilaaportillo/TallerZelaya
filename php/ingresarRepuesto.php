@@ -91,7 +91,7 @@ if (mysqli_query($conn, $sql)) {
     }
     
     $descripcion = "Repuesto creado: $codigo - $nombre - Stock mínimo: $stock";
-    registrarEnBitacora('INSERTAR', $descripcion, 'repuesto', $nuevo_id, 'Repuestos');
+    registrarEnBitacora('CREAR', $descripcion, 'repuesto', $nuevo_id, 'Repuestos');
     
     echo json_encode(["status" => "exito", "mensaje" => "Repuesto registrado correctamente."]);
 } else {

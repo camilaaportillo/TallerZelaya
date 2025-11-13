@@ -43,7 +43,7 @@ if ($stmt->execute()) {
     
     // ✅ REGISTRAR EN BITÁCORA
     registrarEnBitacora(
-        'INSERT',
+        'CREAR',
         "Marca creada: $nombre",
         'marca',
         $nuevo_id,

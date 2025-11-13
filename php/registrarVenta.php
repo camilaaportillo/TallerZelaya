@@ -192,7 +192,7 @@ function registrarEnBitacoraManual($data, $id_venta) {
         $descripcion = "Venta registrada #$id_venta - Total: $" . $data['total'];
         
         $sql = "INSERT INTO bitacora (id_usuario, nombre_usuario, accion, descripcion, tabla_afectada, ip_address, user_agent, modulo) 
-                VALUES (?, ?, 'INSERT', ?, 'venta', ?, ?, 'Ventas')";
+                VALUES (?, ?, 'CREAR', ?, 'venta', ?, ?, 'Ventas')";
         
         $stmt = $conn_bitacora->prepare($sql);
         if ($stmt) {

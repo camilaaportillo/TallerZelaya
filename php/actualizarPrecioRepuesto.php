@@ -109,7 +109,7 @@ try {
         
         // Llamar a la función de bitácora (usará las variables de sesión que acabamos de establecer)
         $resultado_bitacora = registrarEnBitacora(
-            'ACTUALIZAR', 
+            'EDITAR', 
             $descripcion, 
             'repuesto', 
             $id_repuesto, 

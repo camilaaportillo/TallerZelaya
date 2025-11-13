@@ -119,7 +119,7 @@ try {
     // ====== REGISTRAR EN BITÁCORA ======
     $descripcionCompra = "Compra registrada #{$idCompra} - Proveedor: {$nombreProveedor} - Total: $" . number_format($precioTotal, 2);
     registrarEnBitacora(
-        'INSERT',
+        'CREAR',
         $descripcionCompra,
         'compra',
         $idCompra,
@@ -143,7 +143,7 @@ try {
         $stmtNombreRep->close();
         
         registrarEnBitacora(
-            'UPDATE',
+            'EDITAR',
             "Stock actualizado: {$nombreRepuesto} +{$cantidad} unidades (Compra #{$idCompra})",
             'repuesto',
             $idRepuesto,

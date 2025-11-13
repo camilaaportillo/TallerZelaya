@@ -98,7 +98,7 @@ if ($stmt->execute()) {
     }
     
     registrarEnBitacora(
-        'UPDATE',
+        'EDITAR',
         $descripcion,
         'cliente',
         $id,
