@@ -16,7 +16,7 @@ const configAyuda = {
     },
     'clientes': {
         titulo: 'Ayuda - Gestión de Clientes',
-        archivo: 'ayuda_clientes.pdf',
+        archivo: 'ayudaregistro_datos.pdf',
         descripcion: 'Registro y gestión de clientes'
     },
     'compras': {
@@ -26,22 +26,22 @@ const configAyuda = {
     },
     'repuestos': {
         titulo: 'Ayuda - Gestión de Repuestos',
-        archivo: 'ayuda_repuestos.pdf',
+        archivo: 'ayudaregistro_datos.pdf',
         descripcion: 'Catálogo y control de repuestos'
     },
     'proveedor': {
         titulo: 'Ayuda - Proveedores',
-        archivo: 'ayuda_proveedores.pdf',
+        archivo: 'ayudaregistro_datos.pdf',
         descripcion: 'Administración de proveedores'
     },
     'marcas': {
         titulo: 'Ayuda - Gestión de Marcas',
-        archivo: 'ayuda_marcas.pdf',
+        archivo: 'ayudaregistro_datos.pdf',
         descripcion: 'Catálogo de marcas'
     },
     'medidas': {
         titulo: 'Ayuda - Unidades de Medida',
-        archivo: 'ayuda_medidas.pdf',
+        archivo: 'ayudaregistro_datos.pdf',
         descripcion: 'Configuración de unidades de medida'
     },
     'usuarios': {
@@ -51,17 +51,17 @@ const configAyuda = {
     },
     'empresas': {
         titulo: 'Ayuda - Configuración de Empresa',
-        archivo: 'ayuda_empresas.pdf',
+        archivo: 'ayudaregistro_datos.pdf',
         descripcion: 'Datos y configuración de la empresa'
     },
     'backup': {
         titulo: 'Ayuda - Copias de Seguridad',
-        archivo: 'ayuda_backup.pdf',
+        archivo: 'ayuda_backups.pdf',
         descripcion: 'Respaldo y recuperación de datos'
     },
     'perfil': {
         titulo: 'Ayuda - Perfil de usuario',
-        archivo: 'ayuda_backup.pdf',
+        archivo: 'ayuda_perfil.pdf',
         descripcion: 'Gestion de tus datos de usuario'
     }
 };
