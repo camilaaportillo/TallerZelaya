@@ -105,7 +105,13 @@ require_once 'conexion.php';
                                 <option value="">Todos los módulos</option>
                                 <option value="Usuarios">Usuarios</option>
                                 <option value="Clientes">Clientes</option>
-                                <option value="Bicicletas">Bicicletas</option>
+                                <option value="Repuestos">Repuestos</option>
+                                <option value="Herramientas">Herramientas</option>
+                                <option value="Marcas">Marcas</option>
+                                <option value="Medidas">Medidas</option>
+                                <option value="Proveedor">Proveedor</option>
+                                <option value="Ventas">Ventas</option>
+                                <option value="Compras">Compras</option>
                                 <option value="Reparaciones">Reparaciones</option>
                                 <option value="Inventario">Inventario</option>
                                 <option value="Backups">Backups</option>
