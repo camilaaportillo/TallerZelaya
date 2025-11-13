@@ -382,7 +382,7 @@ function restoreBackup() {
         $conn->query('SET FOREIGN_KEY_CHECKS=1');
         
         // Registrar en bitácora la acción de restauración
-        registrarAccionBackup('BACKUP', "Backup restaurado: $filename - Base de datos completa restaurada", $filename);
+        registrarAccionBackup('RESTAURAR', "Backup restaurado: $filename - Base de datos completa restaurada", $filename);
         
         echo json_encode(['success' => true, 'message' => 'Backup restaurado correctamente']);
         
